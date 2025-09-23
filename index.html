@@ -14,11 +14,10 @@
   --accent:#6ee7ff;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;margin:0}
 body{
-  margin:0;
   color:var(--ink);
-  background:radial-gradient(1400px 700px at 70% -10%, #13233c 0%, #0b1220 45%, #090f1a 100%);
+  background:#0b1220;
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
 }
 button,a.btn{
@@ -33,103 +32,48 @@ button,a.btn{
   align-items:center;
   justify-content:center;
 }
-.btn-accent{
-  background:linear-gradient(180deg,#1b9ab7,#168aa4);
-  color:#06131b;
-  border:1px solid #0a6c82;
-}
-.btn-ghost{
-  background:rgba(0,0,0,.35);
-  border:1px solid #2a3a57;
-  color:#cbd5e1;
-}
+.btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
+.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
 .btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
 
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
-
-/* 하단 오버레이 */
-header{
-  position:absolute;
-  inset:auto 0 0 0;
-  padding:10px 12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  background:linear-gradient(180deg,rgba(4,10,20,0),rgba(4,10,20,.75) 30%, rgba(4,10,20,.85));
-  backdrop-filter:blur(6px);
-  z-index:30;
-}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:40px;
-  height:40px;
-  border-radius:12px;
-  border:1px solid #22314d;
-  background:linear-gradient(140deg,#1b2a45,#0c1627);
-  display:grid;
-  place-items:center;
-}
-.logo svg{width:26px;height:26px}
-h1{margin:0;font-size:16px;letter-spacing:.2px}
-.sub{margin:0;font-size:12px;color:#94a3b8}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-select{
-  background:rgba(0,0,0,.35);
-  border:1px solid #2a3a57;
-  color:#dbe7f3;
-  border-radius:10px;
-  padding:8px 10px;
-  font-weight:700;
-}
-#names{
-  min-width:300px;
-  padding:10px;
-  border:1px solid #223047;
-  border-radius:10px;
-  background:rgba(0,0,0,.35);
-  color:#dbe7f3;
-  outline:none;
-}
-
-/* 스테이지 */
 .stage{position:absolute; inset:0;}
 .viewport{
   position:absolute;
-  left:50%;
-  top:50%;
+  left:50%;top:50%;
   transform:translate(-50%,-50%);
   transform-origin:center;
-  transition:transform 0.15s ease-out;
+  transition:transform .15s ease-out;
 }
-.canvas{width:1000px;height:600px;position:relative}
-.ovalSvg{width:100%;height:100%}
-
-/* 말 */
+.canvas{
+  width:1000px;
+  height:600px;
+  position:relative;
+}
+.ovalSvg{
+  position:absolute;
+  left:0;top:0;
+  width:1000px;
+  height:600px;
+}
 .horse{
   position:absolute;
   width:46px;
   height:34px;
   transform:translate(-50%,-50%);
-  will-change:transform;
 }
 .nameplate{
   position:absolute;
-  bottom:100%;
-  left:50%;
+  bottom:100%;left:50%;
   transform:translate(-50%,-8px);
   background:#09111e;
   color:#dbe7f3;
-  border:1px solid #2a3a57;
+  border:1px solid #2a3b57;
   border-radius:10px;
   font-size:11px;
   font-weight:800;
   padding:3px 8px;
-  pointer-events:none;
   white-space:nowrap;
-  max-width:150px;
-  text-overflow:ellipsis;
-  overflow:hidden;
 }
 .horse-svg{width:46px;height:34px}
 .horse-svg .body{fill:#e5e7eb}
@@ -140,111 +84,39 @@ select{
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
 .horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
 
-/* HUD */
 .hud{position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:20}
 .hud.show{display:flex}
-.traffic{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  background:#0b1220cc;
-  border:1px solid #334155;
-  padding:10px 14px;
-  border-radius:12px;
-  box-shadow:0 10px 40px rgba(0,0,0,.45);
-}
-.light{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:#111827;
-  border:1px solid #334155;
-  box-shadow:0 0 0 2px #09111e inset;
-}
-.light.on.red{background:#ef4444}
-.light.on.yellow{background:#f59e0b}
-.light.on.green{background:#22c55e}
-.countTxt{margin-left:6px;font-weight:900;letter-spacing:.3px}
+.traffic{display:flex;gap:10px;align-items:center;background:#0b1220cc;border:1px solid #334155;padding:10px 14px;border-radius:12px}
+.light{width:18px;height:18px;border-radius:50%;background:#111827;border:1px solid #334155}
+.light.on.red{background:#ef4444}.light.on.yellow{background:#f59e0b}.light.on.green{background:#22c55e}
+.countTxt{margin-left:6px;font-weight:900}
 .gun{margin-left:8px;font-size:12px;color:#93c5fd}
 
-/* 우승 배너 */
-.winner{
-  position:absolute;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  display:none;
-  padding:12px 16px;
-  border-radius:12px;
-  background:linear-gradient(180deg,#0e1e33,#0a1626);
-  border:1px solid #213250;
-  z-index:15;
-}
+.winner{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:none;padding:12px 16px;border-radius:12px;background:#0e1e33;border:1px solid #213250;z-index:15}
 .winner strong{color:#9ae6b4}
 
-/* 순위판 */
-.ranking{
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:220px;
-  background:rgba(8,18,34,.78);
-  border:1px solid #2a3b54;
-  border-radius:10px;
-  padding:8px;
-  z-index:25;
-  backdrop-filter: blur(4px);
-  font-size:13px;
-  line-height:1.5;
-}
-.ranking h3{margin:2px 0 6px; font-size:13px; color:#93c5fd}
-.ranking .row{display:flex; justify-content:space-between; padding:2px 6px; border-radius:6px}
+.ranking{position:absolute;top:12px;right:12px;width:220px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
+.ranking h3{margin:2px 0 6px;font-size:13px;color:#93c5fd}
+.ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
-.ranking .pos{font-weight:900; color:#6ee7ff}
+.ranking .pos{font-weight:900;color:#6ee7ff}
 
-/* 중계석 */
-.booth{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:200px;
-  z-index:12;
-}
-.booth svg{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
-.commentary{
-  position:absolute;
-  left:50%;
-  top:calc(50% - 80px);
-  transform:translateX(-50%);
-  background:rgba(10,18,28,.92);
-  border:1px solid #27405e;
-  padding:6px 9px;
-  border-radius:10px;
-  font-weight:800;
-  letter-spacing:.2px;
-  z-index:22;
-}
+.booth{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:200px;z-index:12}
+.commentary{position:absolute;left:50%;top:calc(50% - 80px);transform:translateX(-50%);background:rgba(10,18,28,.92);border:1px solid #27405e;padding:6px 9px;border-radius:10px;font-weight:800;z-index:22}
 
-/* 당근비 */
 @keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999}
 
-/* 모달 */
+header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,.5);z-index:30}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#names{min-width:300px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
 .modal a{color:#ffffff;text-decoration:underline}
-.panel{
-  background:linear-gradient(180deg,var(--panel),#0c1322 70%);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
-  box-shadow:0 8px 30px rgba(0,0,0,.35);
-}
+.panel{background:#0f172a;border:1px solid var(--border);border-radius:14px;padding:14px}
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <!-- HUD -->
   <div class="hud" id="hud">
     <div class="traffic">
@@ -260,11 +132,11 @@ select{
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
       <div class="canvas" id="canvas">
-        <svg class="ovalSvg" id="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+        <svg class="ovalSvg" viewBox="0 0 1000 600">
           <!-- 트랙 -->
           <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
           <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-          <ellipse id="runLine" cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
+          <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
           <!-- 출발 / 도착 -->
           <line x1="500" y1="80" x2="500" y2="120" stroke="#22d3ee" stroke-width="4"/>
           <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">START</text>
@@ -276,13 +148,9 @@ select{
     </div>
 
     <!-- 중계석 -->
-    <div class="booth" aria-hidden="true">
+    <div class="booth">
       <svg viewBox="0 0 600 220">
-        <rect x="40" y="110" width="520" height="70" rx="10" fill="#0f2033" stroke="#26435f"/>
-        <rect x="60" y="80" width="120" height="60" rx="12" fill="#10253c"/>
-        <rect x="420" y="80" width="120" height="60" rx="12" fill="#10253c"/>
-        <circle cx="120" cy="75" r="18" fill="#9ca3af"/>
-        <circle cx="480" cy="75" r="18" fill="#9ca3af"/>
+        <rect x="40" y="110" width="520" height="70" rx="10" fill="#0f2033"/>
       </svg>
     </div>
 
@@ -303,17 +171,6 @@ select{
 
   <!-- 하단 UI -->
   <header>
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <rect x="10" y="22" width="44" height="20" rx="6" fill="#e8c87a"/>
-        </svg>
-      </div>
-      <div>
-        <h1>Lucky Horse Race — Oval</h1>
-        <p class="sub">자유롭게 사용하시고 피드백 부탁드립니다.</p>
-      </div>
-    </div>
     <div class="controls">
       <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
       <select id="raceLen">
@@ -325,10 +182,10 @@ select{
         <option value="20">20바퀴</option>
       </select>
       <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
-      <button class="btn-accent" id="startBtn">Start Race ▶</button>
+      <button class="btn-accent" id="startBtn">Start ▶</button>
       <button class="btn-ghost" id="resetBtn">Reset</button>
       <button class="btn-ghost" id="camToggleBtn">카메라: 고정</button>
-      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener" class="btn-accent btn" id="btnDonate">🥕 개발자에게 당근 보내주기</a>
+      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
       <button class="btn-ghost" id="btnContact">문의</button>
     </div>
   </header>
@@ -337,42 +194,44 @@ select{
 <!-- 문의 모달 -->
 <div class="modal" id="modal">
   <div class="panel" style="max-width:380px;margin:8% auto">
-    <h3 style="margin:0 0 12px">문의 · 제안 · 건의</h3>
-    <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px;">
-      <strong>Email:</strong>
-      <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
+    <h3>문의 · 제안 · 건의</h3>
+    <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px">
+      <strong>Email:</strong> <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
     </div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
-      <button class="btn-ghost" onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 주소 복사</button>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn-ghost" onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 복사</button>
       <button class="btn-accent" onclick="document.getElementById('modal').style.display='none'">닫기</button>
     </div>
   </div>
 </div>
 <script>
-/* ====== 랜덤 & 도우미 ====== */
+/* ===== Utils ===== */
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 let _rand=Math.random;
 function reseed(seed){_rand=mulberry32(seed|0)}
 function autoSeed(){return(Date.now()^Math.floor(Math.random()*0xFFFFFFFF))>>>0}
-
 const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e','#6ee7ff'];
 function jc(i){return JERSEYS[i%JERSEYS.length]}
-
-/* 참가자 이름 파싱 */
 function splitNames(raw){
-  return raw.split(/[/\s]+/).map(s=>s.trim()).filter(Boolean).flatMap(s=>{
-    let m=s.match(/(.+)\*(\d+)/);
-    if(m){return Array.from({length:Math.min(50,parseInt(m[2]))},()=>m[1])}
-    return s;
-  }).slice(0,50).map((n,i)=>({name:n,no:i+1}))
+  return raw.split(/[/\s]+/)
+            .map(s=>s.trim())
+            .filter(Boolean)
+            .flatMap(s=>{
+              let m=s.match(/(.+)\*(\d+)/);
+              if(m){
+                return Array.from({length:Math.min(50,parseInt(m[2]))},()=>m[1])
+              }
+              return s;
+            })
+            .slice(0,50)
+            .map((n,i)=>({name:n,no:i+1}));
 }
 
-/* ====== 요소 ====== */
+/* ===== DOM ===== */
 const $names=document.getElementById('names'),
       $raceLen=document.getElementById('raceLen'),
       $start=document.getElementById('startBtn'),
       $reset=document.getElementById('resetBtn'),
-      $gate=document.getElementById('gate'),
       $hud=document.getElementById('hud'),
       $ltR=document.getElementById('ltR'),
       $ltY=document.getElementById('ltY'),
@@ -382,69 +241,69 @@ const $names=document.getElementById('names'),
       $winnerBox=document.getElementById('winnerBox'),
       $winnerName=document.getElementById('winnerName'),
       $rankingLines=document.getElementById('rankingLines'),
-      $commentary=document.getElementById('commentaryBox'),
       $viewport=document.getElementById('viewport'),
       $camToggle=document.getElementById('camToggleBtn');
+document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
 
-document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block'
-
-/* ====== 상태 ====== */
+/* ===== State ===== */
 const MIN=2,MAX=50;
-let H=[],running=false,raf=null,startTs=0,laps=5,cameraMode="fixed";
+let H=[],running=false,raf=null,laps=5,cameraMode="fixed";
 
-/* ====== 말 SVG ====== */
-function horseSVG(color='#60a5fa'){return `
-<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--jersey:${color}">
-  <g class="g-bob">
-    <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
-    <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
-    <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
-    <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
-    <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
-  </g>
-</svg>`}
-
-/* ====== 말 관리 ====== */
-function clearHorses(){document.querySelectorAll('.horse').forEach(n=>n.remove());H.length=0}
+/* ===== Horses ===== */
+function horseSVG(color='#60a5fa'){
+  return `<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
+    <g class="g-bob">
+      <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
+      <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
+      <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
+      <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
+      <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
+    </g>
+  </svg>`;
+}
+function clearHorses(){
+  document.querySelectorAll('.horse').forEach(n=>n.remove());
+  H.length=0;
+}
 function buildHorses(list){
   clearHorses();
   list.forEach((ent,i)=>{
     const h=document.createElement('div');
-    h.className='horse';h.innerHTML=horseSVG(jc(i));
+    h.className='horse';
+    h.innerHTML=horseSVG(jc(i));
     const plate=document.createElement('div');
     plate.className='nameplate';
     plate.textContent=`${ent.no}번 ${ent.name}`;
     h.appendChild(plate);
-    document.getElementById('stage').appendChild(h);
+    document.getElementById('canvas').appendChild(h);
     H.push({name:ent.name,no:ent.no,$el:h,theta:-Math.PI/2+i*0.03,v:0,done:false});
   });
   updateRanking();
   H.forEach(placeHorse);
 }
-
-/* ====== 위치 & 카메라 ====== */
 function placeHorse(h){
-  const cx=500,cy=300,rxRun=390,ryRun=190;
+  const cx=500,cy=300,rx=390,ry=190;
   const t=h.theta;
-  const x=cx+rxRun*Math.cos(t);
-  const y=cy+ryRun*Math.sin(t);
+  const x=cx+rx*Math.cos(t);
+  const y=cy+ry*Math.sin(t);
   h.$el.style.left=x+"px";
   h.$el.style.top=y+"px";
-  const dx=-rxRun*Math.sin(t),dy=ryRun*Math.cos(t);
+  const dx=-rx*Math.sin(t),dy=ry*Math.cos(t);
   const ang=Math.atan2(dy,dx)*180/Math.PI;
   h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
 }
+
+/* ===== Ranking & Camera ===== */
 function orderByLead(){return H.slice().sort((a,b)=>b.theta-a.theta)}
 function updateCamera(){
   if(cameraMode==="leader"&&H.length){
-    const leader=orderByLead()[0];
-    if(!leader)return;
-    const cx=500,cy=300,rxRun=390,ryRun=190;
+    const leader=orderByLead()[0]; if(!leader) return;
+    const cx=500,cy=300,rx=390,ry=190;
     const t=leader.theta;
-    const x=cx+rxRun*Math.cos(t);
-    const y=cy+ryRun*Math.sin(t);
-    $viewport.style.transform=`translate(calc(50% - ${x}px),calc(50% - ${y}px)) scale(1.5)`;
-  }else{
+    const x=cx+rx*Math.cos(t);
+    const y=cy+ry*Math.sin(t);
+    $viewport.style.transform=`translate(calc(50% - ${x}px), calc(50% - ${y}px)) scale(1.5)`;
+  } else {
     $viewport.style.transform="translate(-50%,-50%) scale(1)";
   }
 }
@@ -452,8 +311,6 @@ $camToggle.onclick=()=>{
   cameraMode=cameraMode==="fixed"?"leader":"fixed";
   $camToggle.textContent=cameraMode==="fixed"?"카메라: 고정":"카메라: 1등 추적";
 }
-
-/* ====== 순위판 ====== */
 function updateRanking(){
   const order=orderByLead();
   $rankingLines.innerHTML=order.map((h,i)=>
@@ -461,80 +318,81 @@ function updateRanking(){
   ).join('');
 }
 
-/* ====== 경기 ====== */
+/* ===== Countdown ===== */
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 async function countdown(){
   $hud.classList.add('show');
-  $ltR.className='light on red';$countTxt.textContent='3';
+  $ltR.className='light on red'; $countTxt.textContent='3';
   await wait(700);
-  $ltY.className='light on yellow';$countTxt.textContent='2';
+  $ltY.className='light on yellow'; $countTxt.textContent='2';
   await wait(700);
-  $ltG.className='light on green';$countTxt.textContent='1';
+  $ltG.className='light on green'; $countTxt.textContent='1';
   await wait(600);
-  $countTxt.textContent='START!';$gunTxt.textContent='탕!';
+  $countTxt.textContent='START!'; $gunTxt.textContent='탕!';
   await wait(300);
   $hud.classList.remove('show');
 }
+
+/* ===== Race Loop ===== */
 function run(){
   running=true;
   const tick=()=>{
-    for(const h of H){
-      if(h.done)continue;
-      h.v=0.003;
-      h.theta+=h.v*16;
-      if(h.theta>=(-Math.PI/2)+laps*2*Math.PI){h.done=true}
-    }
-    H.forEach(placeHorse);
+    H.forEach(h=>{
+      if(h.done) return;
+      h.theta+=0.005;
+      placeHorse(h);
+      if(h.theta>=(-Math.PI/2)+laps*2*Math.PI) h.done=true;
+    });
     updateRanking();
     updateCamera();
     if(H.every(h=>h.done)){
-      running=false;cancelAnimationFrame(raf);
+      running=false;
       const win=orderByLead()[0];
       $winnerName.textContent=`${win.no}번 ${win.name}`;
       $winnerBox.style.display='block';
-      // 당근비
-      for(let i=0;i<30;i++){
-        let c=document.createElement('div');
-        c.className='carrot';c.textContent="🥕";
-        c.style.left=Math.random()*100+'vw';
-        c.style.animationDuration=(2+Math.random()*2)+'s';
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(),4000);
-      }
-      return;
+      for(let i=0;i<20;i++) dropCarrot();
+    } else {
+      raf=requestAnimationFrame(tick);
     }
-    raf=requestAnimationFrame(tick);
   };
   raf=requestAnimationFrame(tick);
 }
-
-/* ====== 버튼 ====== */
-document.getElementById('shuffleBtn').onclick=()=>{
-  $names.value=$names.value.split(/[/\s]+/).sort(()=>Math.random()-0.5).join(' ');
-  const list=splitNames($names.value);if(list.length>0)buildHorses(list);
+function dropCarrot(){
+  const c=document.createElement('div');
+  c.className='carrot';
+  c.textContent='🥕';
+  c.style.left=Math.random()*100+"vw";
+  c.style.animationDuration=(2+Math.random()*2)+"s";
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),4000);
 }
-$names.addEventListener("input",()=>{
-  const list=splitNames($names.value);
-  if(list.length>0)buildHorses(list);else clearHorses();
-})
+
+/* ===== Controls ===== */
 $start.onclick=async()=>{
-  if(running)return;
+  if(running) return;
   const list=splitNames($names.value);
-  if(list.length<MIN){alert('최소 2명을 입력해주세요');return}
-  if(list.length>MAX){alert('최대 50명까지만 가능합니다');return}
+  if(list.length<MIN){alert('최소 2명 입력');return}
+  if(list.length>MAX){alert('최대 50명까지 가능');return}
   laps=parseInt($raceLen.value,10)||5;
   reseed(autoSeed());
-  $winnerBox.style.display='none';
   clearHorses();
   buildHorses(list);
   await countdown();
   run();
 }
 $reset.onclick=()=>{
-  $names.value='';
+  cancelAnimationFrame(raf);raf=null;running=false;
   clearHorses();
   $winnerBox.style.display='none';
-  updateRanking();
+}
+document.getElementById('shuffleBtn').onclick=()=>{
+  const list=splitNames($names.value);
+  for(let i=list.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [list[i],list[j]]=[list[j],list[i]];
+  }
+  $names.value=list.map(x=>x.name).join(' ');
+  buildHorses(list);
 }
 </script>
 </body>
