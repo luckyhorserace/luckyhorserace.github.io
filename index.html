@@ -3,226 +3,182 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Lucky Horse Race</title>
+<title>Mini Horse Race</title>
 <style>
 :root{
-  --track-h:64px; --lane-gap:10px;
-  --bg:#0b1220; --panel:#111827; --ink:#e5e7eb; --muted:#9ca3af; --border:#1f2937; --accent:#2563eb;
+  --bg:#0b1220; --bg2:#0c111b; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8;
+  --accent:#6ee7ff; --accent2:#22c55e; --border:#1f2937;
+  --track-h:58px; --lane-gap:10px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,#0b1220,#0c111b 30%,#0b1220);color:var(--ink);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  background:radial-gradient(1200px 600px at 70% -10%, #12213a 0%, #0b1220 45%, #090f1a 100%);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+}
 a{color:inherit;text-decoration:none}
-header{padding:18px 16px 8px;text-align:center}
-header h1{margin:0 0 6px;font-size:22px}
-header p{margin:0;color:var(--muted);font-size:14px}
-.wrap{max-width:1180px;margin:0 auto;padding:12px 16px;display:block}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
-button,.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
-.btn{background:#243b55;color:#fff}.btn:hover{filter:brightness(1.08)}
-.btn-accent{background:var(--accent)} .btn-ghost{background:transparent;border:1px solid #334155;color:#cbd5e1}
-.small{color:#9ca3af;font-size:12px}
-.legal{margin:20px 0 10px;text-align:center;font-size:12px;color:#6b7280}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-badge{
+  width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#1b2a45,#0c1627);
+  border:1px solid #22314d; display:grid; place-items:center; color:#6ee7ff; font-weight:900
+}
+h1{margin:0;font-size:20px;letter-spacing:.2px}
+.sub{margin:2px 0 0;color:var(--muted);font-size:12px}
 
-/* ===== Track container ===== */
-.track{position:relative;border:1px solid var(--border);border-radius:12px;padding:16px;height:auto;background:linear-gradient(180deg,#0f172a,#0c111b)}
-/* 직선 모드: 스크롤 */
-.scroll{position:relative;height:100%;min-width:calc(var(--finishX,1400px) + 220px); overflow:auto}
-.finish{position:absolute;top:12px;bottom:12px;width:18px;left:var(--finishX,1400px);
-  background:conic-gradient(#fff 25%,#000 0 50%,#fff 0 75%,#000 0) 0/10px 10px;border:1px solid #000;
-  box-shadow:0 0 0 2px #111827 inset;border-radius:4px}
-/* 레인/말 */
-.lane{position:relative;height:var(--track-h);margin-bottom:var(--lane-gap);
-  background:linear-gradient(180deg,#0f172a,#0c111b);border:1px solid #1f2937;border-radius:12px;overflow:hidden}
+.panel{
+  background:linear-gradient(180deg,var(--panel),#0c1322 70%);
+  border:1px solid var(--border); border-radius:14px; padding:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,.35);
+}
+
+/* --- Controls (마블룰렛 감성: 단순/정돈) --- */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.card{flex:1 1 360px;display:flex;flex-direction:column;gap:10px}
+label.small{font-size:12px;color:var(--muted)}
+textarea{
+  width:100%;min-height:120px;resize:vertical;background:#0b1220;border:1px solid #223047;
+  color:var(--ink);border-radius:12px;padding:12px;outline:none
+}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+button{
+  border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px
+}
+.btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
+.btn-ghost{background:transparent;border:1px solid #2a3a57;color:#cbd5e1}
+.btn-accent:hover{filter:brightness(1.06)} .btn-ghost:hover{filter:brightness(1.1)}
+.hint{font-size:12px;color:var(--muted)}
+
+/* --- Track --- */
+.trackBox{margin-top:14px}
+.track{
+  position:relative; border:1px solid var(--border); border-radius:14px; padding:14px;
+  background:linear-gradient(180deg,#0d1728,#0c111b);
+  overflow:auto; min-height:260px
+}
+.scroll{position:relative; min-width:1200px}
+.finish{
+  position:absolute; top:10px; bottom:10px; left:var(--fx,1050px); width:16px; border-radius:6px;
+  background:conic-gradient(#fff 25%,#0000 0 50%,#fff 0 75%,#0000 0) 0/10px 10px, rgba(255,255,255,.06);
+  border:1px solid #000; box-shadow:0 0 0 2px #0d1422 inset, 0 0 18px rgba(255,255,255,.08)
+}
+.lane{position:relative;height:var(--track-h);margin-bottom:var(--lane-gap);border-radius:12px;
+  background:linear-gradient(180deg,#0f1b30,#0e1525); border:1px solid #1c2741; overflow:hidden}
 .lane:last-child{margin-bottom:0}
-.label{position:absolute;left:10px;top:50%;transform:translateY(-50%);
-  background:#111827;border:1px solid #1f2937;border-radius:8px;padding:4px 8px;font-size:13px;color:#e5e7eb;z-index:2;max-width:55%;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
-.horse{position:absolute;left:0;top:10px;height:calc(var(--track-h) - 20px);display:flex;align-items:center;justify-content:center;user-select:none}
-.nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-6px);
-  background:#0b1220;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:3px 8px;font-size:12px;font-weight:700;white-space:nowrap;max-width:140px;text-overflow:ellipsis;overflow:hidden;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.jersey-badge{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#0b1220;color:#e5e7eb;border:1px solid #334155;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
-/* 자동 축소 */
-.compact-9  .horse-svg{transform:scale(.95)} .compact-11 .horse-svg{transform:scale(.9)}
-.compact-13 .horse-svg{transform:scale(.86)} .compact-14 .horse-svg{transform:scale(.82)}
-.compact-9  {--track-h:60px} .compact-11{--track-h:56px} .compact-13{--track-h:52px} .compact-14{--track-h:48px}
+.label{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  background:#0b1220;border:1px solid #233250;border-radius:10px;color:#d7e0ea;
+  padding:4px 8px;font-size:12px;max-width:48%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden
+}
+.horse{position:absolute; left:0; top:8px; height:calc(var(--track-h) - 16px); display:flex; align-items:center}
+.nameplate{
+  position:absolute; bottom:100%; left:50%; transform:translate(-50%,-6px);
+  background:#09111e; color:#dbe7f3; border:1px solid #2a3a57; border-radius:10px;
+  font-size:11px; font-weight:800; padding:3px 8px; pointer-events:none; white-space:nowrap; max-width:140px; text-overflow:ellipsis; overflow:hidden
+}
 
-/* ===== 타원형 모드 ===== */
-.ovalWrap{position:relative; width:100%; height:520px; display:none}
-.oval{position:absolute; inset:0}
-.oval svg{width:100%; height:100%; display:block}
-.oval .horse2{position:absolute; width:44px; height:32px; transform:translate(-50%,-50%); will-change:transform}
-.oval .nameplate{transform:translate(-50%,-12px)}
-.startFlag{position:absolute; width:6px; height:36px; background:#fff; border:1px solid #000; left:50%; top:50%; transform:translate(-50%,-50%);}
+/* --- Winner banner --- */
+.winner{
+  margin-top:10px; display:none; padding:12px; border-radius:12px;
+  background:linear-gradient(180deg,#0e1e33,#0a1626); border:1px solid #213250;
+}
+.winner strong{color:#9ae6b4}
+.timer{color:#a0aec0;font-size:12px}
 
-/* ===== Horse SVG (original) ===== */
-.horse-svg{width:44px;height:32px}
-@keyframes legA{0%,100%{transform:translateY(0) skewX(0deg)}50%{transform:translateY(-2px) skewX(-4deg)}}
-@keyframes legB{0%,100%{transform:translateY(0) skewX(0deg)}50%{transform:translateY( 2px) skewX( 4deg)}}
-@keyframes bob {0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
-.horse-svg .g-bob{animation:bob .28s infinite ease-in-out}
-.horse-svg .g-legs-a{animation:legA .26s infinite ease-in-out}
-.horse-svg .g-legs-b{animation:legB .26s infinite ease-in-out}
-.horse-svg .body{fill:#e5e7eb}.horse-svg .mane{fill:#cbd5e1}.horse-svg .jockey{fill:var(--jersey,#f59e0b)}.horse-svg .saddle{fill:#94a3b8}.horse-svg .eye{fill:#0f172a}
+/* --- SVG horse: 내가 직접 만든 저작권 프리 --- */
+.horse-svg{width:46px;height:34px}
+.horse-svg .body{fill:#e5e7eb}
+.horse-svg .mane{fill:#cbd5e1}
+.horse-svg .jockey{fill:var(--jersey,#60a5fa)}
+.horse-svg .saddle{fill:#94a3b8}
+.horse-svg .eye{fill:#0f172a}
 
-/* 효과 말풍선(내장 아이콘) */
-.fx-pop{position:absolute;top:-22px;left:50%;transform:translate(-50%,-100%);background:#111827;color:#e5e7eb;font-size:11px;padding:3px 6px;border:1px solid #334155;border-radius:6px;opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease;white-space:nowrap;display:flex;gap:6px;align-items:center}
-.fx-pop.show{opacity:1;transform:translate(-50%,-130%)}
-.fx-pop svg{width:12px;height:12px;display:block}
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-1.2px)} }
+/* 앞다리/뒷다리 번갈아 달리기 */
+@keyframes legA{ 0%,100%{transform:translateY(0) skewX(0deg)} 50%{transform:translateY(-2px) skewX(-5deg)} }
+@keyframes legB{ 0%,100%{transform:translateY(0) skewX(0deg)} 50%{transform:translateY( 2px) skewX( 5deg)} }
 
-/* ===== Controls under the track ===== */
-.controls{margin-top:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px}
-.ctrl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-textarea#names{width:100%;min-height:110px}
-.badge-ok{color:#22c55e;font-weight:800}.badge-warn{color:#f59e0b;font-weight:800}.badge-no{color:#ef4444;font-weight:800}
+.horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
+.horse-svg .g-legs-a{animation:legA .22s infinite ease-in-out}
+.horse-svg .g-legs-b{animation:legB .22s infinite ease-in-out}
 
-/* ===== Modal (문의) ===== */
-.btn-contact{padding:10px 16px;border-radius:10px;background:#1e293b;color:#e5e7eb;font-weight:600;border:0;cursor:pointer}
-.btn-contact:hover{filter:brightness(1.12)}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
-.modal-content{background:#0b1220;color:#e5e7eb;max-width:360px;margin:10% auto;padding:20px;border:1px solid #334155;border-radius:12px;text-align:center}
-.contact-box{margin:12px 0;padding:10px;border:1px dashed #334155;border-radius:10px}
-.btn-row{display:flex;gap:8px;justify-content:center;margin-top:8px}
-.btn-close{margin-top:10px;padding:8px 12px;border-radius:8px;background:#111827;color:#e5e7eb;border:1px solid #334155;cursor:pointer}
-.modal.show{display:block}
+/* auto-compact */
+.scroll.compact-9  .horse-svg{transform:scale(.96)}
+.scroll.compact-11 .horse-svg{transform:scale(.9)}
+.scroll.compact-13 .horse-svg{transform:scale(.84)}
+.scroll.compact-14 .horse-svg{transform:scale(.8)}
+.scroll.compact-9  {--track-h:54px}
+.scroll.compact-11 {--track-h:52px}
+.scroll.compact-13 {--track-h:50px}
+.scroll.compact-14 {--track-h:46px}
 </style>
 </head>
 <body>
-<header>
-  <h1>Lucky Horse Race</h1>
-  <p>단일 맵 · 아래쪽 간단 UI · 가중치 없이 이름만 입력 · 직선/타원형 트랙</p>
-</header>
-
 <div class="wrap">
-  <!-- TRACK -->
-  <section class="panel">
-    <h2 style="margin:0 0 10px">트랙</h2>
-
-    <!-- 직선 모드 -->
-    <div class="track" id="trackLinear" style="display:block">
-      <div class="scroll" id="scroll">
-        <div class="finish" id="finish"></div>
+  <header>
+    <div class="brand">
+      <div class="brand-badge">HR</div>
+      <div>
+        <h1>Mini Horse Race</h1>
+        <p class="sub">마블룰렛처럼 심플 · 외부이미지 ❌ · SVG 말/기수 직접제작 ✅</p>
       </div>
     </div>
+    <div class="hint">참가자 2~14명</div>
+  </header>
 
-    <!-- 타원형 모드 -->
-    <div class="track ovalWrap" id="trackOval" style="display:none">
-      <div class="oval" id="oval">
-        <!-- SVG 트랙 -->
-        <svg id="ovalSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-          <!-- 잔디 -->
-          <rect x="0" y="0" width="1000" height="600" fill="#0c111b"/>
-          <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#243447" stroke-width="2"/>
-          <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-          <!-- 레일 라인 -->
-          <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#334155" stroke-dasharray="6,6"/>
-        </svg>
-        <!-- 스타트 깃발(0도 방향) -->
-        <div class="startFlag" id="ovalFlag"></div>
-      </div>
-    </div>
-
-    <div class="panel" id="winnerBox" style="display:none;margin-top:10px">
-      <div class="small" id="timeBox"></div>
-      <p><strong>우승:</strong> <span id="winnerName"></span></p>
-    </div>
-  </section>
-
-  <!-- CONTROLS -->
-  <section class="controls">
-    <div class="ctrl-row">
-      <strong>참가자</strong>
-      <span id="pHint" class="small" style="margin-left:auto">참가자 0명</span>
-    </div>
-    <textarea id="names" placeholder="예)
+  <section class="panel controls">
+    <div class="card">
+      <label class="small">참가자 이름 (줄바꿈으로 구분)</label>
+      <textarea id="names" placeholder="예)
 도라에몽
 노진구
 루피
 나미
-우솝
-손오공
-베지터
-나루토
-사스케
-이누야샤
-코난
-하이바라
-미키
-도널드"></textarea>
-
-    <div class="ctrl-row" style="margin-top:8px">
-      <label><input type="radio" name="mode" value="normal" id="modeNormal" checked> 일반(2~14명)</label>
-      <label><input type="radio" name="mode" value="tournament" id="modeTournament"> 토너먼트(15명+)</label>
-      <label>우승자 <select id="topKSelect"><option>1</option><option>2</option><option>3</option></select> 명</label>
-      <label style="margin-left:auto">트랙 타입
-        <select id="trackType">
-          <option value="linear" selected>직선</option>
-          <option value="oval">타원형</option>
-        </select>
-      </label>
+우솝"></textarea>
+      <div class="btnrow">
+        <button class="btn-accent" id="startBtn">Start Race ▶</button>
+        <button class="btn-ghost" id="buildBtn">트랙 새로고침</button>
+        <button class="btn-ghost" id="resetBtn">Reset</button>
+      </div>
+      <div class="hint" id="pHint">참가자 0명</div>
     </div>
+  </section>
 
-    <div class="ctrl-row" style="margin-top:8px">
-      <button class="btn btn-accent" id="startBtn">Start Race ▶</button>
-      <button class="btn" id="buildBtn">트랙 새로고침</button>
-      <button class="btn" id="resetBtn">Reset</button>
-      <button class="btn-ghost" id="shareBtn">공유 링크 복사</button>
-      <button class="btn-ghost" id="dlLogBtn" disabled>로그 다운로드</button>
-      <label class="btn-ghost" style="cursor:pointer">로그 불러오기<input id="loadLogInput" type="file" accept="application/json" style="display:none"></label>
-      <button class="btn-contact" onclick="openContact()">문의</button>
-      <a class="btn-ghost" href="https://www.buymeacoffee.com/YOUR_ID" target="_blank" rel="noopener">개발자에게 말밥 보내주기</a>
+  <section class="trackBox panel">
+    <div class="track">
+      <div class="scroll" id="scroll">
+        <div class="finish" id="finish"></div>
+      </div>
+    </div>
+    <div class="winner" id="winnerBox">
+      <div class="timer" id="timeBox"></div>
+      <div><strong>우승:</strong> <span id="winnerName"></span></div>
     </div>
   </section>
 </div>
 
-<footer class="legal">
-  <small>© 2025 luckyhorserace — Original SVG/JS/CSS only. No third-party assets or emoji glyphs. For entertainment purposes.</small>
-</footer>
-
-<!-- ===== Modal ===== -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h3 style="margin:0 0 6px">문의</h3>
-    <div class="contact-box small">
-      버그/개선 제안은 깃허브 이슈나 이메일로 남겨주세요.<br>
-      <strong>Email:</strong> dev@example.com
-    </div>
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="navigator.clipboard.writeText('dev@example.com')">메일 복사</button>
-      <button class="btn-ghost" onclick="window.open('https://github.com/your/repo','_blank')">GitHub 열기</button>
-    </div>
-    <button class="btn-close" onclick="closeContact()">닫기</button>
-  </div>
-</div>
-
-<!-- ===== SCRIPTS ===== -->
 <script>
-/* ---------- PRNG ---------- */
+/* ======= Utils & PRNG ======= */
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 let _rand=Math.random;
 function reseed(seed){ _rand = Number.isFinite(seed)? mulberry32(seed|0) : Math.random; }
 function autoSeed(){ return (Date.now() ^ Math.floor(Math.random()*0xFFFFFFFF))>>>0; }
 
-/* ---------- Utils ---------- */
-function parseInput(raw){
-  return raw.split(/\n+/).map(s=>s.trim()).filter(Boolean).map(name=>({name, weight:1}));
-}
-function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(_rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e'];
+function jerseyColor(i){ return JERSEYS[i%JERSEYS.length]; }
+function parseInput(raw){ return raw.split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,14).map(n=>({name:n})); }
 function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
-function lerp(a,b,t){ return a + (b-a)*t; }
-function fxIcon(horseEl, key, label){
-  const svg = key==='bolt'
-    ? '<svg viewBox="0 0 24 24"><path fill="#f59e0b" d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>'
-    : '<svg viewBox="0 0 24 24"><path fill="#60a5fa" d="M4 10h10a3 3 0 100-6 1 1 0 100 2 1 1 0 110 2H4v2zm0 4h14a3 3 0 110 6 1 1 0 110-2 1 1 0 100-2H4v-2z"/></svg>';
-  const fx=document.createElement('div'); fx.className='fx-pop'; fx.innerHTML=svg+'<span>'+label+'</span>';
-  horseEl.appendChild(fx); requestAnimationFrame(()=>fx.classList.add('show')); setTimeout(()=>fx.remove(),900);
-}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(_rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a; }
 
-/* ---------- Horse SVG ---------- */
-const JERSEYS=['#f59e0b','#22c55e','#3b82f6','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#60a5fa','#34d399','#f97316','#a3e635','#e879f9','#f43f5e'];
-function jerseyColorFromIndex(i){ return JERSEYS[i%JERSEYS.length]; }
-function horseSVG(jerseyColor='#f59e0b'){ return `
-<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--jersey:${jerseyColor}">
-  <g class="g-legs-b"><rect x="16" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="30" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/></g>
+/* ======= SVG Horse (내 제작, 저작권 문제 없음) ======= */
+function horseSVG(color='#60a5fa'){ return `
+<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--jersey:${color}">
+  <g class="g-legs-b">
+    <rect x="16" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/>
+    <rect x="30" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/>
+  </g>
   <g class="g-bob">
     <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
     <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
@@ -230,388 +186,143 @@ function horseSVG(jerseyColor='#f59e0b'){ return `
     <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
     <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
   </g>
-  <g class="g-legs-a"><rect x="22" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="38" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/></g>
+  <g class="g-legs-a">
+    <rect x="22" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/>
+    <rect x="38" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/>
+  </g>
 </svg>`; }
 
-/* ---------- DOM ---------- */
+/* ======= DOM ======= */
 const $names=document.getElementById('names');
-const $modeNormal=document.getElementById('modeNormal'); const $modeTournament=document.getElementById('modeTournament');
-const $topKSel=document.getElementById('topKSelect'); const $trackType=document.getElementById('trackType');
-const $start=document.getElementById('startBtn'); const $build=document.getElementById('buildBtn'); const $reset=document.getElementById('resetBtn');
-const $dlLog=document.getElementById('dlLogBtn'); const $loadLogInput=document.getElementById('loadLogInput'); const $shareBtn=document.getElementById('shareBtn');
-const $winnerBox=document.getElementById('winnerBox'); const $winnerName=document.getElementById('winnerName'); const $timeBox=document.getElementById('timeBox');
+const $start=document.getElementById('startBtn');
+const $build=document.getElementById('buildBtn');
+const $reset=document.getElementById('resetBtn');
 const $pHint=document.getElementById('pHint');
-/* linear */
-const $trackLinear=document.getElementById('trackLinear'); const $scroll=document.getElementById('scroll'); const $finish=document.getElementById('finish');
-/* oval */
-const $trackOval=document.getElementById('trackOval'); const $oval=document.getElementById('oval'); const $ovalSvg=document.getElementById('ovalSvg'); const $ovalFlag=document.getElementById('ovalFlag');
+const $scroll=document.getElementById('scroll');
+const $finish=document.getElementById('finish');
+const $winnerBox=document.getElementById('winnerBox');
+const $winnerName=document.getElementById('winnerName');
+const $timeBox=document.getElementById('timeBox');
 
-/* ---------- State ---------- */
-const MIN_HORSES=2, MAX_HORSES=14;
-let state={mode:'normal', type:'linear', horses:[], running:false, startTs:0, raf:null,
-           finishX:1400, speedScale:1, /* linear */
-           /* oval params: */ rx:390, ry:190, cx:500, cy:300, laps:1.0 };
-let _raceResolve=null;
+/* ======= State ======= */
+const MIN=2, MAX=14;
+let running=false, raf=null, startTs=0;
+let horses=[]; // {name, $lane, $horse, x, v, done, sprint, cd}
+let finishX=1050;
 
-/* Replay/store */
-const replay={seed:null, mode:'normal', type:'linear', topK:1, entries:[], events:[], running:false, startedAt:0};
-function logEvent(type,payload={}){ if(!replay.running) return; const t=performance.now()-replay.startedAt; replay.events.push({t:Math.round(t),type,...payload}); }
-function downloadJSON(name,obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
-
-/* ---------- Skills/Map (단일, 항상 ON) ---------- */
-const MAP={ speedMul:1.00, noiseMul:1.00, sprintBoost:1.10, draftMul:1.00, bumpProb:1.00 };
-const SPRINT={ probPerFrame:0.006, durMs:[250,600], boost:+1.5, cdMs:[1200,2400] };
-const DRAFT={ rangeMin:40, rangeMax:70, bonusMax:0.08 };
-const BUMP ={ distLinear:14, distAngle:0.05, nudge:-0.5, cdMs:[800,1200] };
-function randIn([a,b]){ return a + _rand()*(b-a); }
-
-/* ---------- Helpers ---------- */
-function currentMode(){ return $modeTournament.checked? 'tournament':'normal'; }
-function applyCompactClassLinear(n){
+/* ======= Build ======= */
+function applyCompact(n){
   $scroll.classList.remove('compact-9','compact-11','compact-13','compact-14');
   if(n>=14)$scroll.classList.add('compact-14');
   else if(n>=13)$scroll.classList.add('compact-13');
   else if(n>=11)$scroll.classList.add('compact-11');
   else if(n>=9)$scroll.classList.add('compact-9');
 }
-function setFinishX(px){
-  state.finishX = Math.max(900, px|0);
-  $scroll.style.setProperty('--finishX', state.finishX + 'px');
+function setFinishAuto(){
+  const visW = $scroll.parentElement.clientWidth - 80;
+  finishX = Math.max(900, visW);
+  $finish.style.setProperty('--fx', finishX+'px');
 }
-function resetWinner(){ $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent=''; }
-
-/* ---------- Build Lanes (linear) ---------- */
-function buildLinear(entries){
-  $scroll.innerHTML=''; // clear
-  const lanesFrag=document.createDocumentFragment();
-  entries.forEach((ent,i)=>{
+function resetWinner(){
+  $winnerBox.style.display='none';
+  $winnerName.textContent=''; $timeBox.textContent='';
+}
+function buildTrack(list){
+  $scroll.innerHTML=''; $scroll.appendChild($finish); setFinishAuto(); applyCompact(list.length);
+  const frag=document.createDocumentFragment();
+  list.forEach((e,i)=>{
     const lane=document.createElement('div'); lane.className='lane';
-    const label=document.createElement('div'); label.className='label'; label.textContent=ent.name;
-    const horse=document.createElement('div'); horse.className='horse'; horse.style.left='0px';
-    horse.innerHTML=horseSVG(jerseyColorFromIndex(i));
-    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=ent.name;
+    const label=document.createElement('div'); label.className='label'; label.textContent=e.name;
+    const horse=document.createElement('div'); horse.className='horse'; horse.style.left='0px'; horse.innerHTML=horseSVG(jerseyColor(i));
+    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=e.name;
     horse.appendChild(plate);
-    const badge=document.createElement('div'); badge.className='jersey-badge'; badge.textContent=String((i+1)%10);
-    lane.appendChild(badge);
-    lane.appendChild(label);
-    lane.appendChild(horse);
-    ent.$lane=lane; ent.$horse=horse; ent.x=0; ent.v=0; ent.cd=0; ent.cdB=0; ent.sprintLeft=0; ent.done=false;
-    lanesFrag.appendChild(lane);
+    lane.appendChild(label); lane.appendChild(horse);
+    frag.appendChild(lane);
+    e.$lane=lane; e.$horse=horse; e.x=0; e.v=0; e.done=false; e.sprint=0; e.cd=0;
   });
-  $scroll.appendChild(lanesFrag);
-  $scroll.appendChild($finish);
-  applyCompactClassLinear(entries.length);
-  // finish line placement by viewport width
-  const visW = $trackLinear.clientWidth - 80; // padding allowance
-  setFinishX(Math.max(1200, visW));
+  $scroll.appendChild(frag);
 }
 
-/* ---------- Build (oval) ---------- */
-function buildOval(entries){
-  const rect = $oval.getBoundingClientRect();
-  state.cx = rect.width/2; state.cy = rect.height/2;
-  state.rx = Math.min(rect.width*0.39, 430); state.ry = Math.min(rect.height*0.36, 210);
-  $oval.innerHTML = $oval.innerHTML; // keep SVG & flag; this is a quick reset trick
-  // reselect static nodes
-  // (SVG and flag are recreated by the line above, re-query them)
-  const horsesFrag=document.createDocumentFragment();
-  entries.forEach((ent,i)=>{
-    const h=document.createElement('div'); h.className='horse2'; h.innerHTML=horseSVG(jerseyColorFromIndex(i));
-    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=ent.name;
-    h.appendChild(plate);
-    ent.$oval=h; ent.theta=0; ent.v=0; ent.cd=0; ent.cdB=0; ent.sprintLeft=0; ent.done=false; ent.progress=0;
-    horsesFrag.appendChild(h);
-  });
-  $oval.appendChild(horsesFrag);
-}
-
-/* ---------- Size/Participants hint ---------- */
-function updatePHint(list){
-  const n=list.length;
-  let badge = (n<MIN_HORSES) ? '<span class="badge-no">최소 2명</span>'
-            : (n>MAX_HORSES && currentMode()==='normal') ? '<span class="badge-warn">14명 초과 → 토너먼트 권장</span>'
-            : '<span class="badge-ok">OK</span>';
-  $pHint.innerHTML = `참가자 ${n}명 · ${badge}`;
-}
-
-/* ---------- Physics step (linear) ---------- */
-function stepLinear(dt, entries){
-  const base = 0.18 * MAP.speedMul; // px/ms
-  entries.forEach((h,i)=>{
-    if(h.done) return;
-    const noise = ( (_rand()-0.5)*0.06 ) * MAP.noiseMul;
-    // draft: find leader ahead within range
-    let draft=0;
-    for(const o of entries){ if(o===h) continue; const d = (o.x - h.x); if(d> DRAFT.rangeMin && d < DRAFT.rangeMax){ draft = Math.max(draft, DRAFT.bonusMax*(1 - (d-DRAFT.rangeMin)/(DRAFT.rangeMax-DRAFT.rangeMin)) ); } }
-    // bump (rare backward nudge if very close)
-    if(h.cdB<=0){
-      for(const o of entries){ if(o===h) continue; if(Math.abs(o.x-h.x) < BUMP.distLinear){ h.v += BUMP.nudge; h.cdB = randIn(BUMP.cdMs); fxIcon(h.$horse,'bump','부딪힘!'); break; } }
-    }
-    // sprint chance
-    if(h.sprintLeft<=0 && h.cd<=0 && _rand() < SPRINT.probPerFrame){
-      h.sprintLeft = randIn(SPRINT.durMs);
-      h.cd = randIn(SPRINT.cdMs);
-      fxIcon(h.$horse,'bolt','스프린트!');
-    }
-    const sprint = h.sprintLeft>0 ? SPRINT.boost : 0;
-    h.v = (base + noise) * (1 + draft*MAP.draftMul) + sprint;
+/* ======= Physics (간단/경쾌) ======= */
+const BASE=0.19, NOISE=0.06; // px/ms
+function step(dt){
+  let maxX=0;
+  for(const h of horses){
+    if(h.done) continue;
+    const noise = ( (_rand()-0.5) * NOISE );
+    if(h.sprint<=0 && h.cd<=0 && _rand()<0.008){ h.sprint=300+_rand()*300; h.cd=900+_rand()*1100; }
+    const spd = BASE + noise + (h.sprint>0? 1.35:0);
+    h.v = spd;
     h.x += h.v * dt;
-    h.sprintLeft -= dt; h.cd -= dt; h.cdB -= dt;
-
+    h.sprint -= dt; h.cd -= dt;
+    if(h.x >= finishX - 40){ h.done=true; }
     h.$horse.style.left = Math.max(0, h.x|0) + 'px';
-    // finish
-    const finishAt = state.finishX - 40; // a little margin
-    if(h.x >= finishAt){
-      h.done = true;
-      logEvent('finish',{name:h.name, t:performance.now()-state.startTs});
-    }
-  });
-}
-
-/* ---------- Physics step (oval) ---------- */
-function stepOval(dt, entries){
-  const base = 0.00125 * MAP.speedMul; // rad/ms scaled
-  entries.forEach((h,i)=>{
-    if(h.done) return;
-    const noise = (_rand()-0.5)*0.0004;
-    // draft by angle
-    let draft=0;
-    for(const o of entries){ if(o===h) continue; const d = (o.theta - h.theta); if(d> BUMP.distAngle && d < (BUMP.distAngle + 0.5)){ draft = Math.max(draft, 0.06); } }
-    if(h.cdB<=0){
-      for(const o of entries){ if(o===h) continue; if(Math.abs(o.theta - h.theta) < BUMP.distAngle){ h.v += -0.002; h.cdB = randIn(BUMP.cdMs); break; } }
-    }
-    if(h.sprintLeft<=0 && h.cd<=0 && _rand() < SPRINT.probPerFrame){
-      h.sprintLeft = randIn(SPRINT.durMs);
-      h.cd = randIn(SPRINT.cdMs);
-      fxIcon(h.$oval,'bolt','스프린트!');
-    }
-    const sprint = h.sprintLeft>0 ? 0.003 : 0;
-    h.v = (base + noise) * (1 + draft) + sprint;
-    h.theta += h.v * dt;
-    h.sprintLeft -= dt; h.cd -= dt; h.cdB -= dt;
-
-    // position map
-    const t = h.theta;
-    const x = state.cx + state.rx * Math.cos(t);
-    const y = state.cy + state.ry * Math.sin(t);
-    h.$oval.style.left = x + 'px';
-    h.$oval.style.top  = y + 'px';
-    // rotate heading
-    const dx = -state.rx*Math.sin(t), dy = state.ry*Math.cos(t);
-    const ang = Math.atan2(dy,dx) * 180/Math.PI;
-    h.$oval.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
-
-    // finish laps
-    h.progress = h.theta/(Math.PI*2);
-    if(h.progress >= state.laps){
-      h.done = true;
-      logEvent('finish',{name:h.name, t:performance.now()-state.startTs});
-    }
-  });
-}
-
-/* ---------- Race Loop ---------- */
-function runRace(entries, modeType){
-  return new Promise(resolve=>{
-    state.running=true; replay.running=true; replay.events=[]; replay.startedAt=performance.now(); state.startTs = performance.now();
-    function tick(now){
-      // dt
-      const dt = 16; // fixed step ~60fps
-      if(state.type==='linear') stepLinear(dt, entries);
-      else stepOval(dt, entries);
-
-      // leader auto-scroll (linear)
-      if(state.type==='linear'){
-        const maxX = Math.max(...entries.map(h=>h.x||0));
-        $scroll.scrollLeft = Math.max(0, maxX - $scroll.clientWidth*0.55);
-      }
-
-      // check finishers
-      const alive = entries.filter(h=>!h.done);
-      const finished = entries.filter(h=>h.done && !h._counted);
-      finished.forEach(h=>{ h._counted=true; });
-
-      const topK = Number($topKSel.value)||1;
-      const order = entries.slice().sort((a,b)=> (b.done-b.done) || (b.x-a.x) || (b.progress-a.progress));
-      const winners = order.filter(h=>h.done).slice(0, topK);
-
-      if(winners.length>=topK || alive.length===0){
-        state.running=false; cancelAnimationFrame(state.raf); state.raf=null;
-        const tElapsed = ((performance.now()-state.startTs)/1000).toFixed(2);
-        $winnerBox.style.display='block';
-        $winnerName.textContent = winners.map(w=>w.name).join(', ');
-        $timeBox.textContent = `경과 ${tElapsed}s`;
-        logEvent('race_end',{winners:winners.map(w=>w.name)});
-        resolve(winners);
-        return;
-      }
-      state.raf = requestAnimationFrame(tick);
-    }
-    state.raf = requestAnimationFrame(tick);
-  });
-}
-
-/* ---------- Tournament (simple) ---------- */
-async function runTournament(allEntries){
-  const chunk = 12; // heat size
-  const heats = [];
-  for(let i=0;i<allEntries.length;i+=chunk) heats.push(allEntries.slice(i,i+chunk));
-  const finalists=[];
-  for(let hi=0;hi<heats.length;hi++){
-    // build one heat
-    const group = heats[hi];
-    buildByType(group);
-    await delay(300);
-    await runRace(group);
-    const k = Math.min(3, group.length); // top 3 to final
-    const top = group.slice().sort((a,b)=> (b.done-b.done) || (b.x-a.x) || (b.progress-a.progress)).slice(0,k)
-      .map(x=>({name:x.name, weight:1}));
-    finalists.push(...top);
-    await delay(300);
-    resetWinner();
+    if(h.x>maxX) maxX=h.x;
   }
-  // final
-  const finalistsUnique = finalists.slice(0, MAX_HORSES);
-  buildByType(finalistsUnique);
-  await delay(400);
-  const winners = await runRace(finalistsUnique);
-  return winners;
+  $scroll.parentElement.scrollLeft = Math.max(0, maxX - $scroll.parentElement.clientWidth*0.55);
 }
 
-/* ---------- Build by track type ---------- */
-function buildByType(entries){
-  if(state.type==='linear'){ buildLinear(entries); }
-  else { buildOval(entries); }
-}
-
-/* ---------- Controls ---------- */
-function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-function readEntries(){
-  const list = parseInput($names.value);
-  updatePHint(list);
-  return list;
-}
-
-function openContact(){ document.getElementById('modal').classList.add('show'); }
-function closeContact(){ document.getElementById('modal').classList.remove('show'); }
-
-function resetAll(){
-  cancelAnimationFrame(state.raf); state.raf=null; state.running=false;
-  $dlLog.disabled=true; replay.running=false; replay.events=[];
-  $scroll.innerHTML=''; $scroll.appendChild($finish);
-  $oval.querySelectorAll('.horse2').forEach(n=>n.remove());
-  resetWinner();
-}
-
-function applyQuery(){
-  const params = new URLSearchParams(location.search);
-  if(params.has('names')){
-    try{
-      const arr = JSON.parse(decodeURIComponent(params.get('names')));
-      if(Array.isArray(arr) && arr.length){ $names.value = arr.join('\n'); }
-    }catch{}
+/* ======= Race Loop ======= */
+function runRace(){
+  running=true; startTs=performance.now();
+  function tick(){
+    step(16);
+    const alive=horses.filter(h=>!h.done).length;
+    if(alive===0){
+      running=false; cancelAnimationFrame(raf); raf=null;
+      const order=horses.slice().sort((a,b)=> (b.x-a.x));
+      const winners=order.slice(0,1);
+      $winnerName.textContent = winners.map(w=>w.name).join(', ');
+      $timeBox.textContent = `경과 ${( (performance.now()-startTs)/1000 ).toFixed(2)}s`;
+      $winnerBox.style.display='block';
+      return;
+    }
+    raf=requestAnimationFrame(tick);
   }
-  if(params.get('mode')==='tournament'){ $modeTournament.checked=true; }
-  if(params.get('type')==='oval'){ $trackType.value='oval'; }
+  raf=requestAnimationFrame(tick);
 }
 
-function shareLink(){
-  const list = readEntries().map(x=>x.name);
-  const params = new URLSearchParams();
-  params.set('names', encodeURIComponent(JSON.stringify(list)));
-  params.set('mode', currentMode());
-  params.set('type', $trackType.value);
-  const url = location.origin + location.pathname + '?' + params.toString();
-  navigator.clipboard.writeText(url).then(()=>{
-    fxIcon(document.body,'bolt','링크 복사됨');
-    alert('공유 링크가 복사되었습니다!');
-  });
+/* ======= Controls ======= */
+function updateHint(list){
+  const n=list.length;
+  const s = n<MIN ? '최소 2명 입력' : (n>MAX ? '최대 14명 (초과는 잘림)' : 'OK');
+  $pHint.textContent = `참가자 ${n}명 · ${s}`;
 }
 
 $build.addEventListener('click', ()=>{
-  if(state.running) return;
-  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
-  const entries = readEntries();
-  if(entries.length<MIN_HORSES){ alert('최소 2명을 입력해주세요.'); return; }
-  const draw = entries.slice(0, currentMode()==='normal' ? Math.min(entries.length, MAX_HORSES) : entries.length);
-  resetAll();
-  buildByType(draw);
-});
-
-$start.addEventListener('click', async ()=>{
-  if(state.running) return;
-  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
-  let entries = readEntries();
-  const seed = autoSeed(); reseed(seed); replay.seed=seed;
-  replay.mode=currentMode(); replay.type=state.type; replay.topK = Number($topKSel.value)||1; replay.entries = entries.map(e=>e.name);
-  $dlLog.disabled=false;
-
-  if(entries.length<MIN_HORSES){ alert('최소 2명을 입력해주세요.'); return; }
-
+  if(running) return;
+  const list=parseInput($names.value);
+  if(list.length<MIN){ alert('최소 2명을 입력해주세요.'); return; }
+  horses=list; buildTrack(horses);
   resetWinner();
-  if(currentMode()==='normal' && entries.length>MAX_HORSES){
-    if(!confirm('일반 모드는 최대 14명입니다. 토너먼트로 진행할까요?')) return;
-    $modeTournament.checked=true;
-  }
-
-  if(currentMode()==='normal'){
-    const draw = entries.slice(0, Math.min(entries.length, MAX_HORSES));
-    shuffle(draw);
-    buildByType(draw);
-    await delay(300);
-    await runRace(draw);
-  }else{
-    // tournament
-    shuffle(entries);
-    await runTournament(entries);
-  }
+  updateHint(horses);
 });
 
-$reset.addEventListener('click', ()=>{ resetAll(); });
-
-$names.addEventListener('input', ()=>updatePHint(readEntries()));
-
-$trackType.addEventListener('change', ()=>{
-  if(state.running) return;
-  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
-  // rebuild placeholder lanes to reflect type if entries present
-  const list = readEntries();
-  if(list.length>=MIN_HORSES){
-    resetAll();
-    buildByType(list.slice(0, Math.min(list.length, MAX_HORSES)));
-  }
+$start.addEventListener('click', ()=>{
+  if(running) return;
+  let list=parseInput($names.value);
+  if(list.length<MIN){ alert('최소 2명을 입력해주세요.'); return; }
+  reseed(autoSeed());
+  list=shuffle(list);
+  horses=list;
+  buildTrack(horses);
+  resetWinner();
+  runRace();
 });
 
-$shareBtn.addEventListener('click', shareLink);
-
-$dlLog.addEventListener('click', ()=>{
-  const name = `race_log_${Date.now()}.json`;
-  downloadJSON(name, replay);
+$reset.addEventListener('click', ()=>{
+  cancelAnimationFrame(raf); raf=null; running=false;
+  $scroll.innerHTML=''; $scroll.appendChild($finish);
+  resetWinner();
+  updateHint(parseInput($names.value));
 });
 
-$loadLogInput.addEventListener('change', async (e)=>{
-  const file = e.target.files?.[0]; if(!file) return;
-  const text = await file.text();
-  try{
-    const data = JSON.parse(text);
-    if(Array.isArray(data.entries)){ $names.value = data.entries.join('\n'); updatePHint(readEntries()); }
-    alert('로그를 불러왔습니다. 참가자 목록에 적용했습니다.');
-  }catch{ alert('유효하지 않은 JSON 로그입니다.'); }
-});
+$names.addEventListener('input', ()=> updateHint(parseInput($names.value)));
+window.addEventListener('resize', ()=> setFinishAuto());
 
-/* Resize finish line on viewport changes for linear */
-window.addEventListener('resize', ()=>{
-  if(state.type==='linear'){
-    const visW = $trackLinear.clientWidth - 80;
-    setFinishX(Math.max(1200, visW));
-  }
-});
-
-/* ---------- Init ---------- */
-applyQuery();
-updatePHint(readEntries());
-setFinishX(1400);
+/* init */
+updateHint(parseInput($names.value));
+setFinishAuto();
 </script>
 </body>
 </html>
