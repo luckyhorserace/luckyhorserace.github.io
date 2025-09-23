@@ -1,5 +1,4 @@
-# Create the final index.html with all requested features
-html = r"""<!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
@@ -162,8 +161,8 @@ const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab
 
 /* 참가자 split: 공백/슬래시 + 이름*숫자 */
 function splitNames(raw){
-  return raw.split(/[/\\s]+/).map(s=>s.trim()).filter(Boolean).flatMap(n=>{
-    const m=n.match(/(.+)\*(\\d{1,2})$/);
+  return raw.split(/[/\s]+/).map(s=>s.trim()).filter(Boolean).flatMap(n=>{
+    const m=n.match(/(.+)\*(\d{1,2})$/);
     if(m){
       const base=m[1];const count=Math.min(parseInt(m[2],10),50);
       return Array.from({length:count},(_,i)=>base+(count>1?(i+1):''));
@@ -181,14 +180,13 @@ const $names=document.getElementById('names'),$raceLen=document.getElementById('
 const $stage=document.getElementById('stage'),$canvas=document.getElementById('canvas'),$hud=document.getElementById('hud'),$ltR=document.getElementById('ltR'),$ltY=document.getElementById('ltY'),$ltG=document.getElementById('ltG'),$countTxt=document.getElementById('countTxt'),$gunTxt=document.getElementById('gunTxt');
 const $winnerBox=document.getElementById('winnerBox'),$winnerName=document.getElementById('winnerName');const $rankingLines=document.getElementById('rankingLines');const $commentary=document.getElementById('commentaryBox');
 
-/* 문의 버튼 (작동) */
+/* 문의 버튼 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
 
-/* 관중 SVG 채우기 (외부 JS에서) */
+/* 관중 SVG 채우기 */
 (function buildCrowd(){
-  const svg=document.getElementById('crowdSvg'); if(!svg) return;
-  const row=svg.getElementById ? svg.getElementById('crowdRow') : svg.querySelector('#crowdRow');
-  if(!row) return;
+  const svg=document.getElementById('crowdSvg');
+  const row=svg.querySelector('#crowdRow');
   for(let i=0;i<90;i++){
     const use=document.createElementNS('http://www.w3.org/2000/svg','use');
     use.setAttributeNS('http://www.w3.org/1999/xlink','href','#p');
@@ -243,46 +241,17 @@ function step(dt){
 function orderByLead(){return H.slice().sort((a,b)=>b.theta-a.theta)}
 function run(){
   running=true; lastLeaderNo=null; lapsDoneByHorse.clear();
-  const tick=()=>{
-    step(16);
-    if(H.every(h=>h.done)){
-      running=false; cancelAnimationFrame(raf); raf=null;
-      const win=orderByLead()[0];
-      $winnerName.textContent=`${win.no}번 ${win.name}`;
-      $winnerBox.style.display='block';
-      setCommentary(`체크 플래그! 우승은 ${win.no}번 ${win.name}!`);
-      carrotRain();
-      return;
-    }
-    raf=requestAnimationFrame(tick)
-  };
-  raf=requestAnimationFrame(tick)
+  const tick=()=>{step(16);if(H.every(h=>h.done)){running=false;cancelAnimationFrame(raf);raf=null;const win=orderByLead()[0];$winnerName.textContent=`${win.no}번 ${win.name}`;$winnerBox.style.display='block';setCommentary(`체크 플래그! 우승은 ${win.no}번 ${win.name}!`);carrotRain();return;}raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick)
 }
 
 /* Ranking */
-function updateRanking(){
-  const order=orderByLead();
-  $rankingLines.innerHTML=order.map((h,i)=>{
-    const lapsNow=lapsDoneByHorse.get(h.no)||0;
-    return `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name} (${lapsNow}바퀴)</span></div>`;
-  }).join('');
-}
+function updateRanking(){const order=orderByLead();$rankingLines.innerHTML=order.map((h,i)=>{const lapsNow=lapsDoneByHorse.get(h.no)||0;return `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name} (${lapsNow}바퀴)</span></div>`}).join('');}
 
 /* Commentary */
 function setCommentary(text){$commentary.textContent=text}
 
 /* Carrot Rain */
-function carrotRain(){
-  for(let i=0;i<36;i++){
-    const c=document.createElement('div');
-    c.className='carrot';
-    c.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2c3 2 6 5 6 8s-3 7-6 12c-3-5-6-9-6-12s3-6 6-8z" fill="#f97316"/><path d="M12 2c1-1 3-2 5-2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>';
-    c.style.left=Math.random()*100+'vw';
-    c.style.animationDelay=(Math.random()*1.2)+'s';
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),3400);
-  }
-}
+function carrotRain(){for(let i=0;i<36;i++){const c=document.createElement('div');c.className='carrot';c.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2c3 2 6 5 6 8s-3 7-6 12c-3-5-6-9-6-12s3-6 6-8z" fill="#f97316"/><path d="M12 2c1-1 3-2 5-2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>';c.style.left=Math.random()*100+'vw';c.style.animationDelay=(Math.random()*1.2)+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3400);}}
 
 /* Controls */
 function resetAll(){cancelAnimationFrame(raf);raf=null;running=false;$winnerBox.style.display='none';$winnerName.textContent='';clearHorses();setCommentary('중계 시작 대기');}
@@ -297,7 +266,3 @@ addEventListener('resize',()=>{H.forEach(placeHorse)});instantPreview();
 </script>
 </body>
 </html>
-"""
-with open('/mnt/data/index.html','w', encoding='utf-8') as f:
-    f.write(html)
-print("Saved to /mnt/data/index.html")
