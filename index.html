@@ -1,4 +1,5 @@
-<!doctype html>
+# Create the final index.html with all requested features
+html = r"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
@@ -23,7 +24,7 @@ h1{margin:0;font-size:16px;letter-spacing:.2px}
 .sub{margin:0;font-size:12px;color:#94a3b8}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
-#names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none}
+#names{min-width:300px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none}
 
 /* 스테이지 */
 .stage{position:absolute; inset:0;}
@@ -56,7 +57,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .winner strong{color:#9ae6b4}
 
 /* 순위판 */
-.ranking{position:absolute; top:12px; right:12px; width:200px;background:rgba(8,18,34,.78); border:1px solid #2a3b54; border-radius:10px;padding:8px; z-index:25; backdrop-filter: blur(4px);font-size:13px; line-height:1.5}
+.ranking{position:absolute; top:12px; right:12px; width:220px;background:rgba(8,18,34,.78); border:1px solid #2a3b54; border-radius:10px;padding:8px; z-index:25; backdrop-filter: blur(4px);font-size:13px; line-height:1.5}
 .ranking h3{margin:2px 0 6px; font-size:13px; color:#93c5fd}
 .ranking .row{display:flex; justify-content:space-between; padding:2px 6px; border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
@@ -90,8 +91,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       <defs>
         <g id="p"><circle cx="0" cy="0" r="3" fill="#e5e7eb"/><rect x="-2.4" y="3" width="4.8" height="8" rx="2.2" fill="#d1d5db"/><rect x="-4" y="9" width="8" height="4" rx="2" fill="#9ca3af"/></g>
       </defs>
-      <g id="row"></g>
-      <script>(function(){const g=document.currentScript.previousElementSibling;for(let i=0;i<80;i++){const x=10+i*12+(i%2?4:0);const y=65+Math.sin(i*0.6)*4;const use=document.createElementNS('http://www.w3.org/2000/svg','use');use.setAttributeNS('http://www.w3.org/1999/xlink','href','#p');use.setAttribute('transform',`translate(${x},${y}) scale(${0.9+Math.random()*0.25})`);use.setAttribute('class','person');g.appendChild(use);}})();</script>
+      <g id="crowdRow"></g>
     </svg>
   </div>
 
@@ -131,12 +131,12 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
   <header>
     <div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><rect x="10" y="22" width="44" height="20" rx="6" fill="url(#g)"/><path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/><defs><linearGradient id="g" x1="10" x2="54" y1="22" y2="42"><stop stop-color="#e8c87a"/><stop offset="1" stop-color="#caa555"/></linearGradient></defs></svg></div><div><h1>Lucky Horse Race — Oval</h1><p class="sub">자유롭게 사용하시고 피드백 부탁드립니다.</p></div></div>
     <div class="controls">
-      <input id="names" type="text" placeholder="참가자 입력 (예: 철수/영희 김치*3 · 최대 50마리)">
+      <input id="names" type="text" placeholder="참가자 입력 (예: 철수/영희 김치*3 · 최대 50마리 · 이름*숫자 가능)">
       <button class="btn-ghost" id="shuffleBtn">말 섞기 🔀</button>
       <select id="raceLen"><option value="1">1바퀴</option><option value="3">3바퀴</option><option value="5" selected>5바퀴</option><option value="10">10바퀴</option><option value="15">15바퀴</option><option value="20">20바퀴</option></select>
       <button class="btn-accent" id="startBtn">Start Race ▶</button>
       <button class="btn-ghost" id="resetBtn">Reset</button>
-      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener" class="btn-accent" id="btnDonate">
+      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener" class="btn-accent" id="btnDonate" title="개발자에게 당근 보내주기">
         <svg viewBox="0 0 24 24" width="18" height="18" style="margin-right:6px"><path d="M12 2c3 2 6 5 6 8s-3 7-6 12c-3-5-6-9-6-12s3-6 6-8z" fill="#f97316"/><path d="M12 2c1-1 3-2 5-2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>
         개발자에게 당근 보내주기
       </a>
@@ -160,10 +160,14 @@ function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>1
 let _rand=Math.random;function reseed(seed){_rand=mulberry32(seed|0)}function autoSeed(){return(Date.now()^Math.floor(Math.random()*0xFFFFFFFF))>>>0}
 const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e','#6ee7ff'];function jc(i){return JERSEYS[i%JERSEYS.length]}
 
-/* 참가자 split */
+/* 참가자 split: 공백/슬래시 + 이름*숫자 */
 function splitNames(raw){
-  return raw.split(/[/\s]+/).map(s=>s.trim()).filter(Boolean).flatMap(n=>{
-    const m=n.match(/(.+)\*(\d{1,2})$/);if(m){const base=m[1];const count=Math.min(parseInt(m[2],10),50);return Array.from({length:count},(_,i)=>base+(count>1?(i+1):''));}
+  return raw.split(/[/\\s]+/).map(s=>s.trim()).filter(Boolean).flatMap(n=>{
+    const m=n.match(/(.+)\*(\\d{1,2})$/);
+    if(m){
+      const base=m[1];const count=Math.min(parseInt(m[2],10),50);
+      return Array.from({length:count},(_,i)=>base+(count>1?(i+1):''));
+    }
     return[n];
   }).slice(0,50).map((name,i)=>({name,no:i+1}));
 }
@@ -177,8 +181,24 @@ const $names=document.getElementById('names'),$raceLen=document.getElementById('
 const $stage=document.getElementById('stage'),$canvas=document.getElementById('canvas'),$hud=document.getElementById('hud'),$ltR=document.getElementById('ltR'),$ltY=document.getElementById('ltY'),$ltG=document.getElementById('ltG'),$countTxt=document.getElementById('countTxt'),$gunTxt=document.getElementById('gunTxt');
 const $winnerBox=document.getElementById('winnerBox'),$winnerName=document.getElementById('winnerName');const $rankingLines=document.getElementById('rankingLines');const $commentary=document.getElementById('commentaryBox');
 
-/* 문의 버튼 */
+/* 문의 버튼 (작동) */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
+
+/* 관중 SVG 채우기 (외부 JS에서) */
+(function buildCrowd(){
+  const svg=document.getElementById('crowdSvg'); if(!svg) return;
+  const row=svg.getElementById ? svg.getElementById('crowdRow') : svg.querySelector('#crowdRow');
+  if(!row) return;
+  for(let i=0;i<90;i++){
+    const use=document.createElementNS('http://www.w3.org/2000/svg','use');
+    use.setAttributeNS('http://www.w3.org/1999/xlink','href','#p');
+    const x=8+i*11+(i%2?4:0);
+    const y=68+Math.sin(i*0.45)*4;
+    use.setAttribute('transform',`translate(${x},${y}) scale(${0.85+Math.random()*0.3})`);
+    use.setAttribute('class','person');
+    row.appendChild(use);
+  }
+})();
 
 /* State */
 let running=false,raf=null,H=[];const cx=500,cy=300,rxRun=390,ryRun=190,TWO_PI=Math.PI*2;let laps=5;$raceLen.addEventListener('change',()=>{laps=parseInt($raceLen.value,10)||5})
@@ -197,24 +217,78 @@ function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 
 /* Race */
 let lastLeaderNo=null,lapsDoneByHorse=new Map();
-function step(dt){for(const h of H){if(h.done)continue;const noise=(smoothNoise(h.noiseRng,performance.now()*0.001+h.no)-0.5)*NOISE;base=BASE+h.paceOffset;h.v=base+noise;h.theta+=h.v*dt;placeHorse(h);if(h.theta>=(-Math.PI/2)+laps*TWO_PI){h.done=true;}if(h.theta>=(-Math.PI/2)+((lapsDoneByHorse.get(h.no)||0)+1)*TWO_PI){lapsDoneByHorse.set(h.no,(lapsDoneByHorse.get(h.no)||0)+1);setCommentary(`${h.no}번 ${h.name} ${lapsDoneByHorse.get(h.no)}바퀴 통과!`);}}const order=orderByLead();if(order.length){const leader=order[0];if(lastLeaderNo!==leader.no){if(lastLeaderNo!==null){setCommentary(`${leader.no}번 ${leader.name}! 선두로 역전합니다!`);}else{setCommentary(`출발! 현재 선두는 ${leader.no}번 ${leader.name}!`);}lastLeaderNo=leader.no;}}updateRanking();}
+function step(dt){
+  for(const h of H){
+    if(h.done)continue;
+    const noise=(smoothNoise(h.noiseRng,performance.now()*0.001+h.no)-0.5)*NOISE;
+    const base=BASE+h.paceOffset;
+    h.v=base+noise; h.theta+=h.v*dt; placeHorse(h);
+    if(h.theta>=(-Math.PI/2)+laps*TWO_PI){h.done=true;}
+    if(h.theta>=(-Math.PI/2)+((lapsDoneByHorse.get(h.no)||0)+1)*TWO_PI){
+      lapsDoneByHorse.set(h.no,(lapsDoneByHorse.get(h.no)||0)+1);
+      setCommentary(`${h.no}번 ${h.name} ${lapsDoneByHorse.get(h.no)}바퀴 통과!`);
+    }
+  }
+  const order=orderByLead();
+  if(order.length){
+    const leader=order[0];
+    if(lastLeaderNo!==leader.no){
+      if(lastLeaderNo!==null){ setCommentary(`${leader.no}번 ${leader.name}! 선두로 역전합니다!`); }
+      else { setCommentary(`출발! 현재 선두는 ${leader.no}번 ${leader.name}!`); }
+      lastLeaderNo=leader.no;
+    }
+  }
+  updateRanking();
+}
 function orderByLead(){return H.slice().sort((a,b)=>b.theta-a.theta)}
-function run(){running=true;lastLeaderNo=null;lapsDoneByHorse.clear();const tick=()=>{step(16);if(H.every(h=>h.done)){running=false;cancelAnimationFrame(raf);raf=null;const win=orderByLead()[0];$winnerName.textContent=`${win.no}번 ${win.name}`;$winnerBox.style.display='block';setCommentary(`체크 플래그! 우승은 ${win.no}번 ${win.name}!`);carrotRain();return;}raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick)}
+function run(){
+  running=true; lastLeaderNo=null; lapsDoneByHorse.clear();
+  const tick=()=>{
+    step(16);
+    if(H.every(h=>h.done)){
+      running=false; cancelAnimationFrame(raf); raf=null;
+      const win=orderByLead()[0];
+      $winnerName.textContent=`${win.no}번 ${win.name}`;
+      $winnerBox.style.display='block';
+      setCommentary(`체크 플래그! 우승은 ${win.no}번 ${win.name}!`);
+      carrotRain();
+      return;
+    }
+    raf=requestAnimationFrame(tick)
+  };
+  raf=requestAnimationFrame(tick)
+}
 
 /* Ranking */
-function updateRanking(){const order=orderByLead();$rankingLines.innerHTML=order.map((h,i)=>{const lapsNow=lapsDoneByHorse.get(h.no)||0;return `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name} (${lapsNow}바퀴)</span></div>`}).join('');}
+function updateRanking(){
+  const order=orderByLead();
+  $rankingLines.innerHTML=order.map((h,i)=>{
+    const lapsNow=lapsDoneByHorse.get(h.no)||0;
+    return `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name} (${lapsNow}바퀴)</span></div>`;
+  }).join('');
+}
 
 /* Commentary */
 function setCommentary(text){$commentary.textContent=text}
 
 /* Carrot Rain */
-function carrotRain(){for(let i=0;i<30;i++){const c=document.createElement('div');c.className='carrot';c.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2c3 2 6 5 6 8s-3 7-6 12c-3-5-6-9-6-12s3-6 6-8z" fill="#f97316"/><path d="M12 2c1-1 3-2 5-2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>';c.style.left=Math.random()*100+'vw';c.style.animationDelay=(Math.random()*1.5)+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);}}
+function carrotRain(){
+  for(let i=0;i<36;i++){
+    const c=document.createElement('div');
+    c.className='carrot';
+    c.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2c3 2 6 5 6 8s-3 7-6 12c-3-5-6-9-6-12s3-6 6-8z" fill="#f97316"/><path d="M12 2c1-1 3-2 5-2" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>';
+    c.style.left=Math.random()*100+'vw';
+    c.style.animationDelay=(Math.random()*1.2)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3400);
+  }
+}
 
 /* Controls */
 function resetAll(){cancelAnimationFrame(raf);raf=null;running=false;$winnerBox.style.display='none';$winnerName.textContent='';clearHorses();setCommentary('중계 시작 대기');}
 function instantPreview(){const list=splitNames($names.value);if(list.length>0)buildHorses(list,true);else clearHorses();}
 $names.addEventListener('input',instantPreview);
-$start.addEventListener('click',async()=>{if(running)return;const list=splitNames($names.value);if(list.length<2){alert('최소 2명을 입력해주세요. 예: 고구마/감자');return;}if(list.length>50){alert('최대 50명까지만 가능합니다.');}laps=parseInt($raceLen.value,10)||5;reseed(autoSeed());resetAll();buildHorses(list,true);await countdown();run();});
+$start.addEventListener('click',async()=>{if(running)return;const list=splitNames($names.value);if(list.length<2){alert('최소 2명을 입력해주세요. 예: 고구마/감자 또는 고구마 감자');return;}if(list.length>50){alert('최대 50마리까지만 가능합니다.');}laps=parseInt($raceLen.value,10)||5;reseed(autoSeed());resetAll();buildHorses(list,true);await countdown();run();});
 $reset.addEventListener('click',()=>{$names.value='';resetAll();instantPreview();});
 $shuffle.addEventListener('click',()=>{const list=splitNames($names.value);for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}$names.value=list.map(x=>x.name).join(' ');instantPreview();});
 
@@ -223,3 +297,7 @@ addEventListener('resize',()=>{H.forEach(placeHorse)});instantPreview();
 </script>
 </body>
 </html>
+"""
+with open('/mnt/data/index.html','w', encoding='utf-8') as f:
+    f.write(html)
+print("Saved to /mnt/data/index.html")
