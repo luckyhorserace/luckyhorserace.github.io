@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lucky Horse Race</title>
+<style>
+/* ========== Base Theme ========== */
+:root{
+  --track-h: 64px; --lane-gap: 10px;
+  --bg:#0b1220; --panel:#111827; --ink:#e5e7eb; --muted:#9ca3af; --border:#1f2937; --accent:#2563eb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0b1220,#0c111b 30%,#0b1220);color:var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif}
+a{color:inherit}
+header{padding:18px 16px 8px;text-align:center}
+header h1{margin:0 0 6px;font-size:22px}
+header p{margin:0;color:var(--muted);font-size:14px}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 16px;display:grid;grid-template-columns:360px 1fr;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;color:#cbd5e1}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+.btn{background:#243b55;color:#fff}.btn:hover{filter:brightness(1.08)}
+.btn-accent{background:var(--accent)} .btn-ghost{background:transparent;border:1px solid #334155;color:#cbd5e1}
+input,select,textarea{background:#0b1220;color:var(--ink);border:1px solid #1f2937;border-radius:10px;padding:8px}
+textarea{width:100%;min-height:150px;resize:vertical}
+.hint{color:var(--muted);font-size:12px;margin-top:8px}
+.small{font-size:12px;color:#9ca3af}.muted{color:#9ca3af}
+.footer{margin:12px 0 0;font-size:12px;color:#6b7280}
+
+/* ========== Track / Lanes ========== */
+.track{position:relative;border:1px solid var(--border);border-radius:12px;padding:16px;height:auto;overflow:hidden}
+.finish{position:absolute;top:12px;bottom:12px;width:18px;right:24px;background:conic-gradient(#fff 25%, #000 0 50%, #fff 0 75%, #000 0) 0/10px 10px;border:1px solid #000;box-shadow:0 0 0 2px #111827 inset;border-radius:4px}
+.lane{position:relative;height:var(--track-h);margin-bottom:var(--lane-gap);background:linear-gradient(180deg,#0f172a,#0c111b);border:1px solid #1f2937;border-radius:12px;overflow:hidden}
+.lane:last-child{margin-bottom:0}
+.label{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:#111827;border:1px solid #1f2937;border-radius:8px;padding:4px 8px;font-size:13px;color:#e5e7eb;z-index:2;max-width:55%;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+.horse{position:absolute;left:0;top:10px;height:calc(var(--track-h) - 20px);display:flex;align-items:center;justify-content:center;user-select:none}
+.nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-6px);background:#0b1220;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:3px 8px;font-size:12px;font-weight:700;white-space:nowrap;max-width:140px;text-overflow:ellipsis;overflow:hidden;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.jersey-badge{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#0b1220;color:#e5e7eb;border:1px solid #334155;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+
+/* Auto-compact by count */
+.compact-9  .horse-svg{transform:scale(.95)} .compact-11 .horse-svg{transform:scale(.9)}
+.compact-13 .horse-svg{transform:scale(.86)} .compact-14 .horse-svg{transform:scale(.82)}
+/* lane height by count - apply as utility classes on #track via JS */
+.compact-9  { --track-h: 60px } .compact-11 { --track-h: 56px } .compact-13 { --track-h: 52px } .compact-14 { --track-h: 48px }
+
+/* ========== Maps ========== */
+.track.plain { background:#4ade80; background-image:linear-gradient(#86efac 1px, transparent 1px); background-size:100% 20px; }
+.track.desert{ background:#fcd34d; background-image:linear-gradient(#fde68a 1px, transparent 1px); background-size:100% 20px; }
+.track.night { background:#0b1220; background-image:linear-gradient(#1e293b 1px, transparent 1px); background-size:100% 20px; }
+.track.snow  { background:#e0f2fe; background-image:linear-gradient(#bae6fd 1px, transparent 1px); background-size:100% 20px; }
+.track.city  { background:#475569; background-image:linear-gradient(#64748b 1px, transparent 1px); background-size:100% 20px; }
+
+/* ========== FX ========== */
+.fx-pop{position:absolute;top:-22px;left:50%;transform:translate(-50%,-100%);background:#111827;color:#e5e7eb;font-size:12px;padding:3px 6px;border:1px solid #334155;border-radius:6px;opacity:0;pointer-events:none;transition:transform .2s ease, opacity .2s ease;white-space:nowrap}
+.fx-pop.show{opacity:1;transform:translate(-50%,-130%)}
+
+/* ========== Horse SVG (original) ========== */
+.horse-svg{ width:44px; height:32px; }
+@keyframes legA { 0%,100%{transform:translateY(0) skewX(0deg)} 50%{transform:translateY(-2px) skewX(-4deg)} }
+@keyframes legB { 0%,100%{transform:translateY(0) skewX(0deg)} 50%{transform:translateY( 2px) skewX( 4deg)} }
+@keyframes bob  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-1.2px)} }
+.horse-svg .g-bob    { animation: bob .28s infinite ease-in-out }
+.horse-svg .g-legs-a { animation: legA .26s infinite ease-in-out }
+.horse-svg .g-legs-b { animation: legB .26s infinite ease-in-out }
+.horse-svg .body   { fill:#e5e7eb } .horse-svg .mane{ fill:#cbd5e1 } .horse-svg .jockey{ fill:var(--jersey,#f59e0b) } .horse-svg .saddle{ fill:#94a3b8 } .horse-svg .eye{ fill:#0f172a }
+
+/* ========== Mode UI ========== */
+.mode-row{display:flex;gap:10px;flex-wrap:wrap}
+.mode-card{display:flex;align-items:flex-start;gap:10px;cursor:pointer;border:1px solid #334155;border-radius:12px;padding:10px 12px;background:#0b1220;min-width:220px;flex:1}
+.mode-card:hover{filter:brightness(1.05)} .mode-card input{margin-top:3px}
+.mode-title{font-weight:800} .mode-desc{font-size:12px;color:#9ca3af}
+.mode-hint{margin-top:8px;font-size:13px;color:#cbd5e1}
+.badge-ok{color:#22c55e;font-weight:800} .badge-warn{color:#f59e0b;font-weight:800} .badge-no{color:#ef4444;font-weight:800}
+
+/* ========== Modal (문의) ========== */
+.btn-contact{padding:10px 16px;border-radius:10px;background:#1e293b;color:#e5e7eb;font-weight:600;border:0;cursor:pointer}
+.btn-contact:hover{filter:brightness(1.12)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
+.modal-content{background:#0b1220;color:#e5e7eb;max-width:360px;margin:10% auto;padding:20px;border:1px solid #334155;border-radius:12px;text-align:center}
+.contact-box{margin:12px 0;padding:10px;border:1px dashed #334155;border-radius:10px}
+.btn-row{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.btn{padding:8px 12px;border-radius:8px;border:0;background:#2563eb;color:#fff;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;border:1px solid #334155;color:#e5e7eb;text-decoration:none;display:inline-flex;align-items:center}
+.btn-close{margin-top:10px;padding:8px 12px;border-radius:8px;background:#111827;color:#e5e7eb;border:1px solid #334155;cursor:pointer}
+.modal.show{display:block}
+
+/* ========== Footer ========== */
+.legal{margin:20px 0 10px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Lucky Horse Race 🐎</h1>
+  <p>이름과 가중치(<code>이름*숫자</code>)로 공정하게! 모드/맵/스킬/연출까지 있는 경마 추첨 도구</p>
+</header>
+
+<div class="wrap">
+  <!-- LEFT: Controls -->
+  <section class="panel">
+    <h2>참가자 입력</h2>
+    <textarea id="names" placeholder="예)\n짱구*5\n짱아*3\n봉미선*2\n철수*1"></textarea>
+    <div class="hint">각 줄에 <b>이름</b> 또는 <b>이름*가중치</b> 형태로 입력하세요. 최소 2명, 최대 14명(일반 모드)까지.</div>
+
+    <div class="row" style="margin-top:8px">
+      <button class="btn btn-ghost" id="shuffleBtn">Shuffle</button>
+      <button class="btn btn-accent" id="buildBtn">트랙 만들기</button>
+      <button class="btn" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="row" style="margin-top:8px">
+      <label>경주 길이(px) <input type="number" id="raceLen" value="800" min="400" max="2200" style="width:120px"></label>
+      <label>난수 시드 <input type="number" id="seed" placeholder="예: 12345" style="width:140px"></label>
+    </div>
+
+    <!-- Map + Skills -->
+    <div class="row" style="margin-top:8px">
+      <label>맵:
+        <select id="mapSelect">
+          <option value="plain">초원</option>
+          <option value="desert">사막</option>
+          <option value="snow">눈길</option>
+          <option value="rain">빗길</option>
+          <option value="city">도심</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="skillSprint" checked> 질주</label>
+      <label><input type="checkbox" id="skillDraft" checked> 드래프팅</label>
+      <label><input type="checkbox" id="skillBump"> 소프트 충돌</label>
+    </div>
+    <div class="hint small">맵 특성: 사막=속도↓ Sprint체감↑, 눈길=노이즈↑, 빗길=노이즈↑ Draft↓ Bump↑, 도심=속도↑</div>
+
+    <!-- Mode -->
+    <div class="panel" style="margin-top:10px">
+      <h2>모드 선택</h2>
+      <div class="mode-row">
+        <label class="mode-card">
+          <input type="radio" name="mode" value="normal" id="modeNormal" checked>
+          <div>
+            <div class="mode-title">일반 모드</div>
+            <div class="mode-desc">참가자 <b>2~14명</b>일 때 사용</div>
+          </div>
+        </label>
+        <label class="mode-card">
+          <input type="radio" name="mode" value="tournament" id="modeTournament">
+          <div>
+            <div class="mode-title">토너먼트</div>
+            <div class="mode-desc">참가자 <b>15명 이상</b> 자동 분할(예선→결승)</div>
+          </div>
+        </label>
+      </div>
+      <div class="mode-hint">현재 참가자: <span id="pCount">0</span>명 — <span id="pValidity">모드를 선택하세요.</span></div>
+      <div class="row" style="margin-top:6px">
+        <label>우승자 수:
+          <select id="topKSelect"><option>1</option><option>2</option><option>3</option></select>
+        </label>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="row" style="margin-top:10px">
+      <button class="btn btn-accent" id="startBtn" disabled>Start Race ▶</button>
+      <button class="btn btn-ghost" id="shakeBtn" disabled>Shake!</button>
+    </div>
+
+    <!-- Info / Winner -->
+    <div class="hint" id="oddsBox" style="display:none"></div>
+    <div class="panel" id="winnerBox" style="display:none;margin-top:10px">
+      <div class="small" id="timeBox"></div>
+      <p><strong>🏁 Winner:</strong> <span id="winnerName"></span></p>
+    </div>
+
+    <!-- Replay / Share -->
+    <div class="row" style="margin-top:8px">
+      <button class="btn btn-ghost" id="dlLogBtn" disabled>리플레이 로그 다운로드</button>
+      <label class="btn btn-ghost" style="cursor:pointer">
+        로그 불러오기<input id="loadLogInput" type="file" accept="application/json" style="display:none">
+      </label>
+      <button class="btn btn-ghost" id="shareBtn">공유 링크 복사</button>
+    </div>
+
+    <!-- Contact / Support -->
+    <div class="row" style="margin-top:8px">
+      <button class="btn-contact" onclick="openContact()">📩 문의하기</button>
+      <a class="btn btn-ghost" href="https://www.buymeacoffee.com/YOUR_ID" target="_blank" rel="noopener">🐴 개발자에게 말밥 보내주기</a>
+    </div>
+
+    <div class="footer">
+      <div class="small">Seed/입력 재현 가능 · 오리지널 SVG/JS/CSS만 사용(저작권 안전)</div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Track -->
+  <section class="panel">
+    <h2>트랙</h2>
+    <div class="track plain" id="track">
+      <div class="finish" id="finish"></div>
+    </div>
+  </section>
+</div>
+
+<footer class="legal">
+  <small>© 2025 luckyhorserace — Original SVG/JS/CSS. No third-party assets or emoji glyphs used. For entertainment purposes only.</small>
+</footer>
+
+<!-- ======== Scripts ======== -->
+<script>
+/* ---------------- Utilities ---------------- */
+function mulberry32(a){return function(){var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296;}}
+let _rand = Math.random;
+function reseed(seed){ Number.isFinite(seed) ? (_rand = mulberry32(seed|0)) : (_rand = Math.random); }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(_rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function parseInput(raw){
+  const lines = raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const out=[]; for(const line of lines){ const m=line.match(/^(.+?)(?:\*(\d+))?$/); if(!m) continue;
+    out.push({name:m[1].trim(), weight: Math.max(1, m[2]?parseInt(m[2],10):1)}); }
+  return out;
+}
+function prettyOdds(entries){ const tot=entries.reduce((a,b)=>a+b.weight,0);
+  return '<b>가중치 기반 추정 확률</b><br>'+entries.map(e=>{const p=e.weight/tot;return `${e.name}: ${(p*100).toFixed(1)}% (≈ ${(1/p).toFixed(2)})`}).join('<br>'); }
+
+/* ---------------- SVG Horse ---------------- */
+const JERSEYS = ['#f59e0b','#22c55e','#3b82f6','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#60a5fa','#34d399','#f97316','#a3e635','#e879f9','#f43f5e'];
+function jerseyColorFromIndex(i){ return JERSEYS[i % JERSEYS.length]; }
+function horseSVG(jerseyColor='#f59e0b'){
+  return `
+<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--jersey:${jerseyColor}">
+  <g class="g-legs-b">
+    <rect x="16" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="30" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/>
+  </g>
+  <g class="g-bob">
+    <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
+    <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
+    <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
+    <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
+    <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
+  </g>
+  <g class="g-legs-a">
+    <rect x="22" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="38" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/>
+  </g>
+</svg>`;
+}
+
+/* ---------------- DOM ---------------- */
+const $names=document.getElementById('names'); const $shuffle=document.getElementById('shuffleBtn');
+const $build=document.getElementById('buildBtn'); const $reset=document.getElementById('resetBtn');
+const $raceLen=document.getElementById('raceLen'); const $seed=document.getElementById('seed');
+const $track=document.getElementById('track'); const $finish=document.getElementById('finish');
+const $start=document.getElementById('startBtn'); const $shake=document.getElementById('shakeBtn');
+const $oddsBox=document.getElementById('oddsBox'); const $winnerBox=document.getElementById('winnerBox');
+const $winnerName=document.getElementById('winnerName'); const $timeBox=document.getElementById('timeBox');
+const $mapSelect=document.getElementById('mapSelect');
+const $modeNormal=document.getElementById('modeNormal'); const $modeTournament=document.getElementById('modeTournament');
+const $pCount=document.getElementById('pCount'); const $pValidity=document.getElementById('pValidity');
+const $topKSel=document.getElementById('topKSelect');
+const $dlLog=document.getElementById('dlLogBtn'); const $loadLogInput=document.getElementById('loadLogInput'); const $shareBtn=document.getElementById('shareBtn');
+
+/* Skills toggles */
+const $skillSprint=document.getElementById('skillSprint'); const $skillDraft=document.getElementById('skillDraft'); const $skillBump=document.getElementById('skillBump');
+
+/* ---------------- State ---------------- */
+const MIN_HORSES=2, MAX_HORSES=14;
+let state={horses:[], tickets:[], running:false, startTs:0, raf:null, finishX:800};
+let _shake=0;
+
+/* Replay state */
+const replay={seed:null, finishX:0, map:'plain', mode:'normal', topK:1, entries:[], events:[], running:false, startedAt:0};
+function logEvent(type, payload={}){ if(!replay.running) return; const t=performance.now()-replay.startedAt; replay.events.push({t:Math.round(t),type,...payload}); }
+function downloadJSON(filename,obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url); }
+
+/* ---------------- Maps (reality modifiers) ---------------- */
+const MAPS={
+  plain:{ speedMul:1.00, noiseMul:1.00, sprintBoost:1.00, draftMul:1.00, bumpProb:1.00, class:'plain' },
+  desert:{speedMul:0.93, noiseMul:1.00, sprintBoost:1.15, draftMul:1.00, bumpProb:1.00, class:'desert'},
+  snow:{  speedMul:0.95, noiseMul:1.45, sprintBoost:1.00, draftMul:1.00, bumpProb:1.05, class:'snow'},
+  rain:{  speedMul:1.00, noiseMul:1.30, sprintBoost:1.00, draftMul:0.75, bumpProb:1.30, class:'night'}, /* visual uses night */
+  city:{  speedMul:1.05, noiseMul:1.00, sprintBoost:1.10, draftMul:1.00, bumpProb:1.00, class:'city'}
+};
+let currentMap='plain';
+
+/* ---------------- Skills ---------------- */
+const SPRINT={ probPerFrame:0.006, durMs:[250,600], boost:+1.5, cdMs:[1500,3000] };
+const DRAFT={ rangeMin:40, rangeMax:70, bonusMax:0.08 }; // +8%
+const BUMP={ dist:14, nudge:-0.5, cdMs:[800,1200] };
+
+function randIn([a,b]){ return a + _rand()*(b-a); }
+
+/* ---------------- Build Track ---------------- */
+function applyCompactClass(n){
+  $track.classList.remove('compact-9','compact-11','compact-13','compact-14');
+  if(n>=14) $track.classList.add('compact-14'); else if(n>=13) $track.classList.add('compact-13');
+  else if(n>=11) $track.classList.add('compact-11'); else if(n>=9) $track.classList.add('compact-9');
+}
+function buildTrack(){
+  cancel(); $winnerBox.style.display='none'; $oddsBox.style.display='none';
+  let entries=parseInput($names.value);
+  if(entries.length<MIN_HORSES){ alert(`최소 ${MIN_HORSES}명 이상 입력하세요.`); return; }
+  // 일반 모드에서 14 초과는 막기(토너먼트는 별도 흐름)
+  if(currentMode()==='normal' && entries.length>MAX_HORSES){ alert(`일반 모드는 최대 ${MAX_HORSES}명까지. 토너먼트를 선택하세요.`); return; }
+
+  const seedVal=parseFloat($seed.value); reseed(Number.isFinite(seedVal)? seedVal: NaN);
+  shuffle(entries);
+
+  // map
+  currentMap=$mapSelect.value; Object.values(MAPS).forEach(m=> $track.classList.remove(m.class)); $track.classList.add(MAPS[currentMap].class);
+
+  [...$track.querySelectorAll('.lane')].forEach(n=>n.remove());
+  state.horses=[]; state.tickets=[]; state.finishX=Math.max(400,Math.min(2200,parseInt($raceLen.value,10)||800));
+  applyCompactClass(entries.length);
+
+  const frag=document.createDocumentFragment();
+  entries.forEach((e,idx)=>{
+    const lane=document.createElement('div'); lane.className='lane';
+    const label=document.createElement('div'); label.className='label'; label.textContent=e.name;
+    const horse=document.createElement('div'); horse.className='horse'; horse.style.transform='translateX(0px)';
+    const color=jerseyColorFromIndex(idx); horse.innerHTML=horseSVG(color);
+    const nameplate=document.createElement('div'); nameplate.className='nameplate'; nameplate.textContent=e.name; horse.appendChild(nameplate);
+    const badge=document.createElement('div'); badge.className='jersey-badge'; badge.textContent=(idx+1); horse.appendChild(badge);
+    lane.appendChild(label); lane.appendChild(horse); frag.appendChild(lane);
+    state.horses.push({name:e.name, weight:e.weight, el:horse, x:0, v: 1.6 + _rand()*0.6,
+      sprintTime:0, sprintCD:0, wasDraft:false, bumpCD:0 });
+  });
+  $track.appendChild(frag);
+
+  // tickets
+  state.horses.forEach((h,i)=>{ for(let k=0;k<h.weight;k++) state.tickets.push(i); });
+
+  // odds
+  $oddsBox.style.display='block'; $oddsBox.innerHTML=prettyOdds(entries);
+
+  $start.disabled=false; $shake.disabled=false;
+
+  // replay init
+  replay.seed = Number.isFinite(seedVal)? seedVal : null;
+  replay.finishX = state.finishX; replay.map=currentMap; replay.mode=currentMode(); replay.topK=parseInt($topKSel.value,10)||1;
+  replay.entries = state.horses.map(h=>({name:h.name, weight:h.weight}));
+  replay.events = []; $dlLog && ($dlLog.disabled=true);
+}
+
+/* ---------------- Helpers ---------------- */
+function fx(horseEl, text){ const fx=document.createElement('div'); fx.className='fx-pop'; fx.textContent=text; horseEl.appendChild(fx); requestAnimationFrame(()=>fx.classList.add('show')); setTimeout(()=>fx.remove(), 800); }
+function getRankings(){ return [...state.horses].sort((a,b)=> b.x-a.x || a.name.localeCompare(b.name)).map(h=>({name:h.name, weight:h.weight, x:h.x})); }
+
+/* ---------------- Frame Loop ---------------- */
+let _raceResolve=null;
+function progressOf(h){ return Math.min(1, Math.max(0, h.x / state.finishX)); }
+function frame(ts){
+  if(!state.startTs) state.startTs = ts;
+  const m = MAPS[currentMap];
+  // Skills per-frame updates
+  const boostedIdx = state.tickets[Math.floor(_rand()*state.tickets.length)];
+  // Find leader for drafting
+  let leader=state.horses[0]; for(const hh of state.horses){ if(hh.x>leader.x) leader=hh; }
+
+  for(let i=0;i<state.horses.length;i++){
+    const h=state.horses[i];
+    if(h.sprintCD>0) h.sprintCD -= 16; if(h.sprintTime>0) h.sprintTime -= 16;
+    if(h.bumpCD>0) h.bumpCD -= 16;
+
+    // Sprint proc
+    if($skillSprint.checked && h.sprintTime<=0 && h.sprintCD<=0){
+      if(_rand() < SPRINT.probPerFrame){
+        h.sprintTime = randIn(SPRINT.durMs); h.sprintCD = randIn(SPRINT.cdMs);
+        fx(h.el,'⚡ 질주'); logEvent('sprint_on',{name:h.name});
+      }
+    }
+
+    // Base motion
+    let noise = (_rand()-0.5)*0.6 * m.noiseMul;
+    let boost = (i===boostedIdx? 1.0: 0.2);
+    const shakeKick = _shake>0 ? (_rand()*1.2) : 0;
+    let skillAdd = 0;
+    if($skillSprint.checked && h.sprintTime>0) skillAdd += SPRINT.boost;
+    // Drafting
+    let nowDraft=false;
+    if($skillDraft.checked && leader!==h){
+      const d = leader.x - h.x;
+      nowDraft = (d>=DRAFT.rangeMin && d<=DRAFT.rangeMax);
+      if(nowDraft){
+        const draftGain = Math.min(DRAFT.bonusMax, DRAFT.bonusMax*(1 - (d-DRAFT.rangeMin)/(DRAFT.rangeMax-DRAFT.rangeMin)));
+        skillAdd += (h.v + boost) * draftGain * m.draftMul;
+      }
+      if(nowDraft && !h.wasDraft){ fx(h.el,'💨 드래프팅'); logEvent('draft_on',{name:h.name, behindOf: leader.name}); }
+      if(h.wasDraft && !nowDraft){ logEvent('draft_off',{name:h.name}); }
+      h.wasDraft = nowDraft;
+    }
+
+    // Bump (soft)
+    if($skillBump.checked && h.bumpCD<=0 && m.bumpProb>0){
+      // Check nearest neighbor ahead within BUMP.dist
+      for(const other of state.horses){
+        if(other===h) continue;
+        const dx = other.x - h.x;
+        if(dx>0 && dx < BUMP.dist){
+          // small nudge both
+          h.v = Math.max(0.8, h.v + BUMP.nudge);
+          other.v = Math.max(0.8, other.v + BUMP.nudge);
+          h.bumpCD = randIn(BUMP.cdMs); // pair cool-down approximated
+          break;
+        }
+      }
+    }
+
+    h.v += (0.02 * (_rand()-0.5)); // smear variance
+    let dx = (h.v + noise + boost + shakeKick + skillAdd) * m.speedMul;
+    if($skillSprint.checked && h.sprintTime>0) dx *= m.sprintBoost;
+    h.x += Math.max(0, dx);
+    h.el.style.transform = `translateX(${Math.min(h.x, state.finishX)}px)`;
+  }
+  if(_shake>0) _shake -= 1;
+
+  const winner = state.horses.find(h=>h.x>=state.finishX);
+  if(winner){ finish(winner); return; }
+  state.raf = requestAnimationFrame(frame);
+}
+
+function start(){
+  if(state.running || state.horses.length===0) return;
+  state.running=true; state.startTs=0; $winnerBox.style.display='none';
+  replay.running=true; replay.startedAt=performance.now(); logEvent('start',{});
+  // 3-2-1 카운트다운 간단 연출
+  let c=3; const tid=setInterval(()=>{ fx(state.horses[0]?.el || $track, String(c)); c--; if(c===0){ clearInterval(tid); } },300);
+  state.raf = requestAnimationFrame(frame);
+}
+function cancel(){ if(state.raf) cancelAnimationFrame(state.raf); state.running=false; }
+function finish(winner){
+  cancelAnimationFrame(state.raf); state.running=false;
+  const sec=((performance.now()-state.startTs)/1000).toFixed(2);
+  const ranks=getRankings();
+  $winnerName.textContent=winner.name; $timeBox.textContent=`경주 시간: ${sec}s`;
+  $winnerBox.style.display='block';
+  const topK = parseInt($topKSel.value,10)||1;
+  if(topK>1){
+    const names=ranks.slice(0,topK).map((r,i)=>`${i+1}위 ${r.name}`).join(', ');
+    if(!document.getElementById('topkline')){
+      const div=document.createElement('div'); div.id='topkline'; div.className='small'; div.textContent=`상위 ${topK}: ${names}`; $winnerBox.appendChild(div);
+    }else{ document.getElementById('topkline').textContent=`상위 ${topK}: ${names}`; }
+  }
+  logEvent('finish',{name:winner.name}); replay.running=false; $dlLog && ($dlLog.disabled=false);
+  if(_raceResolve){ _raceResolve({ranks,time:+sec}); _raceResolve=null; }
+}
+
+/* ---------------- Mode / Tournament ---------------- */
+function currentMode(){ return $modeTournament.checked ? 'tournament' : 'normal'; }
+function chunk(arr,size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+
+async function runOneRaceAndGetRanks(entries){
+  return new Promise(res=>{
+    _raceResolve=res;
+    $names.value=entries.map(e=> e.weight===1? e.name : `${e.name}*${e.weight}`).join('\n');
+    buildTrack(); start();
+  });
+}
+
+async function runTournamentAll(entries, finalistsPerHeat=2){
+  const heats = chunk(entries, MAX_HORSES);
+  const finalists=[];
+  for(let i=0;i<heats.length;i++){
+    alert(`예선 ${i+1}/${heats.length} 시작`);
+    const r = await runOneRaceAndGetRanks(heats[i]);
+    finalists.push(...r.ranks.slice(0,finalistsPerHeat));
+  }
+  const finalEntries = finalists.slice(0,MAX_HORSES).map(r=>({name:r.name, weight:1}));
+  alert('결승전 시작!');
+  return await runOneRaceAndGetRanks(finalEntries);
+}
+
+/* ---------------- UI wiring ---------------- */
+function updateParticipantHint(){
+  const n=parseInput($names.value).length; $pCount.textContent=n;
+  const mode=currentMode(); let msg='',cls='';
+  if(mode==='normal'){
+    if(n===0){ msg='참가자를 입력하세요.'; cls='badge-no'; }
+    else if(n<MIN_HORSES){ msg=`일반 모드는 최소 ${MIN_HORSES}명 필요`; cls='badge-no'; }
+    else if(n>MAX_HORSES){ msg=`일반 모드는 최대 ${MAX_HORSES}명. 토너먼트 선택!`; cls='badge-warn'; }
+    else { msg='일반 모드 시작 가능 ✅'; cls='badge-ok'; }
+  }else{
+    if(n<15){ msg='토너먼트는 15명 이상 필요'; cls='badge-no'; }
+    else { msg='토너먼트 시작 가능 ✅ (자동 분할)'; cls='badge-ok'; }
+  }
+  $pValidity.className=cls; $pValidity.textContent=msg;
+}
+
+$mapSelect.addEventListener('change', ()=>{
+  currentMap=$mapSelect.value; Object.values(MAPS).forEach(m=> $track.classList.remove(m.class)); $track.classList.add(MAPS[currentMap].class);
+});
+$shuffle.addEventListener('click', ()=>{
+  const entries=parseInput($names.value); if(entries.length===0) return;
+  reseed(parseFloat($seed.value)); shuffle(entries);
+  $names.value=entries.map(e=> e.weight===1? e.name : `${e.name}*${e.weight}`).join('\n'); updateParticipantHint();
+});
+$build.addEventListener('click', ()=>{
+  const all=parseInput($names.value); const n=all.length;
+  if(currentMode()==='normal' && n>MAX_HORSES){ alert(`현재 일반 모드입니다. 참가자가 ${n}명으로 ${MAX_HORSES}명을 초과했어요.\n'토너먼트' 모드를 선택해 주세요.`); return; }
+  buildTrack();
+});
+$reset.addEventListener('click', ()=>{
+  cancel(); $winnerBox.style.display='none'; $oddsBox.style.display='none'; $start.disabled=true; $shake.disabled=true;
+  [...$track.querySelectorAll('.lane')].forEach(n=>n.remove());
+});
+$start.addEventListener('click', async ()=>{
+  const all=parseInput($names.value); const n=all.length; const mode=currentMode();
+  if(mode==='normal'){
+    if(n<MIN_HORSES){ alert(`일반 모드는 최소 ${MIN_HORSES}명 필요`); return; }
+    if(n>MAX_HORSES){ alert(`일반 모드는 최대 ${MAX_HORSES}명까지입니다.`); return; }
+    await runOneRaceAndGetRanks(all);
+  }else{
+    if(n<15){ alert('토너먼트 모드는 15명 이상 입력하세요.'); return; }
+    const finalistsPerHeat = Math.min(parseInt($topKSel.value,10)||1,3);
+    await runTournamentAll(all, finalistsPerHeat);
+  }
+});
+$shake.addEventListener('click', ()=>{ _shake=5; });
+
+$names.addEventListener('input', updateParticipantHint);
+$modeNormal.addEventListener('change', updateParticipantHint);
+$modeTournament.addEventListener('change', updateParticipantHint);
+
+/* Replay download/load */
+$dlLog?.addEventListener('click', ()=>{
+  if(!replay.events.length){ alert('저장할 로그가 없습니다.'); return; }
+  const name = `race-log_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+  downloadJSON(name, replay);
+});
+$loadLogInput?.addEventListener('change', async (e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const txt=await f.text(); const obj=JSON.parse(txt);
+  // simple replay: rebuild UI to show entries and seed, then run in "replay mode" (same RNG path)
+  $seed.value = obj.seed ?? '';
+  $names.value = (obj.entries||[]).map(e=> e.weight===1? e.name : `${e.name}*${e.weight}`).join('\n');
+  $mapSelect.value = obj.map || 'plain';
+  $modeNormal.checked = true; $modeTournament.checked=false;
+  updateParticipantHint(); buildTrack(); start();
+});
+
+/* Share link (seed + names + map + mode + topK) */
+$shareBtn?.addEventListener('click', ()=>{
+  const params = new URLSearchParams();
+  params.set('seed', $seed.value||'');
+  params.set('map', $mapSelect.value);
+  params.set('mode', currentMode());
+  params.set('topK', $topKSel.value);
+  params.set('names', btoa(unescape(encodeURIComponent($names.value))));
+  const url = location.origin + location.pathname + '?' + params.toString();
+  navigator.clipboard.writeText(url).then(()=> alert('공유 링크가 복사되었습니다!'));
+});
+
+/* On load: parse share URL */
+(function initFromURL(){
+  const q=new URLSearchParams(location.search);
+  if(q.has('names')){
+    try{
+      $names.value = decodeURIComponent(escape(atob(q.get('names'))));
+      if(q.get('seed')) $seed.value = q.get('seed');
+      if(q.get('map')) $mapSelect.value = q.get('map');
+      if(q.get('mode')==='tournament'){ $modeTournament.checked=true; } else { $modeNormal.checked=true; }
+      if(q.get('topK')) $topKSel.value = q.get('topK');
+    }catch(e){}
+  }else{
+    $names.value=['짱구*5','짱아*3','봉미선*2','철수*1','훈이*2','유리*1','맹구*1','수지*2'].join('\n');
+  }
+  updateParticipantHint();
+})();
+
+/* Contact modal */
+const EMAIL="luckyhorserace@gmail.com";
+function openContact(){
+  const m=document.getElementById('contactModal');
+  document.getElementById('contactEmail').textContent=EMAIL;
+  const mailto="mailto:"+EMAIL+"?subject="+encodeURIComponent("경마 추첨 문의")+"&body="+encodeURIComponent("안녕하세요.\n문의/요청 내용을 작성해 주세요.");
+  const a=document.getElementById('mailtoLink'); a.href=mailto; m.classList.add('show');
+}
+function closeContact(){ document.getElementById('contactModal').classList.remove('show'); }
+function copyEmail(){ navigator.clipboard.writeText(EMAIL).then(()=> alert("이메일 주소가 복사되었습니다!")); }
+</script>
+
+<!-- Contact Modal -->
+<div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+  <div class="modal-content">
+    <h3 id="contactTitle">문의 안내</h3>
+    <p>문의하시거나 요청하실 사항은 아래 이메일로 자유롭게 연락주세요 🙂</p>
+    <div class="contact-box">
+      <code id="contactEmail">luckyhorserace@gmail.com</code>
+      <div class="btn-row">
+        <button class="btn" onclick="copyEmail()">복사하기</button>
+        <a id="mailtoLink" class="btn btn-ghost" href="#">메일 쓰기</a>
+      </div>
+    </div>
+    <button class="btn-close" onclick="closeContact()">닫기</button>
+  </div>
+</div>
+
+<!--
+  Lucky Horse Race (c) 2025 luckyhorserace
+  Original SVG/JS/CSS by luckyhorserace — MIT Licensed
+  No third-party assets or emoji glyphs are used.
+-->
+</body>
+</html>
