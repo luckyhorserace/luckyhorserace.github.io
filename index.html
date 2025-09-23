@@ -27,7 +27,7 @@ button,.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-we
 /* ===== Track container ===== */
 .track{position:relative;border:1px solid var(--border);border-radius:12px;padding:16px;height:auto;background:linear-gradient(180deg,#0f172a,#0c111b)}
 /* 직선 모드: 스크롤 */
-.scroll{position:relative;height:100%;min-width:calc(var(--finishX,1400px) + 220px); overflow:hidden}
+.scroll{position:relative;height:100%;min-width:calc(var(--finishX,1400px) + 220px); overflow:auto}
 .finish{position:absolute;top:12px;bottom:12px;width:18px;left:var(--finishX,1400px);
   background:conic-gradient(#fff 25%,#000 0 50%,#fff 0 75%,#000 0) 0/10px 10px;border:1px solid #000;
   box-shadow:0 0 0 2px #111827 inset;border-radius:4px}
@@ -178,6 +178,22 @@ textarea#names{width:100%;min-height:110px}
   <small>© 2025 luckyhorserace — Original SVG/JS/CSS only. No third-party assets or emoji glyphs. For entertainment purposes.</small>
 </footer>
 
+<!-- ===== Modal ===== -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 style="margin:0 0 6px">문의</h3>
+    <div class="contact-box small">
+      버그/개선 제안은 깃허브 이슈나 이메일로 남겨주세요.<br>
+      <strong>Email:</strong> dev@example.com
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="navigator.clipboard.writeText('dev@example.com')">메일 복사</button>
+      <button class="btn-ghost" onclick="window.open('https://github.com/your/repo','_blank')">GitHub 열기</button>
+    </div>
+    <button class="btn-close" onclick="closeContact()">닫기</button>
+  </div>
+</div>
+
 <!-- ===== SCRIPTS ===== -->
 <script>
 /* ---------- PRNG ---------- */
@@ -191,12 +207,14 @@ function parseInput(raw){
   return raw.split(/\n+/).map(s=>s.trim()).filter(Boolean).map(name=>({name, weight:1}));
 }
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(_rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+function lerp(a,b,t){ return a + (b-a)*t; }
 function fxIcon(horseEl, key, label){
   const svg = key==='bolt'
     ? '<svg viewBox="0 0 24 24"><path fill="#f59e0b" d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>'
     : '<svg viewBox="0 0 24 24"><path fill="#60a5fa" d="M4 10h10a3 3 0 100-6 1 1 0 100 2 1 1 0 110 2H4v2zm0 4h14a3 3 0 110 6 1 1 0 110-2 1 1 0 100-2H4v-2z"/></svg>';
   const fx=document.createElement('div'); fx.className='fx-pop'; fx.innerHTML=svg+'<span>'+label+'</span>';
-  horseEl.appendChild(fx); requestAnimationFrame(()=>fx.classList.add('show')); setTimeout(()=>fx.remove(),800);
+  horseEl.appendChild(fx); requestAnimationFrame(()=>fx.classList.add('show')); setTimeout(()=>fx.remove(),900);
 }
 
 /* ---------- Horse SVG ---------- */
@@ -242,7 +260,7 @@ function downloadJSON(name,obj){ const blob=new Blob([JSON.stringify(obj,null,2)
 
 /* ---------- Skills/Map (단일, 항상 ON) ---------- */
 const MAP={ speedMul:1.00, noiseMul:1.00, sprintBoost:1.10, draftMul:1.00, bumpProb:1.00 };
-const SPRINT={ probPerFrame:0.006, durMs:[250,600], boost:+1.5, cdMs:[1500,3000] };
+const SPRINT={ probPerFrame:0.006, durMs:[250,600], boost:+1.5, cdMs:[1200,2400] };
 const DRAFT={ rangeMin:40, rangeMax:70, bonusMax:0.08 };
 const BUMP ={ distLinear:14, distAngle:0.05, nudge:-0.5, cdMs:[800,1200] };
 function randIn([a,b]){ return a + _rand()*(b-a); }
@@ -251,4 +269,349 @@ function randIn([a,b]){ return a + _rand()*(b-a); }
 function currentMode(){ return $modeTournament.checked? 'tournament':'normal'; }
 function applyCompactClassLinear(n){
   $scroll.classList.remove('compact-9','compact-11','compact-13','compact-14');
-  if(n>=14)$
+  if(n>=14)$scroll.classList.add('compact-14');
+  else if(n>=13)$scroll.classList.add('compact-13');
+  else if(n>=11)$scroll.classList.add('compact-11');
+  else if(n>=9)$scroll.classList.add('compact-9');
+}
+function setFinishX(px){
+  state.finishX = Math.max(900, px|0);
+  $scroll.style.setProperty('--finishX', state.finishX + 'px');
+}
+function resetWinner(){ $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent=''; }
+
+/* ---------- Build Lanes (linear) ---------- */
+function buildLinear(entries){
+  $scroll.innerHTML=''; // clear
+  const lanesFrag=document.createDocumentFragment();
+  entries.forEach((ent,i)=>{
+    const lane=document.createElement('div'); lane.className='lane';
+    const label=document.createElement('div'); label.className='label'; label.textContent=ent.name;
+    const horse=document.createElement('div'); horse.className='horse'; horse.style.left='0px';
+    horse.innerHTML=horseSVG(jerseyColorFromIndex(i));
+    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=ent.name;
+    horse.appendChild(plate);
+    const badge=document.createElement('div'); badge.className='jersey-badge'; badge.textContent=String((i+1)%10);
+    lane.appendChild(badge);
+    lane.appendChild(label);
+    lane.appendChild(horse);
+    ent.$lane=lane; ent.$horse=horse; ent.x=0; ent.v=0; ent.cd=0; ent.cdB=0; ent.sprintLeft=0; ent.done=false;
+    lanesFrag.appendChild(lane);
+  });
+  $scroll.appendChild(lanesFrag);
+  $scroll.appendChild($finish);
+  applyCompactClassLinear(entries.length);
+  // finish line placement by viewport width
+  const visW = $trackLinear.clientWidth - 80; // padding allowance
+  setFinishX(Math.max(1200, visW));
+}
+
+/* ---------- Build (oval) ---------- */
+function buildOval(entries){
+  const rect = $oval.getBoundingClientRect();
+  state.cx = rect.width/2; state.cy = rect.height/2;
+  state.rx = Math.min(rect.width*0.39, 430); state.ry = Math.min(rect.height*0.36, 210);
+  $oval.innerHTML = $oval.innerHTML; // keep SVG & flag; this is a quick reset trick
+  // reselect static nodes
+  // (SVG and flag are recreated by the line above, re-query them)
+  const horsesFrag=document.createDocumentFragment();
+  entries.forEach((ent,i)=>{
+    const h=document.createElement('div'); h.className='horse2'; h.innerHTML=horseSVG(jerseyColorFromIndex(i));
+    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=ent.name;
+    h.appendChild(plate);
+    ent.$oval=h; ent.theta=0; ent.v=0; ent.cd=0; ent.cdB=0; ent.sprintLeft=0; ent.done=false; ent.progress=0;
+    horsesFrag.appendChild(h);
+  });
+  $oval.appendChild(horsesFrag);
+}
+
+/* ---------- Size/Participants hint ---------- */
+function updatePHint(list){
+  const n=list.length;
+  let badge = (n<MIN_HORSES) ? '<span class="badge-no">최소 2명</span>'
+            : (n>MAX_HORSES && currentMode()==='normal') ? '<span class="badge-warn">14명 초과 → 토너먼트 권장</span>'
+            : '<span class="badge-ok">OK</span>';
+  $pHint.innerHTML = `참가자 ${n}명 · ${badge}`;
+}
+
+/* ---------- Physics step (linear) ---------- */
+function stepLinear(dt, entries){
+  const base = 0.18 * MAP.speedMul; // px/ms
+  entries.forEach((h,i)=>{
+    if(h.done) return;
+    const noise = ( (_rand()-0.5)*0.06 ) * MAP.noiseMul;
+    // draft: find leader ahead within range
+    let draft=0;
+    for(const o of entries){ if(o===h) continue; const d = (o.x - h.x); if(d> DRAFT.rangeMin && d < DRAFT.rangeMax){ draft = Math.max(draft, DRAFT.bonusMax*(1 - (d-DRAFT.rangeMin)/(DRAFT.rangeMax-DRAFT.rangeMin)) ); } }
+    // bump (rare backward nudge if very close)
+    if(h.cdB<=0){
+      for(const o of entries){ if(o===h) continue; if(Math.abs(o.x-h.x) < BUMP.distLinear){ h.v += BUMP.nudge; h.cdB = randIn(BUMP.cdMs); fxIcon(h.$horse,'bump','부딪힘!'); break; } }
+    }
+    // sprint chance
+    if(h.sprintLeft<=0 && h.cd<=0 && _rand() < SPRINT.probPerFrame){
+      h.sprintLeft = randIn(SPRINT.durMs);
+      h.cd = randIn(SPRINT.cdMs);
+      fxIcon(h.$horse,'bolt','스프린트!');
+    }
+    const sprint = h.sprintLeft>0 ? SPRINT.boost : 0;
+    h.v = (base + noise) * (1 + draft*MAP.draftMul) + sprint;
+    h.x += h.v * dt;
+    h.sprintLeft -= dt; h.cd -= dt; h.cdB -= dt;
+
+    h.$horse.style.left = Math.max(0, h.x|0) + 'px';
+    // finish
+    const finishAt = state.finishX - 40; // a little margin
+    if(h.x >= finishAt){
+      h.done = true;
+      logEvent('finish',{name:h.name, t:performance.now()-state.startTs});
+    }
+  });
+}
+
+/* ---------- Physics step (oval) ---------- */
+function stepOval(dt, entries){
+  const base = 0.00125 * MAP.speedMul; // rad/ms scaled
+  entries.forEach((h,i)=>{
+    if(h.done) return;
+    const noise = (_rand()-0.5)*0.0004;
+    // draft by angle
+    let draft=0;
+    for(const o of entries){ if(o===h) continue; const d = (o.theta - h.theta); if(d> BUMP.distAngle && d < (BUMP.distAngle + 0.5)){ draft = Math.max(draft, 0.06); } }
+    if(h.cdB<=0){
+      for(const o of entries){ if(o===h) continue; if(Math.abs(o.theta - h.theta) < BUMP.distAngle){ h.v += -0.002; h.cdB = randIn(BUMP.cdMs); break; } }
+    }
+    if(h.sprintLeft<=0 && h.cd<=0 && _rand() < SPRINT.probPerFrame){
+      h.sprintLeft = randIn(SPRINT.durMs);
+      h.cd = randIn(SPRINT.cdMs);
+      fxIcon(h.$oval,'bolt','스프린트!');
+    }
+    const sprint = h.sprintLeft>0 ? 0.003 : 0;
+    h.v = (base + noise) * (1 + draft) + sprint;
+    h.theta += h.v * dt;
+    h.sprintLeft -= dt; h.cd -= dt; h.cdB -= dt;
+
+    // position map
+    const t = h.theta;
+    const x = state.cx + state.rx * Math.cos(t);
+    const y = state.cy + state.ry * Math.sin(t);
+    h.$oval.style.left = x + 'px';
+    h.$oval.style.top  = y + 'px';
+    // rotate heading
+    const dx = -state.rx*Math.sin(t), dy = state.ry*Math.cos(t);
+    const ang = Math.atan2(dy,dx) * 180/Math.PI;
+    h.$oval.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+
+    // finish laps
+    h.progress = h.theta/(Math.PI*2);
+    if(h.progress >= state.laps){
+      h.done = true;
+      logEvent('finish',{name:h.name, t:performance.now()-state.startTs});
+    }
+  });
+}
+
+/* ---------- Race Loop ---------- */
+function runRace(entries, modeType){
+  return new Promise(resolve=>{
+    state.running=true; replay.running=true; replay.events=[]; replay.startedAt=performance.now(); state.startTs = performance.now();
+    function tick(now){
+      // dt
+      const dt = 16; // fixed step ~60fps
+      if(state.type==='linear') stepLinear(dt, entries);
+      else stepOval(dt, entries);
+
+      // leader auto-scroll (linear)
+      if(state.type==='linear'){
+        const maxX = Math.max(...entries.map(h=>h.x||0));
+        $scroll.scrollLeft = Math.max(0, maxX - $scroll.clientWidth*0.55);
+      }
+
+      // check finishers
+      const alive = entries.filter(h=>!h.done);
+      const finished = entries.filter(h=>h.done && !h._counted);
+      finished.forEach(h=>{ h._counted=true; });
+
+      const topK = Number($topKSel.value)||1;
+      const order = entries.slice().sort((a,b)=> (b.done-b.done) || (b.x-a.x) || (b.progress-a.progress));
+      const winners = order.filter(h=>h.done).slice(0, topK);
+
+      if(winners.length>=topK || alive.length===0){
+        state.running=false; cancelAnimationFrame(state.raf); state.raf=null;
+        const tElapsed = ((performance.now()-state.startTs)/1000).toFixed(2);
+        $winnerBox.style.display='block';
+        $winnerName.textContent = winners.map(w=>w.name).join(', ');
+        $timeBox.textContent = `경과 ${tElapsed}s`;
+        logEvent('race_end',{winners:winners.map(w=>w.name)});
+        resolve(winners);
+        return;
+      }
+      state.raf = requestAnimationFrame(tick);
+    }
+    state.raf = requestAnimationFrame(tick);
+  });
+}
+
+/* ---------- Tournament (simple) ---------- */
+async function runTournament(allEntries){
+  const chunk = 12; // heat size
+  const heats = [];
+  for(let i=0;i<allEntries.length;i+=chunk) heats.push(allEntries.slice(i,i+chunk));
+  const finalists=[];
+  for(let hi=0;hi<heats.length;hi++){
+    // build one heat
+    const group = heats[hi];
+    buildByType(group);
+    await delay(300);
+    await runRace(group);
+    const k = Math.min(3, group.length); // top 3 to final
+    const top = group.slice().sort((a,b)=> (b.done-b.done) || (b.x-a.x) || (b.progress-a.progress)).slice(0,k)
+      .map(x=>({name:x.name, weight:1}));
+    finalists.push(...top);
+    await delay(300);
+    resetWinner();
+  }
+  // final
+  const finalistsUnique = finalists.slice(0, MAX_HORSES);
+  buildByType(finalistsUnique);
+  await delay(400);
+  const winners = await runRace(finalistsUnique);
+  return winners;
+}
+
+/* ---------- Build by track type ---------- */
+function buildByType(entries){
+  if(state.type==='linear'){ buildLinear(entries); }
+  else { buildOval(entries); }
+}
+
+/* ---------- Controls ---------- */
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function readEntries(){
+  const list = parseInput($names.value);
+  updatePHint(list);
+  return list;
+}
+
+function openContact(){ document.getElementById('modal').classList.add('show'); }
+function closeContact(){ document.getElementById('modal').classList.remove('show'); }
+
+function resetAll(){
+  cancelAnimationFrame(state.raf); state.raf=null; state.running=false;
+  $dlLog.disabled=true; replay.running=false; replay.events=[];
+  $scroll.innerHTML=''; $scroll.appendChild($finish);
+  $oval.querySelectorAll('.horse2').forEach(n=>n.remove());
+  resetWinner();
+}
+
+function applyQuery(){
+  const params = new URLSearchParams(location.search);
+  if(params.has('names')){
+    try{
+      const arr = JSON.parse(decodeURIComponent(params.get('names')));
+      if(Array.isArray(arr) && arr.length){ $names.value = arr.join('\n'); }
+    }catch{}
+  }
+  if(params.get('mode')==='tournament'){ $modeTournament.checked=true; }
+  if(params.get('type')==='oval'){ $trackType.value='oval'; }
+}
+
+function shareLink(){
+  const list = readEntries().map(x=>x.name);
+  const params = new URLSearchParams();
+  params.set('names', encodeURIComponent(JSON.stringify(list)));
+  params.set('mode', currentMode());
+  params.set('type', $trackType.value);
+  const url = location.origin + location.pathname + '?' + params.toString();
+  navigator.clipboard.writeText(url).then(()=>{
+    fxIcon(document.body,'bolt','링크 복사됨');
+    alert('공유 링크가 복사되었습니다!');
+  });
+}
+
+$build.addEventListener('click', ()=>{
+  if(state.running) return;
+  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
+  const entries = readEntries();
+  if(entries.length<MIN_HORSES){ alert('최소 2명을 입력해주세요.'); return; }
+  const draw = entries.slice(0, currentMode()==='normal' ? Math.min(entries.length, MAX_HORSES) : entries.length);
+  resetAll();
+  buildByType(draw);
+});
+
+$start.addEventListener('click', async ()=>{
+  if(state.running) return;
+  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
+  let entries = readEntries();
+  const seed = autoSeed(); reseed(seed); replay.seed=seed;
+  replay.mode=currentMode(); replay.type=state.type; replay.topK = Number($topKSel.value)||1; replay.entries = entries.map(e=>e.name);
+  $dlLog.disabled=false;
+
+  if(entries.length<MIN_HORSES){ alert('최소 2명을 입력해주세요.'); return; }
+
+  resetWinner();
+  if(currentMode()==='normal' && entries.length>MAX_HORSES){
+    if(!confirm('일반 모드는 최대 14명입니다. 토너먼트로 진행할까요?')) return;
+    $modeTournament.checked=true;
+  }
+
+  if(currentMode()==='normal'){
+    const draw = entries.slice(0, Math.min(entries.length, MAX_HORSES));
+    shuffle(draw);
+    buildByType(draw);
+    await delay(300);
+    await runRace(draw);
+  }else{
+    // tournament
+    shuffle(entries);
+    await runTournament(entries);
+  }
+});
+
+$reset.addEventListener('click', ()=>{ resetAll(); });
+
+$names.addEventListener('input', ()=>updatePHint(readEntries()));
+
+$trackType.addEventListener('change', ()=>{
+  if(state.running) return;
+  state.type = $trackType.value==='oval' ? 'oval' : 'linear';
+  // rebuild placeholder lanes to reflect type if entries present
+  const list = readEntries();
+  if(list.length>=MIN_HORSES){
+    resetAll();
+    buildByType(list.slice(0, Math.min(list.length, MAX_HORSES)));
+  }
+});
+
+$shareBtn.addEventListener('click', shareLink);
+
+$dlLog.addEventListener('click', ()=>{
+  const name = `race_log_${Date.now()}.json`;
+  downloadJSON(name, replay);
+});
+
+$loadLogInput.addEventListener('change', async (e)=>{
+  const file = e.target.files?.[0]; if(!file) return;
+  const text = await file.text();
+  try{
+    const data = JSON.parse(text);
+    if(Array.isArray(data.entries)){ $names.value = data.entries.join('\n'); updatePHint(readEntries()); }
+    alert('로그를 불러왔습니다. 참가자 목록에 적용했습니다.');
+  }catch{ alert('유효하지 않은 JSON 로그입니다.'); }
+});
+
+/* Resize finish line on viewport changes for linear */
+window.addEventListener('resize', ()=>{
+  if(state.type==='linear'){
+    const visW = $trackLinear.clientWidth - 80;
+    setFinishX(Math.max(1200, visW));
+  }
+});
+
+/* ---------- Init ---------- */
+applyQuery();
+updatePHint(readEntries());
+setFinishX(1400);
+</script>
+</body>
+</html>
