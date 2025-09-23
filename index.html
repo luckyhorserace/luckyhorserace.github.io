@@ -16,8 +16,8 @@ body{
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif
 }
 button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px}
+a.btn-ghost,button.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 14px}
 .btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
-.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
 .btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
 
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
@@ -34,7 +34,8 @@ header{
 .logo{width:40px;height:40px;border-radius:12px;border:1px solid #22314d;background:linear-gradient(140deg,#1b2a45,#0c1627);display:grid;place-items:center}
 .logo svg{width:26px;height:26px}
 h1{margin:0;font-size:16px;letter-spacing:.2px}
-.sub{display:none} /* 좌하단 보라색 문구 제거 */
+/* 좌하단 보라색 문구 제거: 요소 자체도 삭제했지만 혹시 남아도 숨김 */
+.sub{display:none}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
 #names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none}
@@ -74,7 +75,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .winner{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:none; padding:12px 16px; border-radius:12px; background:linear-gradient(180deg,#0e1e33,#0a1626); border:1px solid #213250; z-index:15}
 .winner strong{color:#9ae6b4}.timer{color:#a0aec0;font-size:12px}
 
-/* 순위판(오른쪽 파란 영역) */
+/* 순위판(오른쪽) — 항상 노출 */
 .ranking{
   position:absolute; top:12px; right:12px; width:180px;
   background:rgba(8,18,34,.78); border:1px solid #2a3b54; border-radius:10px;
@@ -86,7 +87,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900; color:#6ee7ff}
 
-/* 관중석(상단 빨간 영역) */
+/* 관중석(상단) — 항상 노출 */
 .crowdBand{
   position:absolute; left:0; right:0; top:0; height:90px; z-index:8;
   overflow:hidden; pointer-events:none;
@@ -103,7 +104,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 }
 @keyframes crowdBob{0%{transform:translateX(0) scale(1.2)}50%{transform:translateX(-2%) scale(1.2)}100%{transform:translateX(0) scale(1.2)}}
 
-/* 중계석(하단 중앙 ~ 7시 방향) */
+/* 중계석(하단 중앙) — 항상 노출 */
 .booth{
   position:absolute; left:50%; bottom:100px; transform:translateX(-50%);
   width:360px; z-index:12; pointer-events:none;
@@ -208,7 +209,6 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       </div>
       <div>
         <h1>Lucky Horse Race — Oval</h1>
-        <p class="sub">hidden</p>
       </div>
     </div>
 
@@ -226,10 +226,15 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       </select>
       <button class="btn-accent" id="startBtn">Start Race ▶</button>
       <button class="btn-ghost" id="resetBtn">Reset</button>
-      <!-- 말밥 보내주기 (당근/건초 아이콘) -->
-      <button class="btn-ghost" id="btnDonate">
-        <span aria-hidden="true" style="margin-right:6px">🥕</span>개발자에게 말밥 보내주기<span aria-hidden="true" style="margin-left:6px">🌾</span>
-      </button>
+      <!-- 개발자에게 당근 보내주기 (링크로 이동) -->
+      <a class="btn-ghost" id="btnDonate" href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener">
+        <!-- 당근 그림 SVG -->
+        <svg viewBox="0 0 64 64" width="20" height="20" aria-hidden="true">
+          <path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/>
+          <path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        개발자에게 당근 보내주기
+      </a>
       <button class="btn-ghost" id="btnContact">문의</button>
     </div>
   </header>
@@ -238,36 +243,13 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 <!-- 문의 모달 -->
 <div class="modal" id="modal">
   <div class="panel" style="max-width:380px;margin:8% auto">
-    <h3 style="margin:0 0 6px">문의 · 제안 · 보안 이슈</h3>
+    <h3 style="margin:0 0 6px">문의 · 제안 · 건의사항</h3>
     <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
       <strong>Email:</strong> <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
     </div>
     <div style="display:flex;gap:8px;justify-content:center">
       <button class="btn-ghost" onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 주소 복사</button>
       <button class="btn-accent" onclick="document.getElementById('modal').style.display='none'">닫기</button>
-    </div>
-  </div>
-</div>
-
-<!-- 후원 모달 -->
-<div class="modal" id="donateModal">
-  <div class="panel" style="max-width:420px;margin:8% auto">
-    <h3 style="margin:0 0 6px">개발자에게 말밥 보내주기</h3>
-    <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
-        <div class="btn-ghost" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px">
-          <svg viewBox="0 0 64 64" width="24" height="24"><path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/><path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/></svg>
-          당근 한 다발
-        </div>
-        <div class="btn-ghost" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px">
-          <svg viewBox="0 0 64 64" width="24" height="24"><rect x="10" y="22" width="44" height="20" rx="6" fill="#e8c87a"/><path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/></svg>
-          건초 한 포대
-        </div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <a class="btn-accent" href="#" onclick="alert('후원 링크 연결!')">후원하기</a>
-      <button class="btn-ghost" onclick="document.getElementById('donateModal').style.display='none'">닫기</button>
     </div>
   </div>
 </div>
@@ -327,9 +309,8 @@ const $rankingLines=document.getElementById('rankingLines');
 const $commentary=document.getElementById('commentaryBox');
 const $btnVoice=document.getElementById('btnVoice');
 
-/* 문의/후원 버튼: 클릭 정상 동작 */
+/* 문의 버튼: 클릭 정상 동작 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
-document.getElementById('btnDonate').onclick=()=>document.getElementById('donateModal').style.display='block';
 
 /* ======= State ======= */
 const MIN=2, MAX=14;
@@ -404,7 +385,7 @@ function placeHorse(h){
   h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
 }
 
-/* 카메라: 고정 */
+/* 카메라: 고정 (추후 확장 여지) */
 function followCamera(){}
 
 /* ======= Crowd Sound via WebAudio ======= */
@@ -562,6 +543,7 @@ function instantPreview(){
   buildGate(list.length||1);
   if(list.length>0) buildHorses(list,true);
   else clearHorses();
+  updateRanking();
 }
 $names.addEventListener('input', instantPreview);
 
