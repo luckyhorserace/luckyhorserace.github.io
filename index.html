@@ -16,8 +16,8 @@ body{
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif
 }
 button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px}
-a.btn-ghost,button.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 14px}
 .btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
+.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
 .btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
 
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
@@ -34,8 +34,7 @@ header{
 .logo{width:40px;height:40px;border-radius:12px;border:1px solid #22314d;background:linear-gradient(140deg,#1b2a45,#0c1627);display:grid;place-items:center}
 .logo svg{width:26px;height:26px}
 h1{margin:0;font-size:16px;letter-spacing:.2px}
-/* 좌하단 보라색 문구 제거: 요소 자체도 삭제했지만 혹시 남아도 숨김 */
-.sub{display:none}
+.sub{display:none} /* 좌하단 보라색 문구 제거 */
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
 #names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none}
@@ -75,9 +74,9 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .winner{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:none; padding:12px 16px; border-radius:12px; background:linear-gradient(180deg,#0e1e33,#0a1626); border:1px solid #213250; z-index:15}
 .winner strong{color:#9ae6b4}.timer{color:#a0aec0;font-size:12px}
 
-/* 순위판(오른쪽) — 항상 노출 */
+/* 순위판(오른쪽 파란 영역) */
 .ranking{
-  position:absolute; top:12px; right:12px; width:180px;
+  position:absolute; top:12px; right:12px; width:200px;
   background:rgba(8,18,34,.78); border:1px solid #2a3b54; border-radius:10px;
   padding:8px; z-index:25; backdrop-filter: blur(4px);
   font-size:13px; line-height:1.5;
@@ -87,7 +86,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900; color:#6ee7ff}
 
-/* 관중석(상단) — 항상 노출 */
+/* 관중석(상단 빨간 영역) */
 .crowdBand{
   position:absolute; left:0; right:0; top:0; height:90px; z-index:8;
   overflow:hidden; pointer-events:none;
@@ -104,7 +103,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 }
 @keyframes crowdBob{0%{transform:translateX(0) scale(1.2)}50%{transform:translateX(-2%) scale(1.2)}100%{transform:translateX(0) scale(1.2)}}
 
-/* 중계석(하단 중앙) — 항상 노출 */
+/* 중계석(하단 중앙 ~ 7시 방향) */
 .booth{
   position:absolute; left:50%; bottom:100px; transform:translateX(-50%);
   width:360px; z-index:12; pointer-events:none;
@@ -209,15 +208,20 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       </div>
       <div>
         <h1>Lucky Horse Race — Oval</h1>
+        <p class="sub">hidden</p>
       </div>
     </div>
 
     <div class="controls">
       <input id="names" type="text" placeholder="참가자 입력 (예: 고구마/감자/김치)">
+      <button class="btn-ghost" id="shuffleBtn" title="출발 위치 랜덤화">말 섞기 🔀</button>
       <select id="raceLen">
         <option value="1">1바퀴</option>
+        <option value="3">3바퀴</option>
         <option value="5" selected>5바퀴</option>
         <option value="10">10바퀴</option>
+        <option value="15">15바퀴</option>
+        <option value="20">20바퀴</option>
       </select>
       <select id="camMode">
         <option value="leader" selected>선두 추적</option>
@@ -226,14 +230,9 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       </select>
       <button class="btn-accent" id="startBtn">Start Race ▶</button>
       <button class="btn-ghost" id="resetBtn">Reset</button>
-      <!-- 개발자에게 당근 보내주기 (링크로 이동) -->
+      <!-- 당근 보내주기 -->
       <a class="btn-ghost" id="btnDonate" href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener">
-        <!-- 당근 그림 SVG -->
-        <svg viewBox="0 0 64 64" width="20" height="20" aria-hidden="true">
-          <path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/>
-          <path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-        개발자에게 당근 보내주기
+        <span aria-hidden="true" style="margin-right:6px">🥕</span>개발자에게 당근 보내주기
       </a>
       <button class="btn-ghost" id="btnContact">문의</button>
     </div>
@@ -242,7 +241,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 
 <!-- 문의 모달 -->
 <div class="modal" id="modal">
-  <div class="panel" style="max-width:380px;margin:8% auto">
+  <div class="panel" style="max-width:420px;margin:8% auto">
     <h3 style="margin:0 0 6px">문의 · 제안 · 건의사항</h3>
     <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
       <strong>Email:</strong> <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
@@ -266,8 +265,9 @@ function splitNames(raw){
   return raw.split('/')
             .map(s=>s.trim())
             .filter(Boolean)
-            .slice(0,14).map((n,i)=>({name:n, no:i+1}));
+            .slice(0,50).map((n,i)=>({name:n, no:i+1}));
 }
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()* (i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
 
 /* ======= SVG Horse ======= */
@@ -290,6 +290,7 @@ const $raceLen=document.getElementById('raceLen');
 const $camMode=document.getElementById('camMode');
 const $start=document.getElementById('startBtn');
 const $reset=document.getElementById('resetBtn');
+const $shuffle=document.getElementById('shuffleBtn');
 
 const $stage=document.getElementById('stage');
 const $canvas=document.getElementById('canvas');
@@ -309,11 +310,11 @@ const $rankingLines=document.getElementById('rankingLines');
 const $commentary=document.getElementById('commentaryBox');
 const $btnVoice=document.getElementById('btnVoice');
 
-/* 문의 버튼: 클릭 정상 동작 */
+/* 문의 버튼 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
 
 /* ======= State ======= */
-const MIN=2, MAX=14;
+const MIN=2, MAX=50;
 let running=false, raf=null, startTs=0;
 let H=[]; // horses
 const cx=500, cy=300, rxRun=390, ryRun=190;
@@ -385,8 +386,10 @@ function placeHorse(h){
   h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
 }
 
-/* 카메라: 고정 (추후 확장 여지) */
-function followCamera(){}
+/* 카메라 모드 */
+function followCamera(){
+  // 간단: 고정 (확장 준비만)
+}
 
 /* ======= Crowd Sound via WebAudio ======= */
 let audioCtx=null, crowdGain=null;
@@ -441,6 +444,21 @@ function speakK(text){
 }
 function setCommentary(text){ $commentary.firstChild.nodeValue=text; }
 
+/* ======= Crowd random chants ======= */
+let chantTimer=null;
+function startChants(){
+  stopChants();
+  chantTimer=setInterval(()=>{
+    if(!running || H.length===0) return;
+    const pick=H[Math.floor(Math.random()*H.length)];
+    const shout = Math.random()<0.5 ? `와와! 달려라 ${pick.no}번!` : `${pick.no}번 달려라!`;
+    setCommentary(shout);
+    speakK(shout);
+    crowdCheer(0.55);
+  }, 2800);
+}
+function stopChants(){ if(chantTimer){ clearInterval(chantTimer); chantTimer=null; } }
+
 /* ======= Countdown ======= */
 async function countdown(){
   $hud.classList.add('show'); $ltR.className='light'; $ltY.className='light'; $ltG.className='light'; $gunTxt.textContent='';
@@ -474,9 +492,8 @@ function step(dt){
     // 랩 통과 체크
     if(h.theta >= (-Math.PI/2) + ((lapsDoneByHorse.get(h.no)||0)+1)*TWO_PI){
       lapsDoneByHorse.set(h.no,(lapsDoneByHorse.get(h.no)||0)+1);
-      setCommentary(`${h.no}번 ${h.name} ${lapsDoneByHorse.get(h.no)}바퀴 통과!`);
-      speakK(`${h.no}번 ${h.name} ${lapsDoneByHorse.get(h.no)}바퀴 통과`);
-      crowdCheer(0.6);
+      const line=`${h.no}번 ${h.name} ${lapsDoneByHorse.get(h.no)}바퀴 통과!`;
+      setCommentary(line); speakK(line); crowdCheer(0.6);
     }
   }
 
@@ -486,12 +503,11 @@ function step(dt){
     const leader=order[0];
     if(lastLeaderNo!==leader.no){
       if(lastLeaderNo!==null){
-        setCommentary(`${leader.no}번 ${leader.name}! 선두로 역전합니다!`);
-        speakK(`${leader.no}번 ${leader.name}! 선두로 역전합니다`);
-        crowdCheer(0.85);
+        const line=`${leader.no}번 ${leader.name}! 선두로 역전합니다!`;
+        setCommentary(line); speakK(line); crowdCheer(0.85);
       }else{
-        setCommentary(`출발! 현재 선두는 ${leader.no}번 ${leader.name}!`);
-        speakK(`출발! 현재 선두는 ${leader.no}번 ${leader.name}`);
+        const line=`출발! 현재 선두는 ${leader.no}번 ${leader.name}!`;
+        setCommentary(line); speakK(line);
       }
       lastLeaderNo=leader.no;
     }
@@ -503,17 +519,17 @@ function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
 
 function run(){
   running=true; startTs=performance.now(); lastLeaderNo=null; lapsDoneByHorse.clear();
+  startChants();
   const tick=()=>{
     step(16);
     if(H.every(h=>h.done)){
-      running=false; cancelAnimationFrame(raf); raf=null;
+      running=false; cancelAnimationFrame(raf); raf=null; stopChants();
       const win=orderByLead()[0];
       $winnerName.textContent=`${win.no}번 ${win.name}`;
       $timeBox.textContent=`경과 ${((performance.now()-startTs)/1000).toFixed(1)}s`;
       $winnerBox.style.display='block';
       setCommentary(`체크 플래그! 우승은 ${win.no}번 ${win.name}!`);
-      speakK(`우승은 ${win.no}번 ${win.name}`);
-      crowdCheer(1.0);
+      speakK(`우승은 ${win.no}번 ${win.name}`); crowdCheer(1.0);
       return;
     }
     raf=requestAnimationFrame(tick);
@@ -524,14 +540,14 @@ function run(){
 /* ======= Ranking UI ======= */
 function updateRanking(){
   const order=orderByLead();
-  $rankingLines.innerHTML=order.map((h,i)=>`
-    <div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name}</span></div>
-  `).join('');
+  $rankingLines.innerHTML=order.map((h,i)=>
+    `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name}</span></div>`
+  ).join('');
 }
 
 /* ======= Controls ======= */
 function resetAll(){
-  cancelAnimationFrame(raf); raf=null; running=false;
+  cancelAnimationFrame(raf); raf=null; running=false; stopChants();
   $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent='';
   $gate.querySelectorAll('.stall').forEach(s=>s.classList.remove('open'));
   clearHorses();
@@ -543,15 +559,26 @@ function instantPreview(){
   buildGate(list.length||1);
   if(list.length>0) buildHorses(list,true);
   else clearHorses();
-  updateRanking();
 }
 $names.addEventListener('input', instantPreview);
+
+/* 말 섞기: 입력된 이름의 출발 위치만 랜덤화 */
+$shuffle.addEventListener('click', ()=>{
+  const arr=splitNames($names.value);
+  if(arr.length<1) return;
+  const shuffled=[...arr];
+  shuffle(shuffled);
+  // 번호 다시 부여(게이트 번호)
+  shuffled.forEach((x,i)=> x.no=i+1 );
+  buildGate(shuffled.length);
+  buildHorses(shuffled,true);
+});
 
 $start.addEventListener('click', async ()=>{
   if(running) return;
   const list=splitNames($names.value);
   if(list.length<MIN){ alert('최소 2명을 입력해주세요. 예: 고구마/감자'); return; }
-  if(list.length>MAX){ alert('최대 14명까지만 가능합니다.'); }
+  if(list.length>MAX){ alert('최대 50명까지만 가능합니다.'); }
   laps=parseInt($raceLen.value,10)||5;
   reseed(autoSeed());
   resetAll();
