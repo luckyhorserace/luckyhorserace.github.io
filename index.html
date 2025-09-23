@@ -3,53 +3,48 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Lucky Horse Race — Oval One-Track</title>
+<title>Lucky Horse Race — Fullscreen Oval</title>
 <style>
 :root{
   --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --border:#1f2937;
-  --accent:#6ee7ff; --accent2:#22c55e;
+  --accent:#6ee7ff;
 }
 *{box-sizing:border-box} html,body{height:100%}
-body{margin:0;color:var(--ink);background:radial-gradient(1200px 600px at 70% -10%, #13233c 0%, #0b1220 45%, #090f1a 100%);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1100px;margin:0 auto;padding:16px}
+body{
+  margin:0; color:var(--ink);
+  background:radial-gradient(1400px 700px at 70% -10%, #13233c 0%, #0b1220 45%, #090f1a 100%);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif
+}
+button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px}
+.btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
+.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
+.btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
 
-/* header */
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 14px}
+.wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
+
+/* 헤더: 오버레이 */
+header{
+  position:absolute; inset:auto 0 0 0; top:0; height:auto; padding:10px 12px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:linear-gradient(180deg,rgba(4,10,20,.75),rgba(4,10,20,0));
+  z-index:20
+}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:40px;height:40px;border-radius:12px;border:1px solid #22314d;background:linear-gradient(140deg,#1b2a45,#0c1627);display:grid;place-items:center}
 .logo svg{width:26px;height:26px}
-h1{margin:0;font-size:20px;letter-spacing:.2px}
+h1{margin:0;font-size:18px;letter-spacing:.2px}
 .sub{margin:2px 0 0;color:var(--muted);font-size:12px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
 
-/* panel */
-.panel{background:linear-gradient(180deg,var(--panel),#0c1322 70%);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-.controls{display:flex;gap:12px;flex-wrap:wrap}
-.card{flex:1 1 360px;display:flex;flex-direction:column;gap:10px}
-label.small{font-size:12px;color:var(--muted)}
-input[type=text]{width:100%;padding:12px;border:1px solid #223047;border-radius:12px;background:#0b1220;color:#dbe7f3;outline:none}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-select,.chip, label.chk{background:#0b1220;border:1px solid #223047;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
-label.chk{display:flex;align-items:center;gap:6px;cursor:pointer}
-button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px}
-.btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
-.btn-ghost{background:transparent;border:1px solid #2a3a57;color:#cbd5e1}
-.btn-accent:hover{filter:brightness(1.06)} .btn-ghost:hover{filter:brightness(1.1)}
-.hint{font-size:12px;color:var(--muted)}
+/* 스테이지: 화면 꽉 채움 */
+.stage{position:absolute; inset:0; }
+.canvas{position:absolute; left:50%; top:50%; width:min(1600px, 95vw); height:auto; transform:translate(-50%,-50%)}
+.ovalSvg{width:100%; height:auto}
 
-/* OVAL STAGE (스크롤/줌 감성 + 카메라 추적) */
-.stageWrap{position:relative;border:1px solid var(--border);border-radius:14px;padding:0;background:linear-gradient(180deg,#0d1728,#0c111b);height:560px;overflow:auto}
-.stage{position:relative;width:1600px;height:1000px; /* 큼직하게 만들어서 스크롤 추적 느낌 */
-  background:#0c111b}
-.ovalSvg{position:absolute;inset:80px 140px}
-.startFlag{position:absolute;width:8px;height:40px;background:#fff;border:1px solid #000;left:50%;top:50%;transform:translate(-50%,-50%)}
-
-/* horses on oval */
+/* 말 */
 .horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%);will-change:transform}
 .nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3a57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;pointer-events:none;white-space:nowrap;max-width:150px;text-overflow:ellipsis;overflow:hidden}
-
-/* svg horse (내가 만든 오리지널) */
 .horse-svg{width:46px;height:34px}
 .horse-svg .body{fill:#e5e7eb}.horse-svg .mane{fill:#cbd5e1}.horse-svg .jockey{fill:var(--jersey,#60a5fa)}.horse-svg .saddle{fill:#94a3b8}.horse-svg .eye{fill:#0f172a}
 @keyframes bob {0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
@@ -59,13 +54,13 @@ button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:
 .horse-svg .g-legs-a{animation:legA .22s infinite ease-in-out}
 .horse-svg .g-legs-b{animation:legB .22s infinite ease-in-out}
 
-/* starting gate (칸막이) */
-.gate{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(8,1fr);gap:6px;pointer-events:none}
+/* 스타팅 게이트 */
+.gate{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; grid-template-columns:repeat(8,1fr); gap:6px; pointer-events:none; z-index:5}
 .stall{width:48px;height:50px;border:2px solid #22314d;border-radius:8px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 2px #0b1220}
 .stall.open{transform:translateY(-62px);transition:transform .35s ease}
 
-/* countdown HUD */
-.hud{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:10}
+/* HUD(신호등/카운트다운) */
+.hud{position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:10}
 .hud.show{display:flex}
 .traffic{display:flex;gap:10px;align-items:center;background:#0b1220;border:1px solid #334155;padding:10px 14px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
 .light{width:18px;height:18px;border-radius:50%;background:#111827;border:1px solid #334155;box-shadow:0 0 0 2px #09111e inset}
@@ -73,24 +68,18 @@ button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:
 .countTxt{margin-left:6px;font-weight:900;letter-spacing:.3px}
 .gun{margin-left:8px;font-size:12px;color:#93c5fd}
 
-/* finish FX (폭죽/건초/당근) */
-.fx{position:absolute;top:-10px;left:50%;transform:translate(-50%,-100%);background:#111827;color:#e5e7eb;font-size:11px;padding:4px 7px;border:1px solid #334155;border-radius:8px;opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease;white-space:nowrap;display:flex;gap:6px;align-items:center}
-.fx.show{opacity:1;transform:translate(-50%,-140%)}
-.fx svg{width:12px;height:12px;display:block}
-.fire{position:absolute;pointer-events:none}
-@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-.particle{position:absolute;width:10px;height:10px;border-radius:2px;animation:pop .18s ease-out;}
-
-/* winner banner */
-.winner{margin-top:12px;display:none;padding:12px;border-radius:12px;background:linear-gradient(180deg,#0e1e33,#0a1626);border:1px solid #213250}
+/* 우승 배너 */
+.winner{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:none; padding:12px 16px; border-radius:12px; background:linear-gradient(180deg,#0e1e33,#0a1626); border:1px solid #213250; z-index:15}
 .winner strong{color:#9ae6b4}.timer{color:#a0aec0;font-size:12px}
 
-/* announcer */
-.announcer{margin-top:8px;font-size:13px;color:#d6e2f1;min-height:20px}
+/* 모달 공통 */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
+.panel{background:linear-gradient(180deg,var(--panel),#0c1322 70%);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <!-- 헤더: 오버레이 UI -->
   <header>
     <div class="brand">
       <div class="logo" aria-hidden="true">
@@ -102,90 +91,79 @@ button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:
         </svg>
       </div>
       <div>
-        <h1>Lucky Horse Race — Oval One-Track</h1>
-        <p class="sub">원형 트랙 · 모두 한 트랙 · 스타팅게이트 · 카메라 추적 · 피니시 폭죽</p>
+        <h1>Lucky Horse Race — Oval</h1>
+        <p class="sub">전체 화면 · 원형 트랙 · 게이트 · 카운트다운</p>
       </div>
     </div>
-    <div class="row">
-      <button class="btn-ghost" id="btnDonate">말밥 보내주기</button>
+
+    <div class="controls">
+      <input id="names" type="text" placeholder="참가자 입력 (쉼표/공백/엔터/’@이름’ 가능)" style="min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none">
+      <select id="raceLen">
+        <option value="short">짧게(~60초)</option>
+        <option value="standard" selected>표준(~120초)</option>
+        <option value="drama">드라마(~180초)</option>
+      </select>
+      <select id="camMode">
+        <option value="leader" selected>선두 추적</option>
+        <option value="horse1">1번마 추적</option>
+        <option value="none">고정</option>
+      </select>
+      <button class="btn-accent" id="startBtn">Start Race ▶</button>
+      <button class="btn-ghost" id="resetBtn">Reset</button>
+      <button class="btn-ghost" id="btnDonate">개발자에게 말밥 보내주기</button>
       <button class="btn-ghost" id="btnContact">문의</button>
     </div>
   </header>
 
-  <section class="panel controls">
-    <div class="card">
-      <label class="small">참가자 입력 (쉼표/공백/엔터/’@이름@이름’ 모두 가능)</label>
-      <input id="names" type="text" placeholder="예) 진구, 비실이, 퉁퉁이 @토르@나루토 루피 사스케">
-      <div class="row">
-        <span class="chip">연출 길이
-          <select id="raceLen">
-            <option value="short">짧게(~60초)</option>
-            <option value="standard" selected>표준(~120초)</option>
-            <option value="drama">드라마(~180초)</option>
-          </select>
-        </span>
-        <span class="chip">카메라
-          <select id="camMode">
-            <option value="leader">선두 추적</option>
-            <option value="horse1" selected>1번마 추적</option>
-            <option value="none">고정</option>
-          </select>
-        </span>
-        <label class="chk"><input type="checkbox" id="bananaToggle"> 바나나 장애물 ON</label>
-      </div>
-      <div class="row">
-        <button class="btn-accent" id="startBtn">Start Race ▶</button>
-        <button class="btn-ghost" id="resetBtn">Reset</button>
-      </div>
-      <div class="hint" id="pHint">참가자 0명</div>
-      <div class="announcer" id="announcer"></div>
+  <!-- HUD -->
+  <div class="hud" id="hud">
+    <div class="traffic">
+      <div class="light" id="ltR"></div>
+      <div class="light" id="ltY"></div>
+      <div class="light" id="ltG"></div>
+      <span class="countTxt" id="countTxt">Ready</span>
+      <span class="gun" id="gunTxt"></span>
     </div>
-  </section>
+  </div>
 
-  <section class="panel stageWrap" id="stageWrap">
-    <!-- HUD (신호등/카운트다운/권총) -->
-    <div class="hud" id="hud">
-      <div class="traffic">
-        <div class="light" id="ltR"></div>
-        <div class="light" id="ltY"></div>
-        <div class="light" id="ltG"></div>
-        <span class="countTxt" id="countTxt">Ready</span>
-        <span class="gun" id="gunTxt"></span>
-      </div>
-    </div>
-
-    <div class="stage" id="stage">
-      <!-- 트랙 SVG (큰 캔버스 중앙) -->
+  <!-- 스테이지(트랙은 화면 가운데에 자동 맞춤) -->
+  <div class="stage" id="stage">
+    <div class="canvas" id="canvas">
       <svg class="ovalSvg" id="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-        <rect x="0" y="0" width="1000" height="600" fill="#0c111b"/>
-        <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#243447" stroke-width="2"/>
+        <!-- 배경 -->
+        <defs>
+          <radialGradient id="grass" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#0b1422"/>
+            <stop offset="100%" stop-color="#09101b"/>
+          </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="1000" height="600" fill="url(#grass)"/>
+        <!-- 바깥/안쪽 벽 + 러닝 라인 -->
+        <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
         <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-        <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#334155" stroke-dasharray="6,6"/>
+        <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
+        <!-- 스타트 라인 -->
+        <line x1="500" y1="80" x2="500" y2="120" stroke="#e5e7eb" stroke-width="3"/>
       </svg>
-      <div class="startFlag"></div>
-
-      <!-- 스타팅 게이트(칸막이) -->
+      <!-- 게이트 -->
       <div class="gate" id="gate"></div>
-
-      <!-- 말들 & 오브젝트는 JS에서 추가 -->
     </div>
-  </section>
-
-  <div class="winner panel" id="winnerBox">
-    <div class="timer" id="timeBox"></div>
-    <div><strong>우승:</strong> <span id="winnerName"></span></div>
+    <!-- 우승 배너 -->
+    <div class="winner" id="winnerBox">
+      <div class="timer" id="timeBox"></div>
+      <div><strong>우승:</strong> <span id="winnerName"></span></div>
+    </div>
   </div>
 </div>
 
 <!-- 문의 모달 -->
-<div class="modal" id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999">
+<div class="modal" id="modal">
   <div class="panel" style="max-width:380px;margin:8% auto">
     <h3 style="margin:0 0 6px">문의 · 제안 · 보안 이슈</h3>
-    <div class="hint" style="margin:8px 0 12px">이메일로 보내주세요.</div>
-    <div class="panel" style="padding:10px;border-style:dashed">
+    <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
       <strong>Email:</strong> <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
     </div>
-    <div class="row" style="justify-content:center;margin-top:8px">
+    <div style="display:flex;gap:8px;justify-content:center">
       <button class="btn-ghost" onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 주소 복사</button>
       <button class="btn-accent" onclick="document.getElementById('modal').style.display='none'">닫기</button>
     </div>
@@ -193,23 +171,24 @@ button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:
 </div>
 
 <!-- 후원 모달 -->
-<div class="modal" id="donateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999">
+<div class="modal" id="donateModal">
   <div class="panel" style="max-width:380px;margin:8% auto">
-    <h3 style="margin:0 0 6px">말밥 보내주기</h3>
-    <div class="hint">원하는 후원 링크를 연결하세요.</div>
-    <div class="row" style="justify-content:center;margin:10px 0">
-      <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
+    <h3 style="margin:0 0 6px">개발자에게 말밥 보내주기</h3>
+    <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <!-- 건초 -->
-        <svg viewBox="0 0 64 64" width="24" height="24"><rect x="10" y="22" width="44" height="20" rx="6" fill="#e8c87a"/><path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/></svg>
-        건초 한 포대
-      </div>
-      <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
+        <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 64 64" width="24" height="24"><rect x="10" y="22" width="44" height="20" rx="6" fill="#e8c87a"/><path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/></svg>
+          건초 한 포대
+        </div>
         <!-- 당근 -->
-        <svg viewBox="0 0 64 64" width="24" height="24"><path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/><path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/></svg>
-        당근 두 개
+        <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 64 64" width="24" height="24"><path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/><path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/></svg>
+          당근 두 개
+        </div>
       </div>
     </div>
-    <div class="row" style="justify-content:center">
+    <div style="display:flex;gap:8px;justify-content:center">
       <a class="btn-accent" href="#" onclick="alert('후원 링크 연결!')">후원하기</a>
       <button class="btn-ghost" onclick="document.getElementById('donateModal').style.display='none'">닫기</button>
     </div>
@@ -224,28 +203,15 @@ function autoSeed(){return (Date.now() ^ Math.floor(Math.random()*0xFFFFFFFF))>>
 const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e','#6ee7ff'];
 function jc(i){return JERSEYS[i%JERSEYS.length]}
 function splitNames(raw){
-  // 쉼표, 공백, 줄바꿈, @구분 모두 허용
-  return raw
-    .replace(/@/g,' ')              // @ → space
-    .replace(/[,\n\r\t]+/g,' ')     // 콤마/개행 → space
-    .split(/\s+/)                   // 한 칸 이상 공백으로 split
-    .map(s=>s.trim()).filter(Boolean)
-    .slice(0,14)
-    .map((n,i)=>({name:n, no:i+1}));
+  return raw.replace(/@/g,' ')
+            .replace(/[,\n\r\t]+/g,' ')
+            .split(/\s+/).map(s=>s.trim()).filter(Boolean)
+            .slice(0,14).map((n,i)=>({name:n, no:i+1}));
 }
 function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
 function lerp(a,b,t){return a+(b-a)*t}
-function fx(h,icon,label){
-  const svg = icon==='bang'
-    ? '<svg viewBox="0 0 24 24"><path fill="#f59e0b" d="M2 12l8-2-2-8 8 2 2-4 4 8-4 2 4 2-8 4 2-4-8-2 4-4z"/></svg>'
-    : icon==='trophy'
-      ? '<svg viewBox="0 0 24 24"><path fill="#facc15" d="M6 3h12v3a6 6 0 01-6 6 6 6 0 01-6-6V3zm4 11h4v3H10v-3zM7 20h10v2H7z"/></svg>'
-      : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#93c5fd"/></svg>';
-  const el=document.createElement('div'); el.className='fx'; el.innerHTML=svg+'<span>'+label+'</span>';
-  h.appendChild(el); requestAnimationFrame(()=>el.classList.add('show')); setTimeout(()=>el.remove(),1000);
-}
 
-/* ======= SVG Horse (오리지널) ======= */
+/* ======= SVG Horse ======= */
 function horseSVG(color='#60a5fa'){ return `
 <svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="--jersey:${color}">
   <g class="g-legs-b"><rect x="16" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="30" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/></g>
@@ -259,26 +225,15 @@ function horseSVG(color='#60a5fa'){ return `
   <g class="g-legs-a"><rect x="22" y="29" width="5" height="12" rx="1" fill="#cbd5e1"/><rect x="38" y="28" width="5" height="12" rx="1" fill="#cbd5e1"/></g>
 </svg>`}
 
-/* ======= Banana (장애물) ======= */
-function bananaSVG(){ return `
-<svg viewBox="0 0 64 64" width="22" height="22">
-  <path d="M10 36c10 10 30 12 38-2 2-3-1-6-4-4-7 5-16 4-21 2-4-1-9-1-13 4z" fill="#fbbf24" stroke="#92400e" stroke-width="2" />
-  <path d="M45 20c1 0 3 2 3 4" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
-</svg>`}
-
 /* ======= DOM ======= */
 const $names=document.getElementById('names');
 const $raceLen=document.getElementById('raceLen');
 const $camMode=document.getElementById('camMode');
-const $bananaToggle=document.getElementById('bananaToggle');
 const $start=document.getElementById('startBtn');
 const $reset=document.getElementById('resetBtn');
-const $pHint=document.getElementById('pHint');
-const $ann=document.getElementById('announcer');
 
-const $stageWrap=document.getElementById('stageWrap');
 const $stage=document.getElementById('stage');
-const $oval=document.getElementById('oval');
+const $canvas=document.getElementById('canvas');
 const $gate=document.getElementById('gate');
 const $hud=document.getElementById('hud');
 const $ltR=document.getElementById('ltR');
@@ -291,7 +246,7 @@ const $winnerBox=document.getElementById('winnerBox');
 const $winnerName=document.getElementById('winnerName');
 const $timeBox=document.getElementById('timeBox');
 
-/* donate & contact */
+/* 문의/후원 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
 document.getElementById('btnDonate').onclick=()=>document.getElementById('donateModal').style.display='block';
 
@@ -299,12 +254,10 @@ document.getElementById('btnDonate').onclick=()=>document.getElementById('donate
 const MIN=2, MAX=14;
 let running=false, raf=null, startTs=0;
 let H=[]; // horses
-let bananas=[];
-
-let cx=800, cy=500, rx=420, ry=220; // track geometry (SVG viewBox 기준 변환에 맞춰서 별도로 계산)
+let cx=500, cy=300, rx=390, ry=190; // oval geom (SVG 좌표)
 const TWO_PI=Math.PI*2;
 
-// 길이 프리셋 (스킬 제거, 오버테이크는 스무스 노이즈 + 개체별 페이스로 연출)
+// 길이 프리셋 (스킬 없음: 페이스+스무스 노이즈만)
 const LEN={
   short:{laps:1.4, base:0.00125, var:0.00012, noiseAmp:0.00035},
   standard:{laps:1.7, base:0.00105, var:0.00012, noiseAmp:0.00033},
@@ -313,16 +266,10 @@ const LEN={
 let pace=LEN.standard;
 
 /* ======= Simple smooth noise ======= */
-function makeNoise(seed=autoSeed()){
-  let x=seed%997; return ()=>{ x=(x*16807)%2147483647; return x/2147483647; }
-}
-function smoothNoise(rng, t){ // 1D smooth
-  const i=Math.floor(t), f=t-i;
-  const a=rng(), b=rng();
-  return a*(1-f)+b*f;
-}
+function makeNoise(seed){ let x=seed%997; return ()=>{ x=(x*16807)%2147483647; return x/2147483647; } }
+function smoothNoise(rng, t){ const i=Math.floor(t), f=t-i; const a=rng(), b=rng(); return a*(1-f)+b*f; }
 
-/* ======= Build Gate (칸막이) ======= */
+/* ======= Gate ======= */
 function buildGate(n){
   $gate.innerHTML='';
   const cols=Math.min(8, n);
@@ -332,84 +279,47 @@ function buildGate(n){
   }
 }
 
-/* ======= Build Horses ======= */
+/* ======= Horses ======= */
 function buildHorses(list){
-  // 지우기
-  $stage.querySelectorAll('.horse').forEach(n=>n.remove());
+  // clear
+  document.querySelectorAll('.horse').forEach(n=>n.remove());
   H.length=0;
-
-  // 말 배치 (스타트 지점: theta=0 부근을 등간격으로)
   const gap=0.03;
   list.forEach((ent,i)=>{
-    const h=document.createElement('div'); h.className='horse';
-    h.innerHTML=horseSVG(jc(i));
+    const h=document.createElement('div'); h.className='horse'; h.innerHTML=horseSVG(jc(i));
     const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=`${ent.no}번 ${ent.name}`;
     h.appendChild(plate); $stage.appendChild(h);
     H.push({
       name:ent.name, no:ent.no, $el:h,
-      theta:0 + i*gap, v:0,
-      done:false,
-      noiseRng:makeNoise(autoSeed()+i),
-      paceOffset:( _rand()*2-1 )*pace.var // 말마다 약간의 페이스 차이
+      theta: -Math.PI/2 + i*gap, v:0, done:false,
+      noiseRng:makeNoise((autoSeed()+i)%2147483647),
+      paceOffset:( Math.random()*2-1 )*pace.var
     });
-    // 초기 위치 렌더
     placeHorse(H[i]);
   });
 }
 
-/* 위치 렌더링 */
+/* 위치 렌더링 (SVG→DOM 좌표 변환은 canvas 중심을 기준) */
 function placeHorse(h){
+  const rect=$canvas.getBoundingClientRect();
+  const scale=rect.width/1000; // viewBox폭 1000 기준
+  const ox=rect.left, oy=rect.top;
+
   const t=h.theta;
-  const ox=300, oy=200; // ovalSvg offset within stage
-  const x=ox + 500 + rx*Math.cos(t);
-  const y=oy + 300 + ry*Math.sin(t);
+  const x=ox + (cx + rx*Math.cos(t))*scale;
+  const y=oy + (cy + ry*Math.sin(t))*scale;
   h.$el.style.left=x+'px'; h.$el.style.top=y+'px';
   const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
   const ang=Math.atan2(dy,dx)*180/Math.PI;
   h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
 }
 
-/* ======= Banana Obstacles ======= */
-function clearBananas(){ bananas.forEach(b=>b.el.remove()); bananas.length=0; }
-function spawnBananas(){
-  clearBananas();
-  if(!$bananaToggle.checked) return;
-  const count=6; // 레이스 전체에 몇 개
-  for(let i=0;i<count;i++){
-    const t= _rand()*pace.laps*TWO_PI; // 임의 각도
-    const el=document.createElement('div');
-    el.style.position='absolute';
-    el.innerHTML=bananaSVG();
-    const ox=300, oy=200;
-    const x=ox + 500 + (rx-18)*Math.cos(t);
-    const y=oy + 300 + (ry-18)*Math.sin(t);
-    el.style.left=x+'px'; el.style.top=y+'px';
-    $stage.appendChild(el);
-    bananas.push({theta:t, el, used:false});
-  }
-}
-
-/* ======= Camera follow (마블룰렛 감성) ======= */
+/* 카메라: 전체 화면이므로 스크롤 없음 → 약한 ‘줌’ 연출만 */
 function followCamera(){
-  const mode=$camMode.value;
-  let target=null;
-  if(mode==='horse1'){ target=H.find(h=>h.no===1) }
-  else if(mode==='leader'){
-    target=H.slice().sort((a,b)=>b.theta-a.theta)[0];
-  }
-  if(!target) return;
-  // 스테이지 스크롤을 타겟 중심으로
-  const rect=$stageWrap.getBoundingClientRect();
-  const ox=300, oy=200;
-  const x=ox + 500 + rx*Math.cos(target.theta);
-  const y=oy + 300 + ry*Math.sin(target.theta);
-  const cx=x - rect.width/2;
-  const cy=y - rect.height/2;
-  $stageWrap.scrollLeft = clamp(cx, 0, $stage.clientWidth-rect.width);
-  $stageWrap.scrollTop  = clamp(cy, 0, $stage.clientHeight-rect.height);
+  // 풀스크린이라 고정. 필요하면 CSS scale/translate로 줌 넣을 수 있지만 기본은 안정성 유지.
 }
 
-/* ======= Countdown & Gate ======= */
+/* ======= Countdown ======= */
 async function countdown(){
   $hud.classList.add('show'); $ltR.className='light'; $ltY.className='light'; $ltG.className='light'; $gunTxt.textContent=''; 
   $countTxt.textContent='준비';
@@ -420,9 +330,7 @@ async function countdown(){
   await wait(700);
   $ltG.classList.add('on','green'); $countTxt.textContent='1';
   await wait(600);
-  $countTxt.textContent='START!';
-  $gunTxt.textContent='탕!';
-  fx($stage,'bang','스타트!');
+  $countTxt.textContent='START!'; $gunTxt.textContent='탕!';
   // 게이트 오픈
   [...$gate.children].forEach(s=>{ s.classList.add('open'); });
   await wait(300);
@@ -430,102 +338,33 @@ async function countdown(){
 }
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-/* ======= Announcer ======= */
-let annTimer=null;
-function annSay(msg){ $ann.textContent=msg; }
-function startAnnouncer(){
-  stopAnnouncer();
-  const lines=[
-    ()=>`심판 신호 확인… 게이트 준비 완료.`,
-    ()=>`${H[0]?.no}번마 ${H[0]?.name}, 좋은 스타트 자세!`,
-    ()=>`출발 직후 선두 다툼, ${leaderName()} 선두!`,
-    ()=>`1코너 진입—바깥쪽에서 ${randomName()} 추격합니다!`,
-    ()=>`중반 구간, 선두는 여전히 ${leaderName()}—간격 좁혀옵니다.`,
-    ()=>`최종 코너! ${randomName()} 바깥돌기!`,
-    ()=>`직선 주로! 치열합니다—${leaderName()} 버텨낼까요?`,
-  ];
-  let i=0;
-  annTimer=setInterval(()=>{
-    if(!running){ clearInterval(annTimer); return; }
-    const f=lines[i%lines.length]; annSay(f()); i++;
-  }, 3000);
-}
-function stopAnnouncer(){ if(annTimer){ clearInterval(annTimer); annTimer=null; } }
-function leaderName(){ const L=H.slice().sort((a,b)=>b.theta-a.theta)[0]; return L?`${L.no}번 ${L.name}`:'선두' }
-function randomName(){ const h=H[(Math.random()*H.length)|0]; return h?`${h.no}번 ${h.name}`:'외곽' }
-
-/* ======= Fireworks / Hay & Carrot confetti ======= */
-function finishFX(h){
-  // 폭죽 파티클 + 건초/당근 파편
-  const center=h.$el.getBoundingClientRect();
-  const wrap=$stageWrap.getBoundingClientRect();
-  const root=document.body;
-  const N=24;
-  for(let i=0;i<N;i++){
-    const p=document.createElement('div'); p.className='particle';
-    p.style.left=(center.left + Math.cos((i/N)*TWO_PI)*4)+'px';
-    p.style.top =(center.top  + Math.sin((i/N)*TWO_PI)*4)+'px';
-    p.style.background= i%3===0 ? '#e8c87a' : (i%3===1 ? '#f97316' : '#60a5fa');
-    p.style.transform=`translate(-50%,-50%)`;
-    root.appendChild(p);
-    const dx=(Math.random()*2-1)*120, dy=(Math.random()*2-1)*120;
-    p.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(${dx}px,${dy}px) scale(.8)`,opacity:0}],{duration:900+Math.random()*400,easing:'ease-out'}).onfinish=()=>p.remove();
-  }
-  fx(h.$el,'trophy','우승!');
-}
-
-/* ======= Race Loop (NO skills; 부드러운 페이스 & 노이즈만) ======= */
+/* ======= Race Loop (NO skills) ======= */
 function step(dt){
-  // 바나나 충돌 체크 (각도 근접)
-  if($bananaToggle.checked){
-    for(const h of H){
-      const hit=bananas.find(b=>!b.used && Math.abs(normalizeAngle(h.theta - b.theta)) < 0.03);
-      if(hit){
-        hit.used=true; hit.el.style.opacity=.3;
-        // 미끄러짐: 잠깐 감속 + 살짝 스핀 느낌
-        h.v *= 0.3;
-        h.theta -= 0.02; // 약간 뒤로 밀림
-        h.$el.animate([{transform:h.$el.style.transform},{transform:h.$el.style.transform+' rotate(12deg)'}],{duration:180,iterations:2,direction:'alternate'});
-        annSay(`${h.no}번 ${h.name} 바나나 밟고 미끄러집니다!`);
-      }
-    }
-  }
-
-  // 선형 페이스 + 스무스 노이즈
   for(const h of H){
     if(h.done) continue;
     const noise = (smoothNoise(h.noiseRng, performance.now()*0.001 + h.no) - 0.5) * pace.noiseAmp;
     const base = pace.base + h.paceOffset;
-    h.v = base + noise; // 작지만 계속 변동해서 엎치락뒤치락
+    h.v = base + noise;
     h.theta += h.v * dt;
-
-    // 진행 및 위치 갱신
     placeHorse(h);
-    if(h.theta >= pace.laps*TWO_PI){ h.done=true; }
+    if(h.theta >= (-Math.PI/2) + pace.laps*TWO_PI){ h.done=true; }
   }
-
-  // 카메라 추적
   followCamera();
 }
 
-/* ======= Utilities ======= */
-function normalizeAngle(a){ while(a>Math.PI)a-=TWO_PI; while(a<-Math.PI)a+=TWO_PI; return a; }
 function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
 
 /* ======= Main Loop ======= */
 function run(){
   running=true; startTs=performance.now();
-  startAnnouncer();
   const tick=()=>{
     step(16);
     if(H.every(h=>h.done)){
       running=false; cancelAnimationFrame(raf); raf=null;
-      stopAnnouncer();
       const win=orderByLead()[0];
       $winnerName.textContent=`${win.no}번 ${win.name}`;
       $timeBox.textContent=`경과 ${((performance.now()-startTs)/1000).toFixed(1)}s`;
       $winnerBox.style.display='block';
-      finishFX(win);
       return;
     }
     raf=requestAnimationFrame(tick);
@@ -534,48 +373,37 @@ function run(){
 }
 
 /* ======= Controls ======= */
-function updateHint(list){
-  const n=list.length;
-  const s=n<MIN?'최소 2명':(n>MAX?'최대 14명(초과는 잘림)':'OK');
-  $pHint.textContent=`참가자 ${n}명 · ${s}`;
-}
-
 function resetAll(){
   cancelAnimationFrame(raf); raf=null; running=false;
   $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent='';
-  $ann.textContent='';
-  clearBananas();
-  // 게이트 리셋
   $gate.querySelectorAll('.stall').forEach(s=>s.classList.remove('open'));
+  document.querySelectorAll('.horse').forEach(n=>n.remove());
 }
 
-function applyLen(){
-  const v=$raceLen.value; pace=LEN[v]||LEN.standard;
-}
+function applyLen(){ const v=$raceLen.value; pace=LEN[v]||LEN.standard; }
+
+document.getElementById('btnContact').addEventListener('click',()=>document.getElementById('modal').style.display='block');
+document.getElementById('btnDonate').addEventListener('click',()=>document.getElementById('donateModal').style.display='block');
 
 $start.addEventListener('click', async ()=>{
   if(running) return;
   const list=splitNames($names.value);
   if(list.length<MIN){ alert('최소 2명을 입력해주세요.'); return; }
+  if(list.length>MAX){ alert('최대 14명까지만 가능합니다.'); }
   applyLen();
   reseed(autoSeed());
   resetAll();
-
-  // 게이트 & 말 셋업
   buildGate(list.length);
   buildHorses(list);
-  spawnBananas();
-
-  // 카운트다운 & 게이트 오픈 후 출발
-  await countdown();
+  await countdown(); // 3-2-1 후 출발
   run();
 });
+$reset.addEventListener('click', resetAll);
 
-$reset.addEventListener('click', ()=>{ resetAll(); });
-$names.addEventListener('input', ()=> updateHint(splitNames($names.value)));
-
-/* init */
-updateHint(splitNames($names.value));
+/* 반응형 리사이즈 시 위치 재계산 */
+addEventListener('resize', ()=>{
+  H.forEach(placeHorse);
+});
 </script>
 </body>
 </html>
