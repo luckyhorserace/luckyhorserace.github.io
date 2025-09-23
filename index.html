@@ -46,15 +46,15 @@ button,a.btn{
   transition:transform .15s ease-out;
 }
 .canvas{
-  width:1000px;
-  height:600px;
-  position:relative;
+  position: relative;
+  width: min(98vw, 1800px);  /* 크게 */
+  height: auto;
+  margin: 0 auto;
 }
 .ovalSvg{
-  position:absolute;
-  left:0;top:0;
-  width:1000px;
-  height:600px;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 .horse{
   position:absolute;
@@ -282,15 +282,27 @@ function buildHorses(list){
   H.forEach(placeHorse);
 }
 function placeHorse(h){
-  const cx=500,cy=300,rx=390,ry=190;
+  const cx=500, cy=300, rx=390, ry=190;
   const t=h.theta;
-  const x=cx+rx*Math.cos(t);
-  const y=cy+ry*Math.sin(t);
-  h.$el.style.left=x+"px";
-  h.$el.style.top=y+"px";
-  const dx=-rx*Math.sin(t),dy=ry*Math.cos(t);
-  const ang=Math.atan2(dy,dx)*180/Math.PI;
-  h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
+
+  // SVG 좌표
+  const sx = cx + rx * Math.cos(t);
+  const sy = cy + ry * Math.sin(t);
+
+  // 실제 px 변환
+  const rect = document.getElementById('canvas').getBoundingClientRect();
+  const scaleX = rect.width / 1000;
+  const scaleY = rect.height / 600;
+
+  const x = sx * scaleX;
+  const y = sy * scaleY;
+
+  h.$el.style.left = x + "px";
+  h.$el.style.top  = y + "px";
+
+  const dx = -rx * Math.sin(t), dy = ry * Math.cos(t);
+  const ang = Math.atan2(dy*scaleY, dx*scaleX) * 180 / Math.PI;
+  h.$el.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
 }
 
 /* ===== Ranking & Camera ===== */
@@ -300,8 +312,15 @@ function updateCamera(){
     const leader=orderByLead()[0]; if(!leader) return;
     const cx=500,cy=300,rx=390,ry=190;
     const t=leader.theta;
-    const x=cx+rx*Math.cos(t);
-    const y=cy+ry*Math.sin(t);
+    const sx = cx + rx * Math.cos(t);
+    const sy = cy + ry * Math.sin(t);
+
+    const rect = document.getElementById('canvas').getBoundingClientRect();
+    const scaleX = rect.width / 1000;
+    const scaleY = rect.height / 600;
+    const x = sx * scaleX;
+    const y = sy * scaleY;
+
     $viewport.style.transform=`translate(calc(50% - ${x}px), calc(50% - ${y}px)) scale(1.5)`;
   } else {
     $viewport.style.transform="translate(-50%,-50%) scale(1)";
@@ -394,6 +413,9 @@ document.getElementById('shuffleBtn').onclick=()=>{
   $names.value=list.map(x=>x.name).join(' ');
   buildHorses(list);
 }
+
+// 창 크기 변하면 다시 위치 계산
+addEventListener('resize', ()=>{ H.forEach(placeHorse); });
 </script>
 </body>
 </html>
