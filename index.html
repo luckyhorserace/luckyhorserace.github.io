@@ -258,4 +258,187 @@ const $timeBox=document.getElementById('timeBox');
 
 /* 문의/후원 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
-document.getElementById('btnDonate').onclick=
+document.getElementById('btnDonate').onclick=()=>document.getElementById('donateModal').style.display='block';
+
+/* ======= State ======= */
+const MIN=2, MAX=14;
+let running=false, raf=null, startTs=0;
+let H=[]; // horses
+// 오벌 파라미터 (SVG 좌표)
+const cx=500, cy=300, rxRun=390, ryRun=190; // 러닝 라인과 동일
+const TWO_PI=Math.PI*2;
+
+// 길이 프리셋
+const LEN={
+  short:{laps:1.4, base:0.00125, var:0.00012, noiseAmp:0.00035},
+  standard:{laps:1.7, base:0.00105, var:0.00012, noiseAmp:0.00033},
+  drama:{laps:2.1, base:0.0009,  var:0.00012, noiseAmp:0.00031}
+};
+let pace=LEN.standard;
+
+/* ======= Simple smooth noise ======= */
+function makeNoise(seed){ let x=seed%997; return ()=>{ x=(x*16807)%2147483647; return x/2147483647; } }
+function smoothNoise(rng, t){ const i=Math.floor(t), f=t-i; const a=rng(), b=rng(); return a*(1-f)+b*f; }
+
+/* ======= Gate ======= */
+function buildGate(n){
+  $gate.innerHTML='';
+  const cols=Math.min(8, n);
+  $gate.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  for(let i=0;i<cols;i++){
+    const s=document.createElement('div'); s.className='stall'; $gate.appendChild(s);
+  }
+  // 게이트를 START 라인 근처(위쪽 중앙)에 배치
+  const rect=$canvas.getBoundingClientRect();
+  const scale=rect.width/1000;
+  const gx=rect.left + (cx)*scale;
+  const gy=rect.top  + (100)*scale; // START 라인 상단 근처
+  $gate.style.left=gx+'px';
+  $gate.style.top=gy+'px';
+}
+
+/* ======= Horses ======= */
+function clearHorses(){ document.querySelectorAll('.horse').forEach(n=>n.remove()); H.length=0; }
+
+function buildHorses(list, atStart=true){
+  clearHorses();
+  const spread=0.03; // 스타트에서 살짝 간격
+  list.forEach((ent,i)=>{
+    const h=document.createElement('div'); h.className='horse'; h.innerHTML=horseSVG(jc(i));
+    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=`${ent.no}번 ${ent.name}`;
+    h.appendChild(plate); $stage.appendChild(h);
+    const theta0 = -Math.PI/2 + (atStart ? i*spread - Math.min(list.length-1,7)*spread*0.5 : 0);
+    H.push({
+      name:ent.name, no:ent.no, $el:h,
+      theta: theta0, v:0, done:false,
+      noiseRng:makeNoise((autoSeed()+i)%2147483647),
+      paceOffset:( Math.random()*2-1 )*pace.var
+    });
+    placeHorse(H[i]);
+  });
+}
+
+/* SVG→DOM 좌표 변환해서 말 배치 (러닝 라인 위 정확 매핑) */
+function placeHorse(h){
+  const rect=$canvas.getBoundingClientRect();
+  const scale=rect.width/1000; // viewBox 폭 1000 기준 -> meet 비율로 x,y 동일 스케일
+  const ox=rect.left, oy=rect.top;
+
+  const t=h.theta;
+  const x=ox + (cx + rxRun*Math.cos(t))*scale;
+  const y=oy + (cy + ryRun*Math.sin(t))*scale;
+
+  h.$el.style.left=x+'px';
+  h.$el.style.top=y+'px';
+
+  // 진행 방향에 따른 회전 (타원 접선)
+  const dx=-rxRun*Math.sin(t), dy=ryRun*Math.cos(t);
+  const ang=Math.atan2(dy,dx)*180/Math.PI;
+  h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
+}
+
+/* 카메라: 풀스크린 고정 */
+function followCamera(){}
+
+/* ======= Countdown ======= */
+async function countdown(){
+  $hud.classList.add('show'); $ltR.className='light'; $ltY.className='light'; $ltG.className='light'; $gunTxt.textContent='';
+  $countTxt.textContent='준비';
+  await wait(500);
+  $ltR.classList.add('on','red'); $countTxt.textContent='3';
+  await wait(700);
+  $ltY.classList.add('on','yellow'); $countTxt.textContent='2';
+  await wait(700);
+  $ltG.classList.add('on','green'); $countTxt.textContent='1';
+  await wait(600);
+  $countTxt.textContent='START!'; $gunTxt.textContent='탕!';
+  // 게이트 오픈
+  [...$gate.children].forEach(s=>{ s.classList.add('open'); });
+  await wait(300);
+  $hud.classList.remove('show');
+}
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ======= Race Loop ======= */
+function step(dt){
+  for(const h of H){
+    if(h.done) continue;
+    const noise = (smoothNoise(h.noiseRng, performance.now()*0.001 + h.no) - 0.5) * pace.noiseAmp;
+    const base = pace.base + h.paceOffset;
+    h.v = base + noise;
+    h.theta += h.v * dt;
+    placeHorse(h);
+    if(h.theta >= (-Math.PI/2) + pace.laps*TWO_PI){ h.done=true; }
+  }
+  followCamera();
+}
+function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
+
+function run(){
+  running=true; startTs=performance.now();
+  const tick=()=>{
+    step(16);
+    if(H.every(h=>h.done)){
+      running=false; cancelAnimationFrame(raf); raf=null;
+      const win=orderByLead()[0];
+      $winnerName.textContent=`${win.no}번 ${win.name}`;
+      $timeBox.textContent=`경과 ${((performance.now()-startTs)/1000).toFixed(1)}s`;
+      $winnerBox.style.display='block';
+      return;
+    }
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
+}
+
+/* ======= Controls ======= */
+function resetAll(){
+  cancelAnimationFrame(raf); raf=null; running=false;
+  $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent='';
+  $gate.querySelectorAll('.stall').forEach(s=>s.classList.remove('open'));
+  clearHorses();
+}
+
+function applyLen(){ const v=$raceLen.value; pace=LEN[v]||LEN.standard; }
+
+/* 입력 즉시 미리 생성/정렬 */
+function instantPreview(){
+  const list=splitNames($names.value);
+  applyLen();
+  buildGate(list.length||1); // 0일 때 레이아웃 유지
+  if(list.length>0) buildHorses(list,true);
+  else clearHorses();
+}
+$names.addEventListener('input', instantPreview);
+
+document.getElementById('btnContact').addEventListener('click',()=>document.getElementById('modal').style.display='block');
+document.getElementById('btnDonate').addEventListener('click',()=>document.getElementById('donateModal').style.display='block');
+
+$start.addEventListener('click', async ()=>{
+  if(running) return;
+  const list=splitNames($names.value);
+  if(list.length<MIN){ alert('최소 2명을 입력해주세요.'); return; }
+  if(list.length>MAX){ alert('최대 14명까지만 가능합니다.'); }
+  applyLen();
+  reseed(autoSeed());
+  resetAll();
+  buildGate(list.length);
+  buildHorses(list,true); // 스타트 라인에 정렬
+  await countdown(); // 3-2-1 후 출발
+  run();
+});
+
+$reset.addEventListener('click', ()=>{
+  $names.value='';
+  resetAll();
+  instantPreview();
+});
+
+/* 반응형 리사이즈 시 위치 재계산 */
+addEventListener('resize', ()=>{ H.forEach(placeHorse); });
+
+/* 최초 1회 프리뷰 */
+instantPreview();
+</script>
+</body>
+</html>
