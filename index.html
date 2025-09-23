@@ -22,23 +22,25 @@ button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:
 
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
 
-/* 헤더: 오버레이 */
+/* === 하단 오버레이 헤더 === */
 header{
-  position:absolute; inset:auto 0 0 0; top:0; height:auto; padding:10px 12px;
+  position:absolute; inset:auto 0 0 0; height:auto; padding:10px 12px;
   display:flex; align-items:center; justify-content:space-between; gap:12px;
-  background:linear-gradient(180deg,rgba(4,10,20,.75),rgba(4,10,20,0));
+  background:linear-gradient(180deg,rgba(4,10,20,0),rgba(4,10,20,.75) 30%, rgba(4,10,20,.85));
+  backdrop-filter: blur(6px);
   z-index:20
 }
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:40px;height:40px;border-radius:12px;border:1px solid #22314d;background:linear-gradient(140deg,#1b2a45,#0c1627);display:grid;place-items:center}
 .logo svg{width:26px;height:26px}
-h1{margin:0;font-size:18px;letter-spacing:.2px}
+h1{margin:0;font-size:16px;letter-spacing:.2px}
 .sub{margin:2px 0 0;color:var(--muted);font-size:12px}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-radius:10px;padding:8px 10px;font-weight:700}
+#names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none}
 
-/* 스테이지: 화면 꽉 채움 */
-.stage{position:absolute; inset:0; }
+/* === 스테이지 === */
+.stage{position:absolute; inset:0;}
 .canvas{position:absolute; left:50%; top:50%; width:min(1600px, 95vw); height:auto; transform:translate(-50%,-50%)}
 .ovalSvg{width:100%; height:auto}
 
@@ -54,15 +56,15 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 .horse-svg .g-legs-a{animation:legA .22s infinite ease-in-out}
 .horse-svg .g-legs-b{animation:legB .22s infinite ease-in-out}
 
-/* 스타팅 게이트 */
+/* 게이트 */
 .gate{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; grid-template-columns:repeat(8,1fr); gap:6px; pointer-events:none; z-index:5}
 .stall{width:48px;height:50px;border:2px solid #22314d;border-radius:8px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 2px #0b1220}
 .stall.open{transform:translateY(-62px);transition:transform .35s ease}
 
-/* HUD(신호등/카운트다운) */
+/* HUD */
 .hud{position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:10}
 .hud.show{display:flex}
-.traffic{display:flex;gap:10px;align-items:center;background:#0b1220;border:1px solid #334155;padding:10px 14px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.traffic{display:flex;gap:10px;align-items:center;background:#0b1220cc;border:1px solid #334155;padding:10px 14px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
 .light{width:18px;height:18px;border-radius:50%;background:#111827;border:1px solid #334155;box-shadow:0 0 0 2px #09111e inset}
 .light.on.red{background:#ef4444}.light.on.yellow{background:#f59e0b}.light.on.green{background:#22c55e}
 .countTxt{margin-left:6px;font-weight:900;letter-spacing:.3px}
@@ -79,11 +81,61 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
 </head>
 <body>
 <div class="wrap">
-  <!-- 헤더: 오버레이 UI -->
+  <!-- HUD -->
+  <div class="hud" id="hud">
+    <div class="traffic">
+      <div class="light" id="ltR"></div>
+      <div class="light" id="ltY"></div>
+      <div class="light" id="ltG"></div>
+      <span class="countTxt" id="countTxt">Ready</span>
+      <span class="gun" id="gunTxt"></span>
+    </div>
+  </div>
+
+  <!-- 스테이지 -->
+  <div class="stage" id="stage">
+    <div class="canvas" id="canvas">
+      <svg class="ovalSvg" id="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+        <!-- 배경 -->
+        <defs>
+          <radialGradient id="grass" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0b1422"/><stop offset="100%" stop-color="#09101b"/></radialGradient>
+          <!-- FINISH 체크무늬 패턴 -->
+          <pattern id="chk" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="4" height="4" fill="#e5e7eb"/><rect x="4" y="4" width="4" height="4" fill="#e5e7eb"/>
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="1000" height="600" fill="url(#grass)"/>
+        <!-- 바깥/안쪽 벽 + 러닝 라인 -->
+        <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+        <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
+        <!-- 러닝 라인(말이 달리는 기준) -->
+        <ellipse id="runLine" cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
+
+        <!-- START / FINISH 라인 + 라벨 -->
+        <!-- START: 위쪽 중앙 -->
+        <line x1="500" y1="80" x2="500" y2="120" stroke="#22d3ee" stroke-width="4"/>
+        <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">START</text>
+
+        <!-- FINISH: 아래쪽 중앙 (체크무늬) -->
+        <line x1="500" y1="480" x2="500" y2="520" stroke="url(#chk)" stroke-width="6"/>
+        <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">FINISH</text>
+      </svg>
+
+      <!-- 게이트 (스타트 라인 위치에 자동 정렬됨) -->
+      <div class="gate" id="gate"></div>
+    </div>
+
+    <!-- 우승 배너 -->
+    <div class="winner" id="winnerBox">
+      <div class="timer" id="timeBox"></div>
+      <div><strong>우승:</strong> <span id="winnerName"></span></div>
+    </div>
+  </div>
+
+  <!-- 하단 오버레이 UI -->
   <header>
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <!-- 건초 아이콘 -->
         <svg viewBox="0 0 64 64" fill="none">
           <rect x="10" y="22" width="44" height="20" rx="6" fill="url(#g)"/>
           <path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/>
@@ -97,7 +149,7 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
     </div>
 
     <div class="controls">
-      <input id="names" type="text" placeholder="참가자 입력 (쉼표/공백/엔터/’@이름’ 가능)" style="min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3;outline:none">
+      <input id="names" type="text" placeholder="참가자 입력 (쉼표/공백/엔터/’@이름’ 가능)">
       <select id="raceLen">
         <option value="short">짧게(~60초)</option>
         <option value="standard" selected>표준(~120초)</option>
@@ -114,46 +166,6 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
       <button class="btn-ghost" id="btnContact">문의</button>
     </div>
   </header>
-
-  <!-- HUD -->
-  <div class="hud" id="hud">
-    <div class="traffic">
-      <div class="light" id="ltR"></div>
-      <div class="light" id="ltY"></div>
-      <div class="light" id="ltG"></div>
-      <span class="countTxt" id="countTxt">Ready</span>
-      <span class="gun" id="gunTxt"></span>
-    </div>
-  </div>
-
-  <!-- 스테이지(트랙은 화면 가운데에 자동 맞춤) -->
-  <div class="stage" id="stage">
-    <div class="canvas" id="canvas">
-      <svg class="ovalSvg" id="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-        <!-- 배경 -->
-        <defs>
-          <radialGradient id="grass" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#0b1422"/>
-            <stop offset="100%" stop-color="#09101b"/>
-          </radialGradient>
-        </defs>
-        <rect x="0" y="0" width="1000" height="600" fill="url(#grass)"/>
-        <!-- 바깥/안쪽 벽 + 러닝 라인 -->
-        <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-        <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-        <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
-        <!-- 스타트 라인 -->
-        <line x1="500" y1="80" x2="500" y2="120" stroke="#e5e7eb" stroke-width="3"/>
-      </svg>
-      <!-- 게이트 -->
-      <div class="gate" id="gate"></div>
-    </div>
-    <!-- 우승 배너 -->
-    <div class="winner" id="winnerBox">
-      <div class="timer" id="timeBox"></div>
-      <div><strong>우승:</strong> <span id="winnerName"></span></div>
-    </div>
-  </div>
 </div>
 
 <!-- 문의 모달 -->
@@ -176,12 +188,10 @@ select{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#dbe7f3;border-
     <h3 style="margin:0 0 6px">개발자에게 말밥 보내주기</h3>
     <div class="panel" style="padding:10px;border-style:dashed;margin:10px 0">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <!-- 건초 -->
         <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
           <svg viewBox="0 0 64 64" width="24" height="24"><rect x="10" y="22" width="44" height="20" rx="6" fill="#e8c87a"/><path d="M14 24l6 5M20 24l6 5M26 24l6 5M32 24l6 5M38 24l6 5M44 24l6 5" stroke="#7a5a20" stroke-width="2"/></svg>
           건초 한 포대
         </div>
-        <!-- 당근 -->
         <div class="btn-ghost" style="display:flex;align-items:center;gap:8px">
           <svg viewBox="0 0 64 64" width="24" height="24"><path d="M20 32c0-9 9-14 12-14s12 5 12 14-9 18-12 18-12-9-12-18z" fill="#f97316"/><path d="M30 14c2-3 6-6 10-7" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/></svg>
           당근 두 개
@@ -248,162 +258,4 @@ const $timeBox=document.getElementById('timeBox');
 
 /* 문의/후원 */
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
-document.getElementById('btnDonate').onclick=()=>document.getElementById('donateModal').style.display='block';
-
-/* ======= State ======= */
-const MIN=2, MAX=14;
-let running=false, raf=null, startTs=0;
-let H=[]; // horses
-let cx=500, cy=300, rx=390, ry=190; // oval geom (SVG 좌표)
-const TWO_PI=Math.PI*2;
-
-// 길이 프리셋 (스킬 없음: 페이스+스무스 노이즈만)
-const LEN={
-  short:{laps:1.4, base:0.00125, var:0.00012, noiseAmp:0.00035},
-  standard:{laps:1.7, base:0.00105, var:0.00012, noiseAmp:0.00033},
-  drama:{laps:2.1, base:0.0009,  var:0.00012, noiseAmp:0.00031}
-};
-let pace=LEN.standard;
-
-/* ======= Simple smooth noise ======= */
-function makeNoise(seed){ let x=seed%997; return ()=>{ x=(x*16807)%2147483647; return x/2147483647; } }
-function smoothNoise(rng, t){ const i=Math.floor(t), f=t-i; const a=rng(), b=rng(); return a*(1-f)+b*f; }
-
-/* ======= Gate ======= */
-function buildGate(n){
-  $gate.innerHTML='';
-  const cols=Math.min(8, n);
-  $gate.style.gridTemplateColumns=`repeat(${cols},1fr)`;
-  for(let i=0;i<cols;i++){
-    const s=document.createElement('div'); s.className='stall'; $gate.appendChild(s);
-  }
-}
-
-/* ======= Horses ======= */
-function buildHorses(list){
-  // clear
-  document.querySelectorAll('.horse').forEach(n=>n.remove());
-  H.length=0;
-  const gap=0.03;
-  list.forEach((ent,i)=>{
-    const h=document.createElement('div'); h.className='horse'; h.innerHTML=horseSVG(jc(i));
-    const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=`${ent.no}번 ${ent.name}`;
-    h.appendChild(plate); $stage.appendChild(h);
-    H.push({
-      name:ent.name, no:ent.no, $el:h,
-      theta: -Math.PI/2 + i*gap, v:0, done:false,
-      noiseRng:makeNoise((autoSeed()+i)%2147483647),
-      paceOffset:( Math.random()*2-1 )*pace.var
-    });
-    placeHorse(H[i]);
-  });
-}
-
-/* 위치 렌더링 (SVG→DOM 좌표 변환은 canvas 중심을 기준) */
-function placeHorse(h){
-  const rect=$canvas.getBoundingClientRect();
-  const scale=rect.width/1000; // viewBox폭 1000 기준
-  const ox=rect.left, oy=rect.top;
-
-  const t=h.theta;
-  const x=ox + (cx + rx*Math.cos(t))*scale;
-  const y=oy + (cy + ry*Math.sin(t))*scale;
-  h.$el.style.left=x+'px'; h.$el.style.top=y+'px';
-  const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
-  const ang=Math.atan2(dy,dx)*180/Math.PI;
-  h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
-}
-
-/* 카메라: 전체 화면이므로 스크롤 없음 → 약한 ‘줌’ 연출만 */
-function followCamera(){
-  // 풀스크린이라 고정. 필요하면 CSS scale/translate로 줌 넣을 수 있지만 기본은 안정성 유지.
-}
-
-/* ======= Countdown ======= */
-async function countdown(){
-  $hud.classList.add('show'); $ltR.className='light'; $ltY.className='light'; $ltG.className='light'; $gunTxt.textContent=''; 
-  $countTxt.textContent='준비';
-  await wait(500);
-  $ltR.classList.add('on','red'); $countTxt.textContent='3';
-  await wait(700);
-  $ltY.classList.add('on','yellow'); $countTxt.textContent='2';
-  await wait(700);
-  $ltG.classList.add('on','green'); $countTxt.textContent='1';
-  await wait(600);
-  $countTxt.textContent='START!'; $gunTxt.textContent='탕!';
-  // 게이트 오픈
-  [...$gate.children].forEach(s=>{ s.classList.add('open'); });
-  await wait(300);
-  $hud.classList.remove('show');
-}
-function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-/* ======= Race Loop (NO skills) ======= */
-function step(dt){
-  for(const h of H){
-    if(h.done) continue;
-    const noise = (smoothNoise(h.noiseRng, performance.now()*0.001 + h.no) - 0.5) * pace.noiseAmp;
-    const base = pace.base + h.paceOffset;
-    h.v = base + noise;
-    h.theta += h.v * dt;
-    placeHorse(h);
-    if(h.theta >= (-Math.PI/2) + pace.laps*TWO_PI){ h.done=true; }
-  }
-  followCamera();
-}
-
-function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
-
-/* ======= Main Loop ======= */
-function run(){
-  running=true; startTs=performance.now();
-  const tick=()=>{
-    step(16);
-    if(H.every(h=>h.done)){
-      running=false; cancelAnimationFrame(raf); raf=null;
-      const win=orderByLead()[0];
-      $winnerName.textContent=`${win.no}번 ${win.name}`;
-      $timeBox.textContent=`경과 ${((performance.now()-startTs)/1000).toFixed(1)}s`;
-      $winnerBox.style.display='block';
-      return;
-    }
-    raf=requestAnimationFrame(tick);
-  };
-  raf=requestAnimationFrame(tick);
-}
-
-/* ======= Controls ======= */
-function resetAll(){
-  cancelAnimationFrame(raf); raf=null; running=false;
-  $winnerBox.style.display='none'; $winnerName.textContent=''; $timeBox.textContent='';
-  $gate.querySelectorAll('.stall').forEach(s=>s.classList.remove('open'));
-  document.querySelectorAll('.horse').forEach(n=>n.remove());
-}
-
-function applyLen(){ const v=$raceLen.value; pace=LEN[v]||LEN.standard; }
-
-document.getElementById('btnContact').addEventListener('click',()=>document.getElementById('modal').style.display='block');
-document.getElementById('btnDonate').addEventListener('click',()=>document.getElementById('donateModal').style.display='block');
-
-$start.addEventListener('click', async ()=>{
-  if(running) return;
-  const list=splitNames($names.value);
-  if(list.length<MIN){ alert('최소 2명을 입력해주세요.'); return; }
-  if(list.length>MAX){ alert('최대 14명까지만 가능합니다.'); }
-  applyLen();
-  reseed(autoSeed());
-  resetAll();
-  buildGate(list.length);
-  buildHorses(list);
-  await countdown(); // 3-2-1 후 출발
-  run();
-});
-$reset.addEventListener('click', resetAll);
-
-/* 반응형 리사이즈 시 위치 재계산 */
-addEventListener('resize', ()=>{
-  H.forEach(placeHorse);
-});
-</script>
-</body>
-</html>
+document.getElementById('btnDonate').onclick=
