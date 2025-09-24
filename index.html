@@ -113,6 +113,8 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
 .modal a{color:#ffffff;text-decoration:underline}
 .panel{background:#0f172a;border:1px solid var(--border);border-radius:14px;padding:14px}
+  /* 숨김 처리 */
+.booth, .commentary { display: none !important; }
 </style>
 </head>
 <body>
@@ -427,5 +429,3 @@ $names.addEventListener('input', ()=>{
 addEventListener('resize', ()=>{ H.forEach(placeHorse); updateCamera(); });
 </script>
 
-/* 숨김 처리 */
-.booth, .commentary { display: none !important; }
