@@ -6,11 +6,16 @@
 <title>Lucky Horse Race — 경마게임</title>
 <style>
 :root{
-  --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --accent:#6ee7ff;
+  --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8;
+  --border:#1f2937; --accent:#6ee7ff;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{color:var(--ink);background:#0b1220;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
+
+/* 안내 배너 */
+.notice{position:absolute;top:8px;left:12px;background:rgba(0,0,0,.45);padding:6px 12px;
+  border-radius:10px;font-size:13px;color:#cbd5e1;z-index:40}
 
 /* Buttons / Layout */
 button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
@@ -37,12 +42,14 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
 .horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
 
-/* 직선 다리 애니메이션 */
-@keyframes leg-run-front { 0%,100% { transform: rotate(18deg);} 50% { transform: rotate(-18deg);} }
-@keyframes leg-run-back  { 0%,100% { transform: rotate(-18deg);} 50% { transform: rotate(18deg);} }
+/* 직선맵 다리 애니메이션 */
+@keyframes leg-run-front {0%,100%{transform:rotate(18deg);}50%{transform:rotate(-18deg);}}
+@keyframes leg-run-back {0%,100%{transform:-18deg;}50%{transform:18deg;}}
 .front-leg{transform-origin: top center;animation: leg-run-front .42s infinite linear}
-.back-leg {transform-origin: top center;animation: leg-run-back  .42s infinite linear}
-.horse.jump{filter:drop-shadow(0 6px 4px rgba(0,0,0,.35))}
+.back-leg {transform-origin: top center;animation: leg-run-back .42s infinite linear}
+
+/* 장애물 */
+.obstacle{position:absolute;width:18px;height:24px;background:#f97316;border:2px solid #a74c0a;border-radius:4px;transform:translate(-50%,-50%);z-index:5}
 
 /* Ranking */
 .ranking{position:absolute;top:12px;right:12px;width:260px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
@@ -50,17 +57,16 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 .ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900;color:#6ee7ff}
+.color-badge{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
 
-/* Winner banner */
-.winner{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:none;padding:12px 16px;border-radius:12px;background:#0e1e33;border:1px solid #213250;z-index:15}
-.winner strong{color:#9ae6b4}
+/* Winner 제거됨 */
 
 /* Header */
 header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,.5);z-index:30}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3}
 
-/* HUD (3,2,1 START) */
+/* HUD */
 .hud{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:20}
 .hud.show{display:flex}
 .traffic{display:flex;gap:10px;align-items:center;background:#0b1220cc;border:1px solid #334155;padding:10px 14px;border-radius:12px}
@@ -69,41 +75,25 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .countTxt{margin-left:6px;font-weight:900}
 .gun{margin-left:8px;font-size:12px;color:#93c5fd}
 
-/* Carrot rain / Confetti */
+/* Carrot rain */
 @keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999}
-.confetti{position:fixed;top:-20px;font-size:26px;pointer-events:none;animation:fall 2.5s linear forwards;z-index:10001}
-
-/* 직선맵: 출발선/리본(테이프) */
-.startLine{
-  position:absolute;left:0;top:0; /* JS에서 위치 지정 */
-  width:4px;height:80px;background:#22d3ee;border:1px solid #0aa4c0;border-radius:2px;display:none;z-index:10
-}
-.finishRibbon{
-  position:absolute;left:0;top:0; /* JS에서 위치 지정 */
-  width:6px;height:90px;background:linear-gradient(180deg,#e5e7eb,#cbd5e1);border:1px solid #9aa7b4;border-radius:2px;display:none;z-index:10
-}
-.finishRibbon.cut{animation: ribbonCut .6s ease forwards}
-@keyframes ribbonCut{ 0%{transform:scaleX(1)} 100%{transform:scaleX(0);opacity:.2} }
 
 /* 축하 오버레이 */
-#celebrate{
-  position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
-  background:rgba(0,0,0,.55);z-index:10000;text-align:center
-}
+#celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.55);z-index:10000;text-align:center}
 #celebrate .title{font-size:42px;font-weight:900;color:#fff;margin:0 0 8px}
 #celebrate .subtitle{font-size:22px;color:#bfefff;margin:0 0 18px}
 #celebrate .big{font-size:64px}
+.confetti{position:fixed;top:-20px;font-size:26px;pointer-events:none;animation:fall 2.5s linear forwards;z-index:10001}
 
 /* 모바일 보정 */
-@media (max-width:640px){
-  .ranking{width:220px}
-  #names{min-width:180px}
-}
+@media (max-width:640px){.ranking{width:220px}#names{min-width:180px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <div class="notice">자유롭게 사용해주시고 피드백 부탁드립니다.</div>
 
   <!-- HUD -->
   <div class="hud" id="hud">
@@ -111,12 +101,12 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
       <div class="light" id="ltR"></div>
       <div class="light" id="ltY"></div>
       <div class="light" id="ltG"></div>
-      <span class="countTxt" id="countTxt">준비</span>
+      <span class="countTxt" id="countTxt">Ready</span>
       <span class="gun" id="gunTxt"></span>
     </div>
   </div>
 
-  <!-- STAGE -->
+  <!-- Stage -->
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
       <div class="canvas" id="canvas">
@@ -128,19 +118,9 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
           <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
           <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
         </svg>
-
-        <!-- 직선맵 -->
+        <!-- 직선맵 기본 -->
         <svg id="straightMap" class="straightSvg" viewBox="0 0 2000 400"></svg>
-
-        <!-- 직선맵 출발선/리본 -->
-        <div class="startLine" id="startLine"></div>
-        <div class="finishRibbon" id="finishRibbon"></div>
       </div>
-    </div>
-
-    <!-- 우승 배너 -->
-    <div class="winner" id="winnerBox">
-      <div><strong>우승:</strong> <span id="winnerName"></span></div>
     </div>
 
     <!-- 순위판 -->
@@ -154,20 +134,17 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   <header>
     <div class="controls left">
       <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
-      <!-- 바퀴 수(타원 전용) -->
       <select id="raceLen" style="display:none">
         <option value="1">1바퀴</option>
         <option value="3" selected>3바퀴</option>
         <option value="5">5바퀴</option>
         <option value="10">10바퀴</option>
       </select>
-      <!-- 거리(직선 전용) -->
       <select id="raceDist">
         <option value="100" selected>100m</option>
         <option value="200">200m</option>
         <option value="300">300m</option>
       </select>
-
       <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
       <button class="btn-accent" id="startBtn">시작 ▶</button>
       <button class="btn-ghost" id="resetBtn">리셋</button>
@@ -176,14 +153,16 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
     </div>
 
     <div class="controls right">
-      <!-- 추첨 컨트롤 -->
-      <button class="btn-accent" id="drawFirstBtn">추첨: 1등</button>
-      <button class="btn-ghost" id="drawLastBtn">추첨: 마지막</button>
-      <input id="drawNthInput" type="number" min="1" step="1" placeholder="n등" style="width:80px;padding:8px;border-radius:10px;border:1px solid #223047;background:rgba(0,0,0,.35);color:#dbe7f3">
-      <button class="btn-ghost" id="drawNthBtn">추첨: n등</button>
-
-      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 주기</a>
-      <button class="btn-ghost" id="btnContact">문의</button>
+      <!-- 추첨 메뉴 -->
+      <div class="controls" style="gap:4px">
+        <button class="btn-accent" id="drawFirstBtn">추첨: 1등</button>
+        <button class="btn-ghost" id="drawLastBtn">추첨: 마지막</button>
+        <input id="drawNthInput" type="number" min="1" step="1" placeholder="n등"
+          style="width:70px;padding:8px;border-radius:10px;border:1px solid #223047;background:rgba(0,0,0,.35);color:#dbe7f3">
+        <button class="btn-ghost" id="drawNthBtn">추첨: n등</button>
+      </div>
+      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
+      <button class="btn-ghost" id="btnContact">문의 및 건의사항</button>
     </div>
   </header>
 </div>
@@ -192,28 +171,11 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 <div id="celebrate">
   <div class="big">🎉</div>
   <div class="title" id="celeTitle">King Carrot!</div>
-  <div class="subtitle" id="celeSubtitle">우승을 축하합니다!</div>
+  <div class="subtitle" id="celeSubtitle">당첨자 축하합니다!</div>
   <button class="btn-accent" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
 </div>
-
-<!-- 문의/건의/피드백 모달 -->
-<div class="modal" id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999">
-  <div class="panel" style="max-width:420px;margin:8% auto;background:#0f172a;border:1px solid var(--border);border-radius:14px;padding:16px">
-    <h3 style="margin:0 0 8px">문의 및 건의사항 / 피드백</h3>
-    <p style="color:#cbd5e1;margin:.4rem 0 .8rem">오류 제보, 기능 제안, 밸런스/UX 피드백 등 환영합니다 🙏</p>
-    <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px">
-      <strong style="display:block;margin-bottom:6px">이메일</strong>
-      <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button class="btn-ghost"
-        onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">이메일 복사</button>
-      <button class="btn-accent" onclick="document.getElementById('modal').style.display='none'">닫기</button>
-    </div>
-  </div>
-</div>
 <script>
-/* ========= Utils ========= */
+/* ====== Utils ====== */
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 let _rand=Math.random;
 function reseed(seed){_rand=mulberry32(seed|0)}
@@ -226,10 +188,7 @@ function splitNames(raw){
     .slice(0,50).map((n,i)=>({name:n,no:i+1}));
 }
 
-// 직선맵 거리별 목표 완주시간(초)
-const TARGET_TIME = { 100:[50,60], 200:[70,90], 300:[100,120] };
-
-/* ========= DOM ========= */
+/* ====== DOM ====== */
 const $names=document.getElementById('names'),
       $raceLen=document.getElementById('raceLen'),
       $raceDist=document.getElementById('raceDist'),
@@ -238,137 +197,123 @@ const $names=document.getElementById('names'),
       $shuffle=document.getElementById('shuffleBtn'),
       $mapToggle=document.getElementById('mapToggleBtn'),
       $obstacleToggle=document.getElementById('obstacleToggleBtn'),
-      $winnerBox=document.getElementById('winnerBox'),
-      $winnerName=document.getElementById('winnerName'),
       $rankingBox=document.getElementById('rankingBox'),
       $rankingLines=document.getElementById('rankingLines'),
       $viewport=document.getElementById('viewport'),
       $canvas=document.getElementById('canvas'),
       $ovalMap=document.getElementById('ovalMap'),
       $straightMap=document.getElementById('straightMap'),
-      $startLine=document.getElementById('startLine'),
-      $finishRibbon=document.getElementById('finishRibbon'),
       $cele=document.getElementById('celebrate'),
       $celeTitle=document.getElementById('celeTitle'),
-      $celeSubtitle=document.getElementById('celeSubtitle'),
-      $modal=document.getElementById('modal');
+      $celeSubtitle=document.getElementById('celeSubtitle');
 
-document.getElementById('btnContact').onclick=()=>{$modal.style.display='block'};
-
-/* ========= State ========= */
+/* ====== State ====== */
 const MIN=2,MAX=50;
 let H=[],running=false,raf=null;
-let laps=3, dist=100;                  // 기본 3바퀴(타원), 직선 100m
-let mapMode="straight";                // 기본 직선맵
-let straightViewW=2000, straightViewH=400;
-let pendingDraw=null;                  // {type:'first'|'last'|'nth', n?:number}
-let obstaclesEnabled=false;            // 장애물 토글
+let laps=3, dist=100;
+let mapMode="straight"; // 기본 직선
+let obstaclesEnabled=false;
 let obstacles=[];
+let pendingDraw=null;
 
-/* ========= Obstacles ========= */
+/* ====== Speed Targets ====== */
+const TARGET_TIME={
+  100:[50,60],
+  200:[70,90],
+  300:[100,120]
+};
+const STRAIGHT_SPEED_BOOST=1.20;
+
+/* ====== Obstacles ====== */
 function genObstacles(){
-  obstacles = [];
+  obstacles=[];
   if(!obstaclesEnabled) return;
-  const count = Math.max(1, Math.round(dist/100) + Math.floor(H.length/8));
-  const used = new Set();
+  const baseCount=Math.round(dist/25);
+  const bonus=Math.floor(H.length/10);
+  const count=Math.max(3,baseCount+bonus);
+  const minGap=Math.max(6,Math.round(dist*0.06));
+  const marginStart=Math.round(dist*0.12), marginEnd=Math.round(dist*0.88);
+  const pos=[];
   for(let i=0;i<count;i++){
-    const x = Math.round((0.15 + _rand()*0.7) * dist); // 15~85% 구간
-    if(used.has(x)) { i--; continue; }
-    used.add(x);
-    obstacles.push({ x, w: 1.2 + _rand()*0.8, id: 'ob'+i });
+    let tries=0;
+    while(tries++<50){
+      const x=Math.round(marginStart+_rand()*(marginEnd-marginStart));
+      if(pos.every(px=>Math.abs(px-x)>=minGap)){pos.push(x);break;}
+    }
   }
+  pos.sort((a,b)=>a-b);
+  obstacles=pos.map((x,idx)=>({x,w:1.0+_rand()*1.0,id:'ob'+idx}));
 }
 function renderObstacles(){
-  if(!obstaclesEnabled){ return; }
-  const trackY=150, trackH=100, startX=80, finishX=straightViewW-80;
-  const svgRects = obstacles.map(o=>{
-    const x = startX + (finishX - startX) * (o.x/dist);
-    const w = Math.max(8, o.w * (straightViewW/dist));
-    const y = trackY + trackH - 22;
-    return `<rect data-ob="${o.id}" x="${x-w/2}" y="${y-16}" width="${w}" height="16" rx="3" fill="#9ca3af" stroke="#6b7280"/>`;
-  }).join('');
-  $straightMap.insertAdjacentHTML('beforeend', svgRects);
-}
-
-/* ========= Map (Straight) ========= */
-function drawStraightMap(){
-  straightViewW = 20 * dist;
-  $straightMap.setAttribute('viewBox', `0 0 ${straightViewW} ${straightViewH}`);
-  const trackY=150, trackH=100, startX=80, finishX=straightViewW-80;
-  $straightMap.innerHTML = `
-    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="${startX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${finishX}" y1="${trackY-10}" x2="${finishX}" y2="${trackY+trackH+10}" stroke="#e5e7eb" stroke-width="6"/>
-    <text x="${finishX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
-  `;
-  // 출발선/리본 화면 위치
+  $canvas.querySelectorAll('.obstacle').forEach(e=>e.remove());
+  if(mapMode!=="straight"||!obstaclesEnabled) return;
   const rect=$canvas.getBoundingClientRect();
-  const scaleX=rect.width/straightViewW, scaleY=rect.height/straightViewH;
-  const sx = startX*scaleX, sy = (trackY+trackH/2)*scaleY;
-  const fx = finishX*scaleX, fy = sy;
-  Object.assign($startLine.style,{display:'block', left:`${sx-2}px`, top:`${sy-40}px`});
-  Object.assign($finishRibbon.style,{display:'block', left:`${fx-3}px`, top:`${fy-45}px`});
-  $finishRibbon.classList.remove('cut');
-
-  // 장애물 생성/렌더
-  genObstacles();
-  renderObstacles();
+  const scaleX=rect.width/(dist*20), scaleY=rect.height/400;
+  obstacles.forEach(ob=>{
+    const div=document.createElement('div');
+    div.className='obstacle'; div.id=ob.id;
+    div.style.left=(80+ob.x*20)*scaleX+'px';
+    div.style.top=(200*scaleY)+'px';
+    $canvas.appendChild(div);
+  });
 }
+<script>
+// (안전) 직선 뷰박스 크기 변수
+let straightViewW = 2000, straightViewH = 400;
 
-/* ========= Horses ========= */
-function horseSVG(color='#60a5fa'){
-  return `<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
-    <g class="g-bob">
-      <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
-      <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
-      <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
-      <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
-      <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
-      <rect class="front-leg" x="21" y="26" width="3.5" height="13" fill="#e5e7eb"/>
-      <rect class="back-leg"  x="36" y="26" width="3.5" height="13" fill="#e5e7eb"/>
-    </g>
-  </svg>`;
-}
+/* ====== Horses ====== */
+function horseSVG(color){return `<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
+  <g class="g-bob">
+    <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
+    <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
+    <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
+    <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
+    <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
+    <rect class="front-leg" x="21" y="26" width="3.5" height="13" fill="#e5e7eb"/>
+    <rect class="back-leg"  x="36" y="26" width="3.5" height="13" fill="#e5e7eb"/>
+  </g>
+</svg>`}
+
 function clearHorses(){ $canvas.querySelectorAll('.horse').forEach(n=>n.remove()); H.length=0; }
 
 function buildHorses(list){
   clearHorses();
   const lanes = list.length;
   list.forEach((ent,i)=>{
+    const color = jc(i);
     const el=document.createElement('div');
     el.className='horse';
-    el.innerHTML=horseSVG(jc(i));
+    el.innerHTML=horseSVG(color);
+
     const plate=document.createElement('div');
     plate.className='nameplate';
     plate.textContent=`${ent.no}번 ${ent.name}`;
+    plate.style.borderColor = color;
+    plate.style.boxShadow = `0 0 0 1px rgba(0,0,0,.25), 0 0 8px 0 ${color}33`;
     el.appendChild(plate);
     $canvas.appendChild(el);
 
     if(mapMode==="oval"){
-      H.push({name:ent.name,no:ent.no,$el:el,theta:-Math.PI/2 + i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
+      H.push({name:ent.name,no:ent.no,color,$el:el,theta:-Math.PI/2 + i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
     }else{
-      // 직선: 목표시간 기반 평균속도(m/s) 셋업
       const [tmin,tmax] = TARGET_TIME[dist] || [60,80];
-      const target = tmin + _rand()*(tmax-tmin);   // 각 말별 목표 완주시간
-      const base = dist / target;                  // 평균 속도(m/s)
-      // 레인 배치
+      const target = tmin + _rand()*(tmax-tmin);      // 목표 완주시간(초)
+      const base0  = dist / target;                   // m/s
+      const base   = base0 * STRAIGHT_SPEED_BOOST;    // 살짝 상향
+
       const laneCenter = 200;
       const laneGap = Math.min(28, 90/Math.max(1,lanes-1));
       const y = laneCenter + (i - (lanes-1)/2)*laneGap;
 
       H.push({
-        name:ent.name,no:ent.no,$el:el,
+        name:ent.name,no:ent.no,color,$el:el,
+        // 직선 상태
         x:0,y,
-        base,                          // 기준속도
-        speed: base*(0.9+_rand()*0.2), // 초기 90~110%
-        fatigue:0,
-        legsDur:.42,
-        done:false,
+        base, speed: base*(0.9+_rand()*0.2), fatigue:0,
+        legsDur:.42, done:false,
         // 장애물/점프
-        jumping:false,jumpT:0,jumpDur:0.55,
-        stumble:0,
-        _passed:{}                     // 지나간 장애물 기록
+        jumping:false,jumpT:0,jumpDur:0.55, stumble:0,
+        _passed:{}
       });
     }
   });
@@ -376,7 +321,7 @@ function buildHorses(list){
   H.forEach(placeHorse);
 }
 
-/* ========= Placement ========= */
+/* ====== Placement ====== */
 function placeHorse(h){
   if(mapMode==="oval"){
     const cx=500, cy=300, rx=390, ry=190;
@@ -400,10 +345,9 @@ function placeHorse(h){
 
     // 점프 포물선
     if(h.jumping){
-      const p = Math.min(1, h.jumpT / h.jumpDur);      // 0~1
-      const arc = Math.sin(Math.PI * p);               // 0→1→0
-      const jumpPx = 22 * arc;
-      y -= jumpPx;
+      const p = Math.min(1, h.jumpT / h.jumpDur);
+      const arc = Math.sin(Math.PI * p);
+      y -= 22 * arc;
       h.$el.classList.add('jump');
     }else h.$el.classList.remove('jump');
 
@@ -419,7 +363,7 @@ function placeHorse(h){
   }
 }
 
-/* ========= Ranking ========= */
+/* ====== Ranking ====== */
 function orderByLead(){
   return (mapMode==="oval") ? H.slice().sort((a,b)=>b.theta-a.theta) : H.slice().sort((a,b)=>b.x-a.x);
 }
@@ -434,14 +378,21 @@ function updateRanking(){
     const status = (mapMode==="oval")
       ? (h.done?'완주':`${Math.floor((h.theta+Math.PI/2)/(2*Math.PI))+1}바퀴째`)
       : (h.done?'완주':`${Math.floor(h.x)}m`);
-    return `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name} - ${status}</span></div>`;
+    return `
+      <div class="row">
+        <span class="pos">${i+1}위</span>
+        <span>
+          <span class="color-badge" style="background:${h.color};border:1px solid #1f2937"></span>
+          ${h.no}번 ${h.name} - ${status}
+        </span>
+      </div>`;
   }).join('');
 }
 
-/* ========= Camera ========= */
+/* ====== Camera ====== */
 function updateCamera(){ $viewport.style.transform="translate(-50%,-50%) scale(1)"; }
 
-/* ========= Start Countdown ========= */
+/* ====== Countdown ====== */
 const $hud=document.getElementById('hud'),
       $ltR=document.getElementById('ltR'),
       $ltY=document.getElementById('ltY'),
@@ -457,26 +408,20 @@ async function countdown(){
   $countTxt.textContent='출발!'; $gunTxt.textContent='탕!'; await wait(300);
   $hud.classList.remove('show'); $gunTxt.textContent='';
 }
-
-/* ========= Celebration ========= */
+</script>
+<script>
+/* ====== Celebration & Draw ====== */
 function confettiBurst(){
-  const emojis = ['🎉','✨','🎊','🥳','🍾','🎈','⭐'];
+  const emojis=['🎉','✨','🎊','🥳','🍾','🎈','⭐'];
   for(let i=0;i<30;i++){
     const c=document.createElement('div');
     c.className='confetti';
     c.textContent=emojis[i%emojis.length];
-    c.style.left = (Math.random()*100)+'vw';
+    c.style.left=(Math.random()*100)+'vw';
     c.style.animationDuration=(2+Math.random()*1.5)+'s';
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),3500);
   }
-}
-function celebrate(title, subtitle){
-  $celeTitle.textContent = title;
-  $celeSubtitle.textContent = subtitle;
-  $cele.style.display='flex';
-  confettiBurst();
-  for(let i=0;i<16;i++) dropCarrot();
 }
 function dropCarrot(){
   const c=document.createElement('div');
@@ -487,93 +432,93 @@ function dropCarrot(){
   document.body.appendChild(c);
   setTimeout(()=>c.remove(),4000);
 }
-
-/* ========= Draw (추첨) ========= */
-const $drawFirst=document.getElementById('drawFirstBtn');
-const $drawLast=document.getElementById('drawLastBtn');
-const $drawNth=document.getElementById('drawNthBtn');
-const $drawNthInput=document.getElementById('drawNthInput');
+function celebrate(title, subtitle){
+  document.getElementById('celeTitle').textContent=title;
+  document.getElementById('celeSubtitle').textContent=subtitle;
+  document.getElementById('celebrate').style.display='flex';
+  confettiBurst();
+  for(let i=0;i<16;i++) dropCarrot();
+}
 
 function executeDraw(req){
-  const ordered = orderByLead();
+  const ordered = orderByLead(); // 완주 직후 호출됨
   let idx=0;
   if(req.type==='first') idx=0;
   else if(req.type==='last') idx=ordered.length-1;
   else if(req.type==='nth'){
     const n=(req.n|0);
-    idx = Math.max(1, Math.min(ordered.length, n)) - 1;
+    idx=Math.max(1,Math.min(ordered.length,n))-1;
   }
   const h=ordered[idx];
   celebrate('King Carrot 👑🥕', `${idx+1}등 — ${h.no}번 ${h.name} 축하합니다!`);
   pendingDraw=null;
 }
-$drawFirst.onclick=()=>{ if(running){ pendingDraw={type:'first'}; alert('경기 종료 시 1등 당첨을 발표합니다.'); } else { if(!H.length){alert('참가자를 입력하고 시작하세요.');return;} executeDraw({type:'first'});} };
-$drawLast.onclick =()=>{ if(running){ pendingDraw={type:'last'};  alert('경기 종료 시 마지막 당첨을 발표합니다.'); } else { if(!H.length){alert('참가자를 입력하고 시작하세요.');return;} executeDraw({type:'last'});} };
-$drawNth.onclick  =()=>{ const n=parseInt($drawNthInput.value,10); if(!n){alert('n등 숫자를 입력하세요.');return;}
-  if(running){ pendingDraw={type:'nth',n}; alert(`경기 종료 시 ${n}등 당첨을 발표합니다.`); }
-  else { if(!H.length){alert('참가자를 입력하고 시작하세요.');return;} executeDraw({type:'nth',n}); }
-};
 
-/* ========= Race Loop ========= */
+/* ====== Straight Map (SVG 트랙 + 장애물 렌더) ====== */
+function drawStraightMap(){
+  straightViewW = 20*dist; // 거리 비례로 뷰박스 폭 확장
+  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
+  const trackY=150, trackH=100, startX=80, finishX=straightViewW-80;
+  $straightMap.innerHTML = `
+    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="${startX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${finishX}" y1="${trackY-10}" x2="${finishX}" y2="${trackY+trackH+10}" stroke="#e5e7eb" stroke-width="6"/>
+    <text x="${finishX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+  `;
+  // 장애물 새로 생성+배치
+  genObstacles();
+  renderObstacles();
+}
+
+/* ====== Race Loop ====== */
 function run(){
   running=true;
   let lastTime=null;
 
   const tick=(now)=>{
     if(lastTime===null) lastTime=now;
-    const dt = Math.max(0.001, Math.min(0.05, (now-lastTime)/1000)); // 1~50ms
+    const dt=Math.max(0.001,Math.min(0.05,(now-lastTime)/1000)); // 1~50ms
     lastTime=now;
 
     for(const h of H){
       if(h.done) continue;
 
       if(mapMode==="oval"){
-        // 기존 타원 스릴 모델
+        // 타원: 기존 스릴 주행
         h.v += (_rand()-0.5)*0.01;
         if(_rand()<0.003) h.v += 0.06;
         h.f = Math.max(0, h.f*0.95 + (h.v>0.035? 0.002: 0));
         h.v -= h.f*0.015;
         h.v = Math.max(0.006, Math.min(0.06, h.v));
         h.theta += h.v;
-        if(h.theta >= (-Math.PI/2) + laps*2*Math.PI) h.done=true;
+        if(h.theta >= (-Math.PI/2)+laps*2*Math.PI) h.done=true;
       }else{
-        // ===== 직선: 목표시간 기반 m/s =====
-        // 랜덤 흔들림
-        h.speed += h.base * 0.15 * (_rand()-0.5);   // ±7.5%가량
-        // 부스터 (가끔)
-        if(_rand() < 0.01) h.speed += h.base * 0.6;
-        // 피로
-        if(h.speed > h.base*1.1) h.fatigue = Math.min(1, h.fatigue + dt*0.15);
-        else                     h.fatigue = Math.max(0, h.fatigue - dt*0.08);
-        h.speed -= h.fatigue * h.base * 0.2;
-        // 속도 범위
+        // 직선: 목표시간 기반 m/s + 랜덤/부스터/피로
+        h.speed += h.base*0.15*(_rand()-0.5);      // 흔들림
+        if(_rand()<0.01) h.speed += h.base*0.6;    // 부스터
+        if(h.speed>h.base*1.1) h.fatigue=Math.min(1,h.fatigue+dt*0.15);
+        else h.fatigue=Math.max(0,h.fatigue-dt*0.08);
+        h.speed -= h.fatigue*h.base*0.2;
         const vMin=h.base*0.6, vMax=h.base*1.8;
-        h.speed = Math.max(vMin, Math.min(vMax, h.speed));
+        h.speed=Math.max(vMin,Math.min(vMax,h.speed));
 
-        // 장애물 판정 (켜져 있을 때만)
+        // 장애물 판정
         if(obstaclesEnabled){
-          const ahead = h.x + h.speed * 0.4; // 0.4s 앞
-          const behind = h.x - 0.5;
-          const hit = obstacles.find(o => !h._passed[o.id] && o.x >= behind && o.x <= ahead);
+          const ahead=h.x + h.speed*0.4; // 0.4s 앞
+          const behind=h.x - 0.5;
+          const hit=obstacles.find(o=>!h._passed[o.id] && o.x>=behind && o.x<=ahead);
           if(hit){
-            const jumpChance = 0.7 + Math.min(0.2, (h.speed - h.base)*0.2);
-            if(Math.random() < jumpChance){
-              h.jumping = true; h.jumpT = 0; h._passed[hit.id]=true;
-            }else{
-              h.stumble = 0.5 + Math.random()*0.3;
-              h.speed *= 0.35;
-              h._passed[hit.id]=true;
-            }
+            const jumpChance=0.7 + Math.min(0.2,(h.speed-h.base)*0.2);
+            if(Math.random()<jumpChance){ h.jumping=true; h.jumpT=0; h._passed[hit.id]=true; }
+            else{ h.stumble=0.5+Math.random()*0.3; h.speed*=0.35; h._passed[hit.id]=true; }
           }
-          if(h.stumble>0){ h.stumble -= dt; h.speed *= 0.98; }
-          if(h.jumping){ h.jumpT += dt; if(h.jumpT>=h.jumpDur){ h.jumping=false; h.jumpT=0; } }
+          if(h.stumble>0){ h.stumble-=dt; h.speed*=0.98; }
+          if(h.jumping){ h.jumpT+=dt; if(h.jumpT>=h.jumpDur){ h.jumping=false; h.jumpT=0; } }
         }
 
-        // 거리 적분
-        h.x += h.speed * dt; // m/s * s = m
-
-        // 결승선/리본
-        if(!h._cut && h.x>=dist){ h._cut=true; $finishRibbon.classList.add('cut'); }
+        // 이동(m)
+        h.x += h.speed*dt;
         if(h.x>=dist) h.done=true;
       }
 
@@ -585,19 +530,23 @@ function run(){
 
     if(H.every(h=>h.done)){
       running=false;
-      const win=orderByLead()[0];
-      $winnerName.textContent=`${win.no}번 ${win.name}`;
-      $winnerBox.style.display='block';
+      // 우승 토스트는 제거 — 대신 당근비만
       for(let i=0;i<20;i++) dropCarrot();
+      // 예약된 추첨만 여기서 발표
       if(pendingDraw) executeDraw(pendingDraw);
     }else{
       raf=requestAnimationFrame(tick);
     }
   };
+
   raf=requestAnimationFrame(tick);
 }
 
-/* ========= Controls ========= */
+/* ====== Controls ====== */
+document.getElementById('btnContact').onclick=()=>{
+  alert("문의/건의/피드백: luckyhorserace@gmail.com\n언제든 의견 주세요!");
+};
+
 $start.onclick=async()=>{
   if(running) return;
   const list=splitNames($names.value);
@@ -605,67 +554,87 @@ $start.onclick=async()=>{
   if(list.length>MAX){alert('최대 50명');return}
   laps=parseInt($raceLen.value,10)||3;
   dist=parseInt($raceDist.value,10)||100;
+
   reseed(autoSeed());
-  $winnerBox.style.display='none';
-  $cele.style.display='none';
+  document.getElementById('celebrate').style.display='none';
   clearHorses();
+
   if(mapMode==="straight") drawStraightMap();
   buildHorses(list);
   await countdown();
   run();
 };
+
 $reset.onclick=()=>{
   if(raf) cancelAnimationFrame(raf);
   raf=null; running=false; pendingDraw=null;
-  $winnerBox.style.display='none';
-  $cele.style.display='none';
+  document.getElementById('celebrate').style.display='none';
   clearHorses();
   if(mapMode==="straight") drawStraightMap();
 };
+
 $shuffle.onclick=()=>{
   const list=splitNames($names.value);
   for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]]}
   $names.value=list.map(x=>x.name).join(' ');
   if(list.length) buildHorses(list); else clearHorses();
 };
-$names.addEventListener('input', ()=>{ const list=splitNames($names.value); if(list.length) buildHorses(list); else clearHorses(); });
-addEventListener('resize', ()=>{ if(mapMode==="straight") drawStraightMap(); H.forEach(placeHorse); updateCamera(); });
+
+$names.addEventListener('input', ()=>{
+  const list=splitNames($names.value);
+  if(list.length) buildHorses(list); else clearHorses();
+});
+
+addEventListener('resize', ()=>{
+  if(mapMode==="straight") drawStraightMap();
+  H.forEach(placeHorse);
+  updateCamera();
+});
 
 /* 맵 전환 */
 $mapToggle.onclick=()=>{
   mapMode = (mapMode==="oval") ? "straight" : "oval";
   $mapToggle.textContent = "맵 전환: " + (mapMode==="oval"?"타원":"직선");
+
   if(mapMode==="oval"){
     $raceLen.style.display="inline-block"; $raceDist.style.display="none";
     $ovalMap.style.display="block"; $straightMap.style.display="none";
-    $startLine.style.display="none"; $finishRibbon.style.display="none";
-    $finishRibbon.classList.remove('cut');
   }else{
     $raceLen.style.display="none"; $raceDist.style.display="inline-block";
     $ovalMap.style.display="none"; $straightMap.style.display="block";
-    $startLine.style.display="block"; $finishRibbon.style.display="block";
     drawStraightMap();
   }
+
   if(raf) cancelAnimationFrame(raf);
   raf=null; running=false; pendingDraw=null;
-  $winnerBox.style.display='none'; $cele.style.display='none';
+  document.getElementById('celebrate').style.display='none';
   clearHorses();
 };
 
 /* 장애물 토글 */
 $obstacleToggle.onclick=()=>{
-  obstaclesEnabled = !obstaclesEnabled;
-  $obstacleToggle.textContent = `장애물: ${obstaclesEnabled?'켬':'끔'}`;
-  if(mapMode==="straight"){ drawStraightMap(); } // 즉시 반영
+  obstaclesEnabled=!obstaclesEnabled;
+  $obstacleToggle.textContent=`장애물: ${obstaclesEnabled?'켬':'끔'}`;
+  if(mapMode==="straight") drawStraightMap();
 };
 
-/* 초기 표기(직선맵 기본) */
+/* 추첨(예약만) */
+const $drawFirst=document.getElementById('drawFirstBtn');
+const $drawLast=document.getElementById('drawLastBtn');
+const $drawNth=document.getElementById('drawNthBtn');
+const $drawNthInput=document.getElementById('drawNthInput');
+
+$drawFirst.onclick=()=>{ pendingDraw={type:'first'}; alert('추첨(1등) 예약됨 — 레이스 종료 후 발표됩니다.'); };
+$drawLast.onclick =()=>{ pendingDraw={type:'last'};  alert('추첨(마지막) 예약됨 — 레이스 종료 후 발표됩니다.'); };
+$drawNth.onclick  =()=>{ const n=parseInt($drawNthInput.value,10);
+  if(!n){alert('n등 숫자를 입력하세요.');return;}
+  pendingDraw={type:'nth',n}; alert(`추첨(${n}등) 예약됨 — 레이스 종료 후 발표됩니다.`);
+};
+
+/* ====== 초기 상태: 직선 기본 ====== */
 $raceLen.style.display="none";
 $raceDist.style.display="inline-block";
-$ovalMap.style.display = "none";
-$straightMap.style.display = "block";
-$startLine.style.display = "block";
-$finishRibbon.style.display = "block";
-$mapToggle.textContent = "맵 전환: 직선";
+$ovalMap.style.display="none";
+$straightMap.style.display="block";
 drawStraightMap();
 </script>
