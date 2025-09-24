@@ -315,10 +315,14 @@ function placeHorse(h){
 /* ===== Ranking & Camera ===== */
 function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
 function updateRanking(){
-  const order=orderByLead();
-  $rankingLines.innerHTML = order.map((h,i)=>(
-    `<div class="row"><span class="pos">${i+1}위</span><span>${h.no}번 ${h.name}</span></div>`
-  )).join('');
+  const order = orderByLead();
+  $rankingLines.innerHTML = order.map((h,i)=>{
+    const lapsDone = Math.floor((h.theta + Math.PI/2) / (2*Math.PI));
+    return `<div class="row">
+              <span class="pos">${i+1}위</span>
+              <span>${h.no}번 ${h.name} (${lapsDone}바퀴)</span>
+            </div>`;
+  }).join('');
 }
 document.getElementById('camToggleBtn').onclick=()=>{
   cameraMode = cameraMode==="fixed" ? "leader" : "fixed";
