@@ -385,5 +385,23 @@ addEventListener('resize', ()=>{ H.forEach(placeHorse); updateCamera(); });
 // 초기 카메라 상태 보정
 updateCamera();
 </script>
+
+<!-- 문의 모달 -->
+<div class="modal" id="modal">
+  <div class="panel" style="max-width:380px;margin:8% auto">
+    <h3>문의 · 제안 · 건의</h3>
+    <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px">
+      <strong>Email:</strong>
+      <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn-ghost"
+              onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 복사</button>
+      <button class="btn-accent"
+              onclick="document.getElementById('modal').style.display='none'">닫기</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
