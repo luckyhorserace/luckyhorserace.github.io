@@ -47,21 +47,12 @@ button,a.btn{
 }
 .canvas{
   position: relative;
-  width: min(98vw, 1800px);  /* 크게 */
+  width: min(98vw, 1800px);
   height: auto;
   margin: 0 auto;
 }
-.ovalSvg{
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.horse{
-  position:absolute;
-  width:46px;
-  height:34px;
-  transform:translate(-50%,-50%);
-}
+.ovalSvg{width:100%;height:auto;display:block}
+.horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%)}
 .nameplate{
   position:absolute;
   bottom:100%;left:50%;
@@ -95,14 +86,11 @@ button,a.btn{
 .winner{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:none;padding:12px 16px;border-radius:12px;background:#0e1e33;border:1px solid #213250;z-index:15}
 .winner strong{color:#9ae6b4}
 
-.ranking{position:absolute;top:12px;right:12px;width:220px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
+.ranking{position:absolute;top:12px;right:12px;width:240px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
 .ranking h3{margin:2px 0 6px;font-size:13px;color:#93c5fd}
 .ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900;color:#6ee7ff}
-
-.booth{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:200px;z-index:12}
-.commentary{position:absolute;left:50%;top:calc(50% - 80px);transform:translateX(-50%);background:rgba(10,18,28,.92);border:1px solid #27405e;padding:6px 9px;border-radius:10px;font-weight:800;z-index:22}
 
 @keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999}
@@ -110,11 +98,6 @@ button,a.btn{
 header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,.5);z-index:30}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #names{min-width:300px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999}
-.modal a{color:#ffffff;text-decoration:underline}
-.panel{background:#0f172a;border:1px solid var(--border);border-radius:14px;padding:14px}
-  /* 숨김 처리 */
-.booth, .commentary { display: none !important; }
 </style>
 </head>
 <body>
@@ -129,7 +112,6 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
       <span class="gun" id="gunTxt"></span>
     </div>
   </div>
-
   <!-- 스테이지 -->
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
@@ -148,16 +130,6 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
         <div class="gate" id="gate"></div>
       </div>
     </div>
-
-    <!-- 중계석 -->
-    <div class="booth">
-      <svg viewBox="0 0 600 220">
-        <rect x="40" y="110" width="520" height="70" rx="10" fill="#0f2033"/>
-      </svg>
-    </div>
-
-    <!-- 중계 자막 -->
-    <div class="commentary" id="commentaryBox">중계 시작 대기</div>
 
     <!-- 우승 배너 -->
     <div class="winner" id="winnerBox">
@@ -187,33 +159,11 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
       <button class="btn-accent" id="startBtn">Start ▶</button>
       <button class="btn-ghost" id="resetBtn">Reset</button>
       <button class="btn-ghost" id="camToggleBtn">카메라: 고정</button>
-      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
-      <button class="btn-ghost" id="btnContact">문의</button>
     </div>
   </header>
 </div>
-
-<!-- 문의 모달 -->
-<div class="modal" id="modal">
-  <div class="panel" style="max-width:380px;margin:8% auto">
-    <h3>문의 · 제안 · 건의</h3>
-    <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px">
-      <strong>Email:</strong> <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button class="btn-ghost" onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 복사</button>
-      <button class="btn-accent" onclick="document.getElementById('modal').style.display='none'">닫기</button>
-    </div>
-  </div>
-</div>
 <script>
 /* ===== Utils ===== */
-function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-let _rand=Math.random;
-function reseed(seed){_rand=mulberry32(seed|0)}
-function autoSeed(){return(Date.now()^Math.floor(Math.random()*0xFFFFFFFF))>>>0}
-const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e','#6ee7ff'];
-function jc(i){return JERSEYS[i%JERSEYS.length]}
 function splitNames(raw){
   return raw.split(/[/\s]+/)
     .map(s=>s.trim()).filter(Boolean)
@@ -225,25 +175,27 @@ function splitNames(raw){
     .slice(0,50)
     .map((n,i)=>({name:n,no:i+1}));
 }
+const JERSEYS=['#60a5fa','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#fb7185','#34d399','#f97316','#a3e635','#e879f9','#f43f5e','#6ee7ff'];
+function jc(i){return JERSEYS[i%JERSEYS.length]}
 
-/* ===== DOM ===== */
+/* ===== DOM Refs ===== */
 const $names=document.getElementById('names'),
       $raceLen=document.getElementById('raceLen'),
       $start=document.getElementById('startBtn'),
       $reset=document.getElementById('resetBtn'),
+      $shuffle=document.getElementById('shuffleBtn'),
+      $winnerBox=document.getElementById('winnerBox'),
+      $winnerName=document.getElementById('winnerName'),
+      $rankingLines=document.getElementById('rankingLines'),
+      $viewport=document.getElementById('viewport'),
+      $canvas=document.getElementById('canvas'),
+      $camToggle=document.getElementById('camToggleBtn'),
       $hud=document.getElementById('hud'),
       $ltR=document.getElementById('ltR'),
       $ltY=document.getElementById('ltY'),
       $ltG=document.getElementById('ltG'),
       $countTxt=document.getElementById('countTxt'),
-      $gunTxt=document.getElementById('gunTxt'),
-      $winnerBox=document.getElementById('winnerBox'),
-      $winnerName=document.getElementById('winnerName'),
-      $rankingLines=document.getElementById('rankingLines'),
-      $viewport=document.getElementById('viewport'),
-      $canvas=document.getElementById('canvas');
-
-document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
+      $gunTxt=document.getElementById('gunTxt');
 
 /* ===== State ===== */
 const MIN=2,MAX=50;
@@ -265,7 +217,7 @@ function clearHorses(){ $canvas.querySelectorAll('.horse').forEach(n=>n.remove()
 
 function buildHorses(list){
   clearHorses();
-  const spread=0.03; // 게이트 앞 대기 상태에서 겹치지 않게 살짝 벌림
+  const spread=0.03; // 게이트 앞에서 겹침 방지
   list.forEach((ent,i)=>{
     const el=document.createElement('div');
     el.className='horse';
@@ -274,124 +226,114 @@ function buildHorses(list){
     plate.className='nameplate';
     plate.textContent=`${ent.no}번 ${ent.name}`;
     el.appendChild(plate);
-    // ✅ 반드시 #canvas 안에 붙여야 좌표가 일치
     $canvas.appendChild(el);
-    H.push({name:ent.name,no:ent.no,$el:el,theta:-Math.PI/2 + i*spread,v:0,done:false});
+    H.push({
+      name:ent.name,
+      no:ent.no,
+      $el:el,
+      theta:-Math.PI/2 + i*spread, // START 부근에서 시작
+      v:0.02,                      // 초기 속도
+      done:false
+    });
   });
   updateRanking();
   H.forEach(placeHorse);
 }
 
-/* ===== 좌표 변환(정답 버전) =====
-   - SVG viewBox(1000×600) 기준 → canvas 픽셀로 스케일만 곱한다.
-   - rect.left/top 같은 화면 오프셋 '절대 금지' (자식은 canvas 내부 좌표로 배치)
-*/
+/* ===== 좌표 변환 ===== */
 function placeHorse(h){
-  const cx=500, cy=300, rx=390, ry=190; // 원래 트랙 타원 수치
+  const cx=500, cy=300, rx=390, ry=190;
   const t=h.theta;
-
-  // 1) SVG 좌표
   const sx = cx + rx * Math.cos(t);
   const sy = cy + ry * Math.sin(t);
-
-  // 2) canvas 픽셀 스케일
-  const rect   = $canvas.getBoundingClientRect();
-  const scaleX = rect.width  / 1000;
-  const scaleY = rect.height / 600;
-
-  const x = sx * scaleX;
-  const y = sy * scaleY;
-
-  // 3) 배치 (canvas의 자식이므로 offset 불필요)
-  h.$el.style.left = x + 'px';
-  h.$el.style.top  = y + 'px';
-
-  // 4) 진행 방향 회전 (스케일 차이 보정)
-  const dx = -rx * Math.sin(t), dy = ry * Math.cos(t);
-  const ang = Math.atan2(dy*scaleY, dx*scaleX) * 180/Math.PI;
-  h.$el.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
+  const rect=$canvas.getBoundingClientRect();
+  const scaleX=rect.width/1000, scaleY=rect.height/600;
+  const x=sx*scaleX, y=sy*scaleY;
+  h.$el.style.left=x+'px';
+  h.$el.style.top =y+'px';
+  const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
+  const ang=Math.atan2(dy*scaleY, dx*scaleX)*180/Math.PI;
+  h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
 }
 
-/* ===== Ranking & Camera ===== */
+/* ===== 순위 & 표기 ===== */
 function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
 function updateRanking(){
-  const order = orderByLead();
-  $rankingLines.innerHTML = order.map((h,i)=>{
-    const lapsDone = Math.floor((h.theta + Math.PI/2) / (2*Math.PI));
+  const order=orderByLead();
+  $rankingLines.innerHTML=order.map((h,i)=>{
+    const lapsDone=Math.floor((h.theta+Math.PI/2)/(2*Math.PI));
+    const doneBadge = h.done ? ' · <span style="color:#9ae6b4;font-weight:900">완주</span>' : '';
     return `<div class="row">
               <span class="pos">${i+1}위</span>
-              <span>${h.no}번 ${h.name} (${lapsDone}바퀴)</span>
+              <span>${h.no}번 ${h.name} (${lapsDone}/${laps}바퀴)${doneBadge}</span>
             </div>`;
   }).join('');
 }
-document.getElementById('camToggleBtn').onclick=()=>{
+</script>
+<script>
+/* ===== Camera ===== */
+$camToggle.onclick=()=>{
   cameraMode = cameraMode==="fixed" ? "leader" : "fixed";
-  document.getElementById('camToggleBtn').textContent = cameraMode==="fixed"?"카메라: 고정":"카메라: 1등 추적";
+  $camToggle.textContent = cameraMode==="fixed" ? "카메라: 고정" : "카메라: 1등 추적";
 };
 function updateCamera(){
-  if(!H.length) {
-    $viewport.style.transform = "translate(-50%,-50%) scale(1)";
+  if(!H.length){
+    $viewport.style.transform="translate(-50%,-50%) scale(1)";
     return;
   }
-
-  if(cameraMode === "fixed") {
-    // 기본: 전체 트랙 보이게 고정
-    $viewport.style.transform = "translate(-50%,-50%) scale(1)";
+  if(cameraMode==="fixed"){
+    $viewport.style.transform="translate(-50%,-50%) scale(1)";
     return;
   }
-
-  // === 1등 따라가기 ===
-  const leader = orderByLead()[0];
+  const leader=orderByLead()[0];
   const cx=500, cy=300, rx=390, ry=190;
-  const t = leader.theta;
-
-  // 리더의 SVG 좌표
-  const sx = cx + rx * Math.cos(t);
-  const sy = cy + ry * Math.sin(t);
-
-  // canvas 실제 픽셀 스케일
-  const rect   = $canvas.getBoundingClientRect();
-  const scaleX = rect.width  / 1000;
-  const scaleY = rect.height / 600;
-  const x = sx * scaleX;
-  const y = sy * scaleY;
-
-  // 화면 중앙에 맞추도록 이동
-  $viewport.style.transform =
-    `translate(${-x + rect.width/2}px, ${-y + rect.height/2}px) scale(1.5)`;
+  const t=leader.theta;
+  const sx=cx+rx*Math.cos(t);
+  const sy=cy+ry*Math.sin(t);
+  const rect=$canvas.getBoundingClientRect();
+  const scaleX=rect.width/1000, scaleY=rect.height/600;
+  const x=sx*scaleX, y=sy*scaleY;
+  $viewport.style.transform=`translate(${-x+rect.width/2}px, ${-y+rect.height/2}px) scale(1.5)`;
 }
 
-
-/* ===== Countdown & Race ===== */
+/* ===== Countdown ===== */
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 async function countdown(){
   $hud.classList.add('show');
-  document.getElementById('ltR').className='light on red'; $countTxt.textContent='3';
+  $ltR.className='light on red'; $countTxt.textContent='3';
   await wait(700);
-  document.getElementById('ltY').className='light on yellow'; $countTxt.textContent='2';
+  $ltY.className='light on yellow'; $countTxt.textContent='2';
   await wait(700);
-  document.getElementById('ltG').className='light on green'; $countTxt.textContent='1';
+  $ltG.className='light on green'; $countTxt.textContent='1';
   await wait(600);
   $countTxt.textContent='START!'; $gunTxt.textContent='탕!';
   await wait(300);
   $hud.classList.remove('show');
 }
+
+/* ===== Race ===== */
 function run(){
   running=true;
   const tick=()=>{
     for(const h of H){
       if(h.done) continue;
-      h.theta += 0.02;             // 각속도(느리면 더 작게)
+      // 속도에 약간의 랜덤 가속/감속
+      h.v += (Math.random()-0.5)*0.002; 
+      h.v = Math.max(0.015, Math.min(0.035, h.v));
+      h.theta += h.v;
       placeHorse(h);
-      if(h.theta >= (-Math.PI/2) + laps*2*Math.PI) h.done = true;
+
+      if(h.theta >= (-Math.PI/2)+laps*2*Math.PI){
+        h.done=true;
+      }
     }
     updateRanking();
     updateCamera();
 
     if(H.every(h=>h.done)){
       running=false;
-      const win = orderByLead()[0];
-      $winnerName.textContent = `${win.no}번 ${win.name}`;
+      const win=orderByLead()[0];
+      $winnerName.textContent=`${win.no}번 ${win.name}`;
       $winnerBox.style.display='block';
       for(let i=0;i<20;i++) dropCarrot();
     }else{
@@ -417,9 +359,8 @@ $start.onclick=async()=>{
   if(list.length<MIN){alert('최소 2명 입력');return}
   if(list.length>MAX){alert('최대 50명');return}
   laps=parseInt($raceLen.value,10)||5;
-  reseed(autoSeed());
   clearHorses();
-  buildHorses(list);         // ✅ 생성 즉시 트랙 위에 보임
+  buildHorses(list);
   await countdown();
   run();
 };
@@ -429,20 +370,22 @@ $reset.onclick=()=>{
   clearHorses();
   $winnerBox.style.display='none';
 };
-document.getElementById('shuffleBtn').onclick=()=>{
+$shuffle.onclick=()=>{
   const list=splitNames($names.value);
-  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]]}
+  for(let i=list.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [list[i],list[j]]=[list[j],list[i]];
+  }
   $names.value=list.map(x=>x.name).join(' ');
   buildHorses(list);
 };
 
-/* 즉시 미리보기(입력하면 바로 보이게) */
+/* 즉시 미리보기 */
 $names.addEventListener('input', ()=>{
   const list=splitNames($names.value);
   if(list.length) buildHorses(list); else clearHorses();
 });
 
-/* 창 크기 바뀌면 좌표 재계산 */
+/* 창 크기 바뀔 때 좌표 보정 */
 addEventListener('resize', ()=>{ H.forEach(placeHorse); updateCamera(); });
 </script>
-
