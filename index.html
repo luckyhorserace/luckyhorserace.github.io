@@ -278,22 +278,38 @@ $camToggle.onclick=()=>{
 };
 function updateCamera(){
   if(!H.length){
-    $viewport.style.transform="translate(-50%,-50%) scale(1)";
+    $viewport.style.transform = "translate(-50%,-50%) scale(1)";
     return;
   }
-  if(cameraMode==="fixed"){
-    $viewport.style.transform="translate(-50%,-50%) scale(1)";
+
+  if(cameraMode === "fixed"){
+    // 전체 트랙 보이게
+    $viewport.style.transform = "translate(-50%,-50%) scale(1)";
     return;
   }
-  const leader=orderByLead()[0];
+
+  // === 1등 따라가기 ===
+  const leader = orderByLead()[0];
+  if(!leader) return;
+
   const cx=500, cy=300, rx=390, ry=190;
-  const t=leader.theta;
-  const sx=cx+rx*Math.cos(t);
-  const sy=cy+ry*Math.sin(t);
-  const rect=$canvas.getBoundingClientRect();
-  const scaleX=rect.width/1000, scaleY=rect.height/600;
-  const x=sx*scaleX, y=sy*scaleY;
-  $viewport.style.transform=`translate(${-x+rect.width/2}px, ${-y+rect.height/2}px) scale(1.5)`;
+  const t = leader.theta;
+
+  // 1등 말의 SVG 좌표
+  const sx = cx + rx * Math.cos(t);
+  const sy = cy + ry * Math.sin(t);
+
+  // 화면 크기
+  const rect   = $canvas.getBoundingClientRect();
+  const scaleX = rect.width  / 1000;
+  const scaleY = rect.height / 600;
+  const x = sx * scaleX;
+  const y = sy * scaleY;
+
+  // 뷰포트를 리더를 중심으로 이동 + 확대
+  // 핵심: translate(-50%,-50%)를 유지하면서 margin 만큼 보정
+  $viewport.style.transform =
+    `translate(calc(-50% - ${x - rect.width/2}px), calc(-50% - ${y - rect.height/2}px)) scale(1.5)`;
 }
 
 /* ===== Countdown ===== */
