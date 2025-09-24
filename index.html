@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Lucky Horse Race — Fullscreen Oval</title>
+<title>Lucky Horse Race — Oval & Straight</title>
 <style>
 :root{
   --bg:#0b1220;
@@ -51,7 +51,7 @@ button,a.btn{
   height: auto;
   margin: 0 auto;
 }
-.ovalSvg{width:100%;height:auto;display:block}
+.ovalSvg,.straightSvg{width:100%;height:auto;display:block}
 .horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%)}
 .nameplate{
   position:absolute;bottom:100%;left:50%;
@@ -67,8 +67,21 @@ button,a.btn{
 .horse-svg .jockey{fill:var(--jersey,#60a5fa)}
 .horse-svg .saddle{fill:#94a3b8}
 .horse-svg .eye{fill:#0f172a}
+
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
 .horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
+
+/* 🐎 직선맵 전용 달리기 애니메이션 */
+@keyframes leg-run-front {
+  0%,100% { transform: rotate(20deg); }
+  50% { transform: rotate(-20deg); }
+}
+@keyframes leg-run-back {
+  0%,100% { transform: rotate(-20deg); }
+  50% { transform: rotate(20deg); }
+}
+.front-leg { transform-origin: top center; animation: leg-run-front 0.4s infinite linear; }
+.back-leg { transform-origin: top center; animation: leg-run-back 0.4s infinite linear; }
 
 .hud{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:20}
 .hud.show{display:flex}
@@ -86,8 +99,6 @@ button,a.btn{
 .ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900;color:#6ee7ff}
-
-.booth,.commentary{display:none!important}
 
 @keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999}
@@ -117,7 +128,9 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
       <div class="canvas" id="canvas">
-        <svg class="ovalSvg" viewBox="0 0 1000 600">
+
+        <!-- 🟢 Oval Map -->
+        <svg class="ovalSvg map" id="ovalMap" viewBox="0 0 1000 600">
           <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
           <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
           <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
@@ -126,43 +139,57 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
           <line x1="500" y1="480" x2="500" y2="520" stroke="#e5e7eb" stroke-width="6"/>
           <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">FINISH</text>
         </svg>
+
+        <!-- 🟠 Straight Map (초기에는 숨김) -->
+        <svg class="straightSvg map" id="straightMap" viewBox="0 0 2000 400" style="display:none">
+          <rect x="0" y="150" width="2000" height="100" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+          <!-- 출발선 -->
+          <line x1="50" y1="140" x2="50" y2="260" stroke="#22d3ee" stroke-width="6"/>
+          <text x="50" y="120" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">START</text>
+          <!-- 피니시 라인 -->
+          <line x1="1950" y1="140" x2="1950" y2="260" stroke="#e5e7eb" stroke-width="6"/>
+          <text x="1950" y="120" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">FINISH</text>
+        </svg>
+
       </div>
     </div>
 
     <!-- 우승 배너 -->
     <div class="winner" id="winnerBox">
-      <div><strong>우승:</strong> <span id="winnerName"></span></div>
+      <div><strong>Winner:</strong> <span id="winnerName"></span></div>
     </div>
 
     <!-- 순위판 -->
     <div id="rankingBox" class="ranking">
-      <h3>현재 순위</h3>
+      <h3>Ranking</h3>
       <div id="rankingLines"></div>
     </div>
   </div>
 
   <!-- 하단 UI -->
-<header>
-  <div class="controls left">
-    <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
-    <select id="raceLen">
-      <option value="1">1바퀴</option>
-      <option value="3">3바퀴</option>
-      <option value="5" selected>5바퀴</option>
-      <option value="10">10바퀴</option>
-      <option value="15">15바퀴</option>
-      <option value="20">20바퀴</option>
-    </select>
-    <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
-    <button class="btn-accent" id="startBtn">Start ▶</button>
-    <button class="btn-ghost" id="resetBtn">Reset</button>
-  </div>
+  <header>
+    <div class="controls left">
+      <input id="names" type="text" placeholder="Enter participants (e.g. Alice Bob / Alice*3)">
+      <select id="raceLen">
+        <option value="1">1 Lap</option>
+        <option value="3">3 Laps</option>
+        <option value="5" selected>5 Laps</option>
+        <option value="10">10 Laps</option>
+        <option value="15">15 Laps</option>
+        <option value="20">20 Laps</option>
+      </select>
+      <button class="btn-ghost" id="shuffleBtn">Shuffle</button>
+      <button class="btn-accent" id="startBtn">Start ▶</button>
+      <button class="btn-ghost" id="resetBtn">Reset</button>
+      <!-- 🔄 맵 전환 버튼 -->
+      <button class="btn-ghost" id="mapToggleBtn">Toggle Map</button>
+    </div>
 
-  <div class="controls right">
-    <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
-    <button class="btn-ghost" id="btnContact">문의</button>
-  </div>
-</header>
+    <div class="controls right">
+      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 Buy me a carrot</a>
+      <button class="btn-ghost" id="btnContact">Contact</button>
+    </div>
+  </header>
 </div>
 <script>
 /* ===== Utils ===== */
@@ -200,13 +227,16 @@ const $names=document.getElementById('names'),
       $ltY=document.getElementById('ltY'),
       $ltG=document.getElementById('ltG'),
       $countTxt=document.getElementById('countTxt'),
-      $gunTxt=document.getElementById('gunTxt');
+      $gunTxt=document.getElementById('gunTxt'),
+      $ovalMap=document.getElementById('ovalMap'),
+      $straightMap=document.getElementById('straightMap'),
+      $mapToggle=document.getElementById('mapToggleBtn');
 
 document.getElementById('btnContact').onclick=()=>document.getElementById('modal').style.display='block';
 
 /* ===== State ===== */
 const MIN=2,MAX=50;
-let H=[],running=false,raf=null,laps=5;
+let H=[],running=false,raf=null,laps=5,mapMode="oval";
 
 /* ===== Horses ===== */
 function horseSVG(color='#60a5fa'){
@@ -217,6 +247,9 @@ function horseSVG(color='#60a5fa'){
       <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
       <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
       <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
+      <!-- 다리 -->
+      <rect class="front-leg" x="20" y="25" width="4" height="14" fill="#e5e7eb"/>
+      <rect class="back-leg"  x="35" y="25" width="4" height="14" fill="#e5e7eb"/>
     </g>
   </svg>`;
 }
@@ -224,61 +257,72 @@ function clearHorses(){ $canvas.querySelectorAll('.horse').forEach(n=>n.remove()
 
 function buildHorses(list){
   clearHorses();
-  const spread=0.03; // 출발선에서 살짝 벌려놓기
   list.forEach((ent,i)=>{
     const el=document.createElement('div');
     el.className='horse';
     el.innerHTML=horseSVG(jc(i));
     const plate=document.createElement('div');
     plate.className='nameplate';
-    plate.textContent=`${ent.no}번 ${ent.name}`;
+    plate.textContent=`${ent.no} ${ent.name}`;
     el.appendChild(plate);
     $canvas.appendChild(el);
-    // v: 초기값 + 개인차 (평균 0.02 근처), 피로도 f
-    H.push({name:ent.name,no:ent.no,$el:el,theta:-Math.PI/2 + i*spread,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
+
+    if(mapMode==="oval"){
+      H.push({name:ent.name,no:ent.no,$el:el,theta:-Math.PI/2+i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
+    }else{
+      H.push({name:ent.name,no:ent.no,$el:el,x:80,y:200+i*40,v:1+_rand()*0.5,f:0,done:false});
+    }
   });
   updateRanking();
   H.forEach(placeHorse);
 }
 
-/* ===== 좌표 변환 ===== */
+/* ===== 좌표 배치 ===== */
 function placeHorse(h){
-  const cx=500, cy=300, rx=390, ry=190;
-  const t=h.theta;
-  const sx = cx + rx * Math.cos(t);
-  const sy = cy + ry * Math.sin(t);
-  const rect=$canvas.getBoundingClientRect();
-  const scaleX=rect.width/1000, scaleY=rect.height/600;
-  const x=sx*scaleX, y=sy*scaleY;
-  h.$el.style.left = x+'px';
-  h.$el.style.top  = y+'px';
-  const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
-  const ang=Math.atan2(dy*scaleY, dx*scaleX)*180/Math.PI;
-  h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
+  if(mapMode==="oval"){
+    const cx=500, cy=300, rx=390, ry=190;
+    const t=h.theta;
+    const sx = cx + rx * Math.cos(t);
+    const sy = cy + ry * Math.sin(t);
+    const rect=$canvas.getBoundingClientRect();
+    const scaleX=rect.width/1000, scaleY=rect.height/600;
+    const x=sx*scaleX, y=sy*scaleY;
+    h.$el.style.left = x+'px';
+    h.$el.style.top  = y+'px';
+    const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
+    const ang=Math.atan2(dy*scaleY, dx*scaleX)*180/Math.PI;
+    h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
+  }else{
+    h.$el.style.left = h.x+"px";
+    h.$el.style.top  = h.y+"px";
+    h.$el.style.transform=`translate(-50%,-50%)`;
+  }
 }
 
 /* ===== 순위판 ===== */
-function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
+function orderByLead(){
+  if(mapMode==="oval") return H.slice().sort((a,b)=>b.theta-a.theta);
+  return H.slice().sort((a,b)=>b.x-a.x);
+}
 function updateRanking(){
   const order=orderByLead();
-  const totalLaps = laps;
-  document.querySelector("#rankingBox h3").textContent = `현재 순위 (총 ${totalLaps}바퀴)`;
-
   $rankingLines.innerHTML=order.map((h,i)=>{
-    const lapsDone=Math.floor((h.theta+Math.PI/2)/(2*Math.PI));
-    const status = h.done ? 
-      '<span style="color:#9ae6b4;font-weight:900">완주</span>' : 
-      `${lapsDone+1}바퀴째`;
+    let status="";
+    if(mapMode==="oval"){
+      const lapsDone=Math.floor((h.theta+Math.PI/2)/(2*Math.PI));
+      status = h.done ? "Finished" : `${lapsDone+1} Lap`;
+    }else{
+      status = h.done ? "Finished" : Math.floor(h.x/20)+" m";
+    }
     return `<div class="row">
-      <span class="pos">${i+1}위</span>
-      <span>${h.no}번 ${h.name} - ${status}</span>
+      <span class="pos">${i+1}</span>
+      <span>${h.no} ${h.name} - ${status}</span>
     </div>`;
   }).join('');
 }
 
-/* ===== 카메라(항상 중앙 고정) ===== */
+/* ===== 카메라 ===== */
 function updateCamera(){
-  // 항상 트랙 전체가 중앙: viewport는 고정값으로 유지
   $viewport.style.transform = "translate(-50%,-50%) scale(1)";
 }
 
@@ -289,36 +333,39 @@ async function countdown(){
   $ltR.className='light on red'; $countTxt.textContent='3'; await wait(700);
   $ltY.className='light on yellow'; $countTxt.textContent='2'; await wait(700);
   $ltG.className='light on green'; $countTxt.textContent='1'; await wait(600);
-  $countTxt.textContent='START!'; $gunTxt.textContent='탕!'; await wait(300);
+  $countTxt.textContent='START!'; $gunTxt.textContent='Bang!'; await wait(300);
   $hud.classList.remove('show');
 }
 
-/* ===== 레이스 (스릴 랜덤 속도 + 부스터 + 피로도) ===== */
+/* ===== 레이스 ===== */
 function run(){
   running=true;
   const tick=()=>{
     for(const h of H){
       if(h.done) continue;
 
-      // 기본 가/감속 (요동 크게)
-      h.v += (_rand()-0.5)*0.01;
+      if(mapMode==="oval"){
+        h.v += (_rand()-0.5)*0.01;
+        if(_rand()<0.003){ h.v += 0.06; }
+        h.f = Math.max(0, h.f*0.95 + (h.v>0.035? 0.002: 0));
+        h.v -= h.f*0.015;
+        h.v = Math.max(0.006, Math.min(0.06, h.v));
+        h.theta += h.v;
+        if(h.theta >= (-Math.PI/2)+laps*2*Math.PI) h.done=true;
+      }else{
+        h.v += (_rand()-0.5)*0.2;
+        if(_rand()<0.01) h.v += 1;
+        h.v = Math.max(0.5, Math.min(6, h.v));
+        h.x += h.v;
+        if(h.x>=1900) h.done=true;
 
-      // 랜덤 부스터(희귀하게 강하게 치고 나감)
-      if(_rand()<0.003){ h.v += 0.06; }
+        // 다리 애니메이션 속도 조정
+        const dur=Math.max(0.2,0.6-h.v*0.05);
+        h.$el.querySelectorAll('.front-leg,.back-leg')
+          .forEach(el=>el.style.animationDuration=dur+"s");
+      }
 
-      // 피로도: 너무 오래 빠르면 서서히 감속
-      h.f = Math.max(0, h.f*0.95 + (h.v>0.035? 0.002: 0)); // 빨랐으면 피로 누적
-      h.v -= h.f*0.015; // 피로만큼 감속
-
-      // 속도 클램프 (멈추지 않게 & 너무 빨라지지 않게)
-      h.v = Math.max(0.006, Math.min(0.06, h.v));
-
-      // 진행
-      h.theta += h.v;
       placeHorse(h);
-
-      // 완주
-      if(h.theta >= (-Math.PI/2) + laps*2*Math.PI) h.done=true;
     }
 
     updateRanking();
@@ -327,7 +374,7 @@ function run(){
     if(H.every(h=>h.done)){
       running=false;
       const win=orderByLead()[0];
-      $winnerName.textContent=`${win.no}번 ${win.name}`;
+      $winnerName.textContent=`${win.no} ${win.name}`;
       $winnerBox.style.display='block';
       for(let i=0;i<20;i++) dropCarrot();
     }else{
@@ -352,8 +399,8 @@ function dropCarrot(){
 $start.onclick=async()=>{
   if(running) return;
   const list=splitNames($names.value);
-  if(list.length<MIN){alert('최소 2명 입력');return}
-  if(list.length>MAX){alert('최대 50명');return}
+  if(list.length<MIN){alert('Min 2');return}
+  if(list.length>MAX){alert('Max 50');return}
   laps=parseInt($raceLen.value,10)||5;
   reseed(autoSeed());
   clearHorses();
@@ -361,15 +408,12 @@ $start.onclick=async()=>{
   await countdown();
   run();
 };
-
 $reset.onclick=()=>{
   if(raf) cancelAnimationFrame(raf);
   raf=null; running=false;
   clearHorses();
   $winnerBox.style.display='none';
-  updateCamera(); // 중앙 고정 유지
 };
-
 $shuffle.onclick=()=>{
   const list=splitNames($names.value);
   for(let i=list.length-1;i>0;i--){
@@ -379,31 +423,33 @@ $shuffle.onclick=()=>{
   $names.value=list.map(x=>x.name).join(' ');
   buildHorses(list);
 };
-
 $names.addEventListener('input', ()=>{
   const list=splitNames($names.value);
   if(list.length) buildHorses(list); else clearHorses();
 });
-
 addEventListener('resize', ()=>{ H.forEach(placeHorse); updateCamera(); });
 
-// 초기 카메라 상태 보정
-updateCamera();
+/* ===== Map Toggle ===== */
+$mapToggle.onclick=()=>{
+  mapMode = mapMode==="oval" ? "straight" : "oval";
+  $ovalMap.style.display = mapMode==="oval" ? "block" : "none";
+  $straightMap.style.display = mapMode==="straight" ? "block" : "none";
+  clearHorses();
+};
 </script>
-
 <!-- 문의 모달 -->
 <div class="modal" id="modal">
   <div class="panel" style="max-width:380px;margin:8% auto">
-    <h3>문의 · 제안 · 건의</h3>
+    <h3>Contact</h3>
     <div style="padding:10px;border:1px dashed var(--border);margin:10px 0;border-radius:10px">
       <strong>Email:</strong>
       <a href="mailto:luckyhorserace@gmail.com">luckyhorserace@gmail.com</a>
     </div>
     <div style="display:flex;gap:8px;justify-content:center">
       <button class="btn-ghost"
-              onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">메일 복사</button>
+              onclick="navigator.clipboard.writeText('luckyhorserace@gmail.com')">Copy Email</button>
       <button class="btn-accent"
-              onclick="document.getElementById('modal').style.display='none'">닫기</button>
+              onclick="document.getElementById('modal').style.display='none'">Close</button>
     </div>
   </div>
 </div>
