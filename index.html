@@ -142,24 +142,27 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   </div>
 
   <!-- 하단 UI -->
-  <header>
-    <div class="controls">
-      <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
-      <select id="raceLen">
-        <option value="1">1바퀴</option>
-        <option value="3">3바퀴</option>
-        <option value="5" selected>5바퀴</option>
-        <option value="10">10바퀴</option>
-        <option value="15">15바퀴</option>
-        <option value="20">20바퀴</option>
-      </select>
-      <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
-      <button class="btn-accent" id="startBtn">Start ▶</button>
-      <button class="btn-ghost" id="resetBtn">Reset</button>
-      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
-      <button class="btn-ghost" id="btnContact">문의</button>
-    </div>
-  </header>
+<header>
+  <div class="controls left">
+    <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
+    <select id="raceLen">
+      <option value="1">1바퀴</option>
+      <option value="3">3바퀴</option>
+      <option value="5" selected>5바퀴</option>
+      <option value="10">10바퀴</option>
+      <option value="15">15바퀴</option>
+      <option value="20">20바퀴</option>
+    </select>
+    <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
+    <button class="btn-accent" id="startBtn">Start ▶</button>
+    <button class="btn-ghost" id="resetBtn">Reset</button>
+  </div>
+
+  <div class="controls right">
+    <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">🥕 개발자에게 당근 보내주기</a>
+    <button class="btn-ghost" id="btnContact">문의</button>
+  </div>
+</header>
 </div>
 <script>
 /* ===== Utils ===== */
