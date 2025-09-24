@@ -414,7 +414,23 @@ function placeHorse(h){
 }
 
 /* ====== Ranking ====== */
-function orderByLead(){ return (mapMode==="oval") ? H.slice().sort((a,b)=>b.theta-a.theta) : H.slice().sort((a,b)=>b.x-a.x); }
+// 완료한 말은 finishOrder 순서대로 고정, 나머지는 진행도 기준으로 뒤에
+function orderByLead(){
+  if (mapMode === "oval") {
+    const finished = finishOrder.slice(); // 들어온 순서 그대로
+    const rest = H
+      .filter(h => !h.done)
+      .sort((a, b) => b.theta - a.theta);
+    return finished.concat(rest);
+  } else { // straight
+    const finished = finishOrder.slice();
+    const rest = H
+      .filter(h => !h.done)
+      // 결승선 통과 후 오버슈트 보정
+      .sort((a, b) => Math.min(b.x, dist) - Math.min(a.x, dist));
+    return finished.concat(rest);
+  }
+}
 function updateRanking(){
   const order=orderByLead();
   $rankingBox.querySelector('h3').textContent = (mapMode==="oval") ? `현재 순위 (총 ${laps}바퀴)` : `현재 순위 (${dist}m 달리기)`;
