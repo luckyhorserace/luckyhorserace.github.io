@@ -261,12 +261,17 @@ function placeHorse(h){
 function orderByLead(){ return H.slice().sort((a,b)=>b.theta-a.theta); }
 function updateRanking(){
   const order=orderByLead();
+  const totalLaps = laps;
+  document.querySelector("#rankingBox h3").textContent = `현재 순위 (총 ${totalLaps}바퀴)`;
+
   $rankingLines.innerHTML=order.map((h,i)=>{
     const lapsDone=Math.floor((h.theta+Math.PI/2)/(2*Math.PI));
-    const doneTxt=h.done?' · <span style="color:#9ae6b4;font-weight:900">완주</span>':'';
+    const status = h.done ? 
+      '<span style="color:#9ae6b4;font-weight:900">완주</span>' : 
+      `${lapsDone+1}바퀴째`;
     return `<div class="row">
       <span class="pos">${i+1}위</span>
-      <span>${h.no}번 ${h.name} (${lapsDone}/${laps}바퀴)${doneTxt}</span>
+      <span>${h.no}번 ${h.name} - ${status}</span>
     </div>`;
   }).join('');
 }
