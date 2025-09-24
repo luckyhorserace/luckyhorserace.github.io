@@ -362,7 +362,7 @@ function run(){
   const tick=()=>{
     for(const h of H){
       if(h.done) continue;
-      h.theta += 0.005;             // 각속도(느리면 더 작게)
+      h.theta += 0.02;             // 각속도(느리면 더 작게)
       placeHorse(h);
       if(h.theta >= (-Math.PI/2) + laps*2*Math.PI) h.done = true;
     }
@@ -426,3 +426,6 @@ $names.addEventListener('input', ()=>{
 /* 창 크기 바뀌면 좌표 재계산 */
 addEventListener('resize', ()=>{ H.forEach(placeHorse); updateCamera(); });
 </script>
+
+/* 숨김 처리 */
+.booth, .commentary { display: none !important; }
