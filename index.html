@@ -313,27 +313,38 @@ async function countdown(){
 
 /* ===== Race ===== */
 function run(){
-  running=true;
-  const tick=()=>{
+  running = true;
+  const tick = ()=>{
     for(const h of H){
       if(h.done) continue;
-      // 속도에 약간의 랜덤 가속/감속
-      h.v += (Math.random()-0.5)*0.002; 
-      h.v = Math.max(0.015, Math.min(0.035, h.v));
+
+      // 평균 속도는 0.02, 랜덤 가속/감속 크게 줌
+      let accel = (Math.random() - 0.5) * 0.01; 
+      h.v += accel;
+
+      // 속도 제한 (너무 빠르거나 느리지 않게)
+      h.v = Math.max(0.005, Math.min(0.05, h.v));
+
+      // 랜덤 부스터 확률 (스릴용)
+      if(Math.random() < 0.002){
+        h.v += 0.05;  // 잠깐 급가속
+      }
+
       h.theta += h.v;
       placeHorse(h);
 
-      if(h.theta >= (-Math.PI/2)+laps*2*Math.PI){
-        h.done=true;
+      if(h.theta >= (-Math.PI/2) + laps*2*Math.PI){
+        h.done = true;
       }
     }
+
     updateRanking();
     updateCamera();
 
     if(H.every(h=>h.done)){
       running=false;
-      const win=orderByLead()[0];
-      $winnerName.textContent=`${win.no}번 ${win.name}`;
+      const win = orderByLead()[0];
+      $winnerName.textContent = `${win.no}번 ${win.name}`;
       $winnerBox.style.display='block';
       for(let i=0;i<20;i++) dropCarrot();
     }else{
