@@ -205,8 +205,8 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 
 <!-- 축하 오버레이 -->
 <div id="celebrate">
-  <div class="big">🎉</div>
-  <div class="title" id="celeTitle">King Carrot!</div>
+  <div class="big"></div>
+  <div class="title" id="celeTitle">Champion!</div>
   <div class="subtitle" id="celeSubtitle">당첨자 축하합니다!</div>
   <button class="btn-accent" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
 </div>
@@ -512,21 +512,21 @@ function maybeFireDraw(){
 
   if(pendingDraw.type==='first' && k===1){
     const h = finishOrder[0];
-    celebrate('King Carrot 🥕', `우승: ${h.no}번 ${h.name}`);
+    celebrate('Champion', `우승: ${h.no}번 ${h.name}`);
     drawFired = true; pendingDraw=null; return;
   }
   if(pendingDraw.type==='nth'){
     const n = Math.max(1, parseInt(pendingDraw.n||1,10));
     if(k===n){
       const h = finishOrder[n-1];
-      celebrate('King Carrot 🥕', `${n}등 당첨: ${h.no}번 ${h.name}`);
+      celebrate('Champion', `${n}등 당첨: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
   if(pendingDraw.type==='last'){
     if(k===H.length){
       const h = finishOrder[k-1];
-      celebrate('King Carrot 🥕', `마지막 당첨: ${h.no}번 ${h.name}`);
+      celebrate('Champion', `마지막 당첨: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
