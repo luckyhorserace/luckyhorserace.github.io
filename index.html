@@ -3,50 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨</title>
-
-<!-- ✅ SEO 기본 -->
-<meta name="robots" content="index,follow"/>
-<meta name="description" content="운빨가이~ Lucky Horse Race 경마게임! 이름만 넣고 달리면 자동으로 우승 발표. 룰렛/랜덤게임/추첨 대체용으로 가볍게 쓰세요. 파티모드, 지그재그, S-라인 트랙, 리플레이 다운로드 지원."/>
-<meta name="keywords" content="경마게임, 랜덤게임, 온라인 추첨, 룰렛, 사다리게임, 제비뽑기, 추첨기, 게임, 파티게임, 이름뽑기"/>
-
-<!-- 🔗 여기를 여러분 도메인으로 교체하세요 -->
-<link rel="canonical" href="https://YOUR-DOMAIN.example/lucky-horse-race"/>
+<title>Lucky Horse Race — 경마게임</title>
+<!-- 404 방지용 파비콘(투명) -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
-
-<!-- ✅ 소셜 미리보기 -->
-<meta property="og:type" content="website"/>
-<meta property="og:title" content="Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨"/>
-<meta property="og:description" content="이름만 넣고 달리자! 파티모드/지그재그/S-라인 지원·리플레이 다운로드까지."/>
-<!-- 여기를 실제 이미지로 교체하세요 -->
-<meta property="og:image" content="https://YOUR-DOMAIN.example/og-luckyhorse.jpg"/>
-<meta property="og:url" content="https://YOUR-DOMAIN.example/lucky-horse-race"/>
-<meta name="twitter:card" content="summary_large_image"/>
-
-<!-- ✅ 구조화 데이터 (검색엔진에 ‘랜덤게임/추첨게임’으로도 노출 도움) -->
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"WebApplication",
-  "name":"Lucky Horse Race",
-  "applicationCategory":"Game",
-  "operatingSystem":"Any",
-  "url":"https://YOUR-DOMAIN.example/lucky-horse-race",
-  "inLanguage":"ko-KR",
-  "description":"이름만 넣고 자동으로 우승 발표하는 경마형 랜덤 추첨 게임. 룰렛/랜덤게임/사다리 대체용. 파티모드, 지그재그, S-라인, 리플레이 다운로드 지원.",
-  "keywords":"경마게임, 랜덤게임, 온라인 추첨, 룰렛, 추첨기",
-  "offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
-  "potentialAction":{
-    "@type":"PlayAction",
-    "target":{"@type":"EntryPoint","urlTemplate":"https://YOUR-DOMAIN.example/lucky-horse-race"}
-  }
-}
-</script>
-
 <style>
 :root{
   --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --accent:#6ee7ff;
-  --accent2:#fcd34d; --danger:#ef4444; --ok:#22c55e;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -64,51 +26,39 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 .btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
 .btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
 .btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
-.btn-toggle.on{outline:2px solid var(--accent2); box-shadow:0 0 0 2px #0006 inset}
 
-/* Stage */
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
 .stage{position:absolute; inset:0;}
-.viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);transform-origin:50% 50%; transition:transform .12s ease-out}
+.viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transform-origin:center}
 .canvas{position:relative;width:min(98vw,1800px);height:auto;margin:0 auto}
 
 /* Maps */
 .ovalSvg,.straightSvg{width:100%;height:auto;display:block}
 
-/* Horses / Runner(분리된 기수) */
-.horse,.runner{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
-.horse{width:46px;height:34px; z-index:8}
-.horse.jump{ z-index:12; }
-.runner{width:28px;height:28px; z-index:9}
+/* Horses */
+.horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%);pointer-events:none; z-index:8}
+.horse.jump{ z-index:12; } /* 점프 시 더 위 */
 .nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3b57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;white-space:nowrap}
-.stateIcon{position:absolute;left:50%;top:-36px;transform:translate(-50%,0);font-size:16px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
-
-/* 🐎 말+라이더 SVG */
 .horse-svg{width:46px;height:34px}
 .horse-svg .body{fill:#e5e7eb}
 .horse-svg .mane{fill:#cbd5e1}
-.horse-svg .rider{fill:var(--jersey,#60a5fa)}
+.horse-svg .jockey{fill:var(--jersey,#60a5fa)}
 .horse-svg .saddle{fill:#94a3b8}
 .horse-svg .eye{fill:#0f172a}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
 .horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
 
-/* 다리 애니메이션 */
+/* 직선맵 다리 애니메이션 */
 @keyframes leg-run-front { 0%,100% { transform: rotate(18deg); } 50% { transform: rotate(-18deg); } }
 @keyframes leg-run-back  { 0%,100% { transform: rotate(-18deg); } 50% { transform: rotate(18deg); } }
 .front-leg{transform-origin: top center;animation: leg-run-front .42s infinite linear}
 .back-leg {transform-origin: top center;animation: leg-run-back  .42s infinite linear}
 
-/* 파티모드 이펙트 */
-.spin{animation:spin .6s linear infinite}
-@keyframes spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-.moonwalk .front-leg{animation-direction:reverse}.moonwalk .back-leg{animation-direction:reverse}
-.frenzy{filter:hue-rotate(45deg) brightness(1.15)}
-.biped .horse-svg .g-bob{animation-duration:.18s}
+/* 장애물 (말보다 아래) */
+.obstacle{position:absolute;width:18px;height:24px;background:#f97316;border:2px solid #a74c0a;border-radius:4px;transform:translate(-50%,-50%);z-index:5}
 
-/* Ranking (다열) */
-.rankWrap{position:absolute;top:12px;right:12px;z-index:25;display:flex;gap:8px;align-items:flex-start}
-.ranking{width:260px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;font-size:13px}
+/* Ranking */
+.ranking{position:absolute;top:12px;right:12px;width:260px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
 .ranking h3{margin:2px 0 6px;font-size:13px;color:#93c5fd}
 .ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
 .ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
@@ -129,20 +79,16 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .countTxt{margin-left:6px;font-weight:900}
 .gun{margin-left:8px;font-size:12px;color:#93c5fd}
 
-/* Carrot & Hay rain (사용 가능 자리) */
+/* Carrot & Hay rain */
 @keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999;font-size:56px}
 .hay{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999;font-size:52px}
 
-/* Winner Overlay */
+/* 축하 오버레이 */
 #celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.55);z-index:10000;text-align:center}
-#celebrate .big{font-size:96px;display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:8px}
-#celebrate .title{font-size:72px;color:#fff;margin:0 0 8px;letter-spacing:.2em;animation:jelly 1.6s ease both; text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25)}
+#celebrate .big{font-size:96px}
+#celebrate .title{font-size:72px;color:#fff;margin:0 0 8px;text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25)}
 #celebrate .subtitle{font-size:28px;color:#e6f9ff;margin:0 0 18px;text-shadow:0 1px 6px rgba(0,0,0,.35)}
-@keyframes jelly{0%{transform:scale(0.8)}40%{transform:scale(1.12)}60%{transform:scale(0.98)}100%{transform:scale(1)}}
-.winnerCard{display:flex;gap:20px;align-items:center;justify-content:center;margin:8px 0 18px}
-.winnerHorse{width:160px;height:120px;transform:scale(1.2)}
-.winnerName{font-size:28px;font-weight:900}
 .confetti{position:fixed;top:-20px;font-size:26px;pointer-events:none;animation:fall 2.5s linear forwards;z-index:10001}
 
 /* 추첨 세그먼트 */
@@ -160,9 +106,10 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   background:linear-gradient(180deg,#1b9ab7,#168aa4); color:#06131b; border-color:#0a6c82;
   box-shadow:0 0 0 1px rgba(0,0,0,.15), 0 0 12px #6ee7ff33;
 }
-
-/* 미니 헤드업 */
-.chip{display:inline-block;padding:6px 10px;border:1px solid #2a3b57;border-radius:999px;background:rgba(0,0,0,.35);color:#cbd5e1;font-weight:800}
+#drawNthInput{
+  width:70px; padding:8px; border-radius:10px; border:1px solid #223047;
+  background:rgba(0,0,0,.35); color:#dbe7f3
+}
 
 /* 모바일 보정 */
 @media (max-width:640px){.ranking{width:220px}#names{min-width:180px}}
@@ -188,23 +135,23 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
       <div class="canvas" id="canvas">
-        <!-- 타원맵 -->
-        <svg id="ovalMap" class="ovalSvg" viewBox="0 0 1000 600" style="display:none"></svg>
-        <!-- 직선맵 -->
+        <!-- 타원맵 (초기 숨김) -->
+        <svg id="ovalMap" class="ovalSvg" viewBox="0 0 1000 600" style="display:none">
+          <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+          <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
+          <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
+          <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+          <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+        </svg>
+        <!-- 직선맵 (초기 노출) -->
         <svg id="straightMap" class="straightSvg" viewBox="0 0 2000 400"></svg>
-        <!-- 지그재그 -->
-        <svg id="zigzagMap" class="straightSvg" viewBox="0 0 2000 500" style="display:none"></svg>
-        <!-- S라인 -->
-        <svg id="slineMap" class="straightSvg" viewBox="0 0 2000 500" style="display:none"></svg>
       </div>
     </div>
 
-    <!-- 순위판 래퍼(다열) -->
-    <div class="rankWrap" id="rankWrap">
-      <div id="rankingBox" class="ranking">
-        <h3>현재 순위</h3>
-        <div id="rankingLines"></div>
-      </div>
+    <!-- 순위판 -->
+    <div id="rankingBox" class="ranking">
+      <h3>현재 순위</h3>
+      <div id="rankingLines"></div>
     </div>
   </div>
 
@@ -222,25 +169,20 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
         <option value="100" selected>100m</option>
         <option value="200">200m</option>
         <option value="300">300m</option>
-        <option value="500">500m</option>
-        <option value="1000">1km</option>
       </select>
 
       <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
       <button class="btn-accent" id="startBtn">시작 ▶</button>
       <button class="btn-ghost" id="resetBtn">리셋</button>
-
-      <button class="btn-ghost" id="mapToggleBtn">맵: 직선</button>
-      <button class="btn-ghost btn-toggle" id="firstCamBtn">1등 뷰 OFF</button>
-      <span class="chip">파티모드 <input id="partyChk" type="checkbox"> <select id="partyLv"><option>낮음</option><option selected>보통</option><option>강함</option></select></span>
-      <!-- ✅ 리플레이 체크박스 제거 -->
+      <button class="btn-ghost" id="mapToggleBtn">맵 전환: 직선</button>
+      <button class="btn-ghost" id="obstacleToggleBtn">장애물: 끔</button>
     </div>
 
     <div class="controls right">
       <!-- 추첨 메뉴 (세그먼트) -->
       <div class="seg" id="drawSeg">
-        <label class="seg-item on" data-type="first">
-          <input type="radio" name="draw" value="first" checked>
+        <label class="seg-item" data-type="first">
+          <input type="radio" name="draw" value="first">
           <span>1등</span>
         </label>
         <label class="seg-item" data-type="last">
@@ -261,20 +203,16 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   </header>
 </div>
 
-<!-- Winner Overlay -->
+<!-- 축하 오버레이 -->
 <div id="celebrate">
-  <div class="big" id="winnerVisual"></div>
-  <div class="title" id="celeTitle">W i n n e r r r r r ~</div>
-  <div class="subtitle" id="celeSubtitle">이 맛에 달린다~</div>
-  <div class="winnerCard" id="winnerCard"></div>
-  <div style="display:flex; gap:8px">
-    <!-- ✅ 경기 종료 후 항상 표시 -->
-    <button class="btn-accent" id="replaySaveBtn">리플레이 다운로드</button>
-    <button class="btn-ghost" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
-  </div>
+  <div class="big"></div>
+  <div class="title" id="celeTitle">Champion!</div>
+  <div class="subtitle" id="celeSubtitle">당첨자 축하합니다!</div>
+  <button class="btn-accent" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
 </div>
 
-<script>
+  
+  <script>
 /* ====== Utils ====== */
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 let _rand=Math.random;
@@ -287,12 +225,6 @@ function splitNames(raw){
     .flatMap(s=>{const m=s.match(/(.+)\*(\d+)/);return m?Array.from({length:Math.min(50,parseInt(m[2]))},()=>m[1]):s})
     .slice(0,50).map((n,i)=>({name:n,no:i+1}));
 }
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function download(filename, text){
-  const a=document.createElement('a');
-  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(text);
-  a.download=filename; a.click();
-}
 
 /* ====== DOM ====== */
 const $names=document.getElementById('names'),
@@ -302,172 +234,102 @@ const $names=document.getElementById('names'),
       $reset=document.getElementById('resetBtn'),
       $shuffle=document.getElementById('shuffleBtn'),
       $mapToggle=document.getElementById('mapToggleBtn'),
-      $firstCamBtn=document.getElementById('firstCamBtn'),
-      $partyChk=document.getElementById('partyChk'),
-      $partyLv=document.getElementById('partyLv'),
-      $rankWrap=document.getElementById('rankWrap'),
+      $obstacleToggle=document.getElementById('obstacleToggleBtn'),
+      $rankingBox=document.getElementById('rankingBox'),
+      $rankingLines=document.getElementById('rankingLines'),
       $viewport=document.getElementById('viewport'),
       $canvas=document.getElementById('canvas'),
       $ovalMap=document.getElementById('ovalMap'),
       $straightMap=document.getElementById('straightMap'),
-      $zigzagMap=document.getElementById('zigzagMap'),
-      $slineMap=document.getElementById('slineMap'),
       $cele=document.getElementById('celebrate'),
-      $winnerCard=document.getElementById('winnerCard'),
-      $winnerVisual=document.getElementById('winnerVisual'),
-      $replaySaveBtn=document.getElementById('replaySaveBtn');
+      $celeTitle=document.getElementById('celeTitle'),
+      $celeSubtitle=document.getElementById('celeSubtitle');
 
 /* ====== State ====== */
 const MIN=2,MAX=50;
 let H=[],running=false,raf=null;
 let laps=3, dist=100;
-let mapMode="straight"; // straight | oval | zigzag | sline
-let pendingDraw={type:'first'};
+let mapMode="straight";
+let obstaclesEnabled=false;
+let obstacles=[];
+let pendingDraw=null;
 let finishOrder = [];
-let entryDone = new Map();
 let drawFired = false;
-let firstCam=false;
-let camPanX=0;
-let seed=autoSeed();
+function resetFinishOrder(){ finishOrder=[]; drawFired=false; }
 
-/* ====== Replay: 자동 기록 → 우승자 화면에서 다운로드 ====== */
-let replay={meta:{}, events:[]};
-function logEv(t, type, data){ replay.events.push({t, type, data}); }
-function resetFinishOrder(){ finishOrder=[]; entryDone.clear(); drawFired=false; }
+/* ====== Tuning (시간대 제거 버전) ====== */
+/* 말 기본 속도 분포(m/s). 레이스 체감 속도는 여기서 조절 */
+const BASE_SPEED_MIN = 2.8;   // 느린 말
+const BASE_SPEED_MAX = 6.2;   // 빠른 말
+const SPEED_GLOBAL   = 1.20;  // 전체 배율(더 빠르게 하고 싶으면 1.2~1.4로)
 
-/* ====== Speed/Physics Tuning ====== */
-const BASE_SPEED_MIN = 2.8;
-const BASE_SPEED_MAX = 6.2;
-const SPEED_GLOBAL   = 1.20;
+/* 가감속/부스터/피로 파라미터 */
+const JITTER_FACTOR   = 0.22;  // 프레임마다 흔들림 (base * 이 값 * 랜덤)
+const BOOST_PROB      = 0.015; // 한 틱에서 부스터 발동 확률
+const BOOST_GAIN      = 0.75;  // 부스터 시 추가 속도 (base * 이 값)
+const FATIGUE_INC     = 0.14;  // 과속 시 피로 증가
+const FATIGUE_DEC     = 0.07;  // 서행 시 피로 회복
+const FATIGUE_PENALTY = 0.16;  // 피로가 속도를 깎는 비율
+const VMIN_RATIO      = 0.55;  // 순간 최소속도 = base * 이 값
+const VMAX_RATIO      = 2.10;  // 순간 최대속도 = base * 이 값
 
-const JITTER_FACTOR   = 0.22;
-const BOOST_PROB      = 0.015;
-const BOOST_GAIN      = 0.75;
-const FATIGUE_INC     = 0.14;
-const FATIGUE_DEC     = 0.07;
-const FATIGUE_PENALTY = 0.16;
-const VMIN_RATIO      = 0.55;
-const VMAX_RATIO      = 2.10;
+/* ====== Obstacles ====== */
+function genObstacles(){
+  obstacles=[];
+  if(!obstaclesEnabled) return;
+  const baseCount=Math.round(dist/25);
+  const bonus=Math.floor(H.length/10);
+  const count=Math.max(3,baseCount+bonus);
+  const minGap=Math.max(6,Math.round(dist*0.06));
+  const marginStart=Math.round(dist*0.12), marginEnd=Math.round(dist*0.88);
+  const pos=[];
+  for(let i=0;i<count;i++){
+    let tries=0;
+    while(tries++<50){
+      const x=Math.round(marginStart+_rand()*(marginEnd-marginStart));
+      if(pos.every(px=>Math.abs(px-x)>=minGap)){pos.push(x);break;}
+    }
+  }
+  pos.sort((a,b)=>a-b);
+  obstacles=pos.map((x,idx)=>({x,w:1.0+_rand()*1.0,id:'ob'+idx}));
+}
+function renderObstacles(){
+  $canvas.querySelectorAll('.obstacle').forEach(e=>e.remove());
+  if(mapMode!=="straight"||!obstaclesEnabled) return;
+  const rect=$canvas.getBoundingClientRect();
+  const straightViewW = parseFloat($straightMap.getAttribute('viewBox').split(' ')[2]) || 2000;
+  const scaleX=rect.width/straightViewW, scaleY=rect.height/400;
+  obstacles.forEach(ob=>{
+    const div=document.createElement('div');
+    div.className='obstacle'; div.id=ob.id;
+    const trackY=150, trackH=100, startX=80;
+    const sx = startX + ob.x*20;
+    div.style.left=(sx*scaleX)+'px';
+    div.style.top=((trackY+trackH/2)*scaleY)+'px';
+    $canvas.appendChild(div);
+  });
+}
+function clearObstaclesDOM(){
+  obstacles = [];
+  document.querySelectorAll('.obstacle').forEach(e=>e.remove());
+}
 
-/* Rubberband (직선 전용 살짝) */
-const RB_RANK=0.25, RB_GAP=0.55, RB_MIN=0.92, RB_MAX=1.45;
-
-/* Party Mode */
-function partyScale(){ return $partyLv.value==='강함'?1.5:$partyLv.value==='낮음'?0.6:1; }
-const PARTY = {
-  moonwalk:{p:0.008, dur:[0.6,1.1], icon:'🕺', spd:0.9},
-  spin    :{p:0.006, dur:[0.6,1.0], icon:'🌀', spd:0.95},
-  pee     :{p:0.004, dur:[0.6,1.2], icon:'🚽', spd:0.0},
-  jump    :{p:0.012, dur:[0.45,0.7], icon:'🦘', spd:1.05},
-  biped   :{p:0.006, dur:[0.8,1.3], icon:'🦵', spd:1.08},
-  shades  :{p:0.006, dur:[0.9,1.4], icon:'😎', spd:1.15},
-  bomb    :{p:0.004, stun:[0.5,0.9], icon:'💣'},
-  fall    :{p:0.003, icon:'💥'},
-  piggy   :{p:0.003, dur:[0.9,1.4], icon:'🤱', spd:0.7},
-};
-
-/* ====== Track Drawing ====== */
+/* ====== Horses ====== */
 let straightViewW = 2000, straightViewH = 400;
-let dynTrackY=150, dynTrackH=100, startX=80, finishX=straightViewW-80;
 
-function dynamicTrackHeight(){
-  const n=Math.max(2, H.length||splitNames($names.value).length||2);
-  return Math.min(220, 70 + n*8);
-}
-
-function drawStraightMap(){
-  straightViewW = 20*dist;
-  straightViewH = 400;
-  dynTrackH = dynamicTrackHeight();
-  dynTrackY = Math.round((straightViewH - dynTrackH)/2);
-  startX=80; finishX=straightViewW-80;
-
-  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
-  $straightMap.innerHTML = `
-    <rect x="0" y="${dynTrackY}" width="${straightViewW}" height="${dynTrackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${startX}" y1="${dynTrackY-12}" x2="${startX}" y2="${dynTrackY+dynTrackH+12}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="${startX}" y="${dynTrackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${finishX}" y1="${dynTrackY-16}" x2="${finishX}" y2="${dynTrackY+dynTrackH+16}" stroke="#ffffff" stroke-width="8"/>
-    <text x="${finishX}" y="${dynTrackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
-  `;
-}
-function drawOvalMap(){
-  const rx=420, ry=220;
-  $ovalMap.innerHTML = `
-    <ellipse cx="500" cy="300" rx="${rx}" ry="${ry}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <ellipse cx="500" cy="300" rx="${rx-60}" ry="${ry-60}" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-    <ellipse cx="500" cy="300" rx="${rx-30}" ry="${ry-30}" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
-    <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
-  `;
-}
-/* Zigzag / S-line */
-function drawZigzag(){
-  const W=20*dist, H=500; const top=120, bot=380;
-  $zigzagMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  let pts=[];
-  const teeth=7;
-  for(let i=0;i<=teeth;i++){
-    const x=80 + (W-160)*(i/teeth);
-    const y= i%2? (top):(bot);
-    pts.push(`${x},${y}`);
-  }
-  $zigzagMap.innerHTML=`
-    <rect x="0" y="${top-40}" width="${W}" height="${(bot-top)+80}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <polyline points="${pts.join(' ')}" fill="none" stroke="#5b708f" stroke-dasharray="8,6" stroke-width="2"/>
-    <line x1="${80}" y1="${top-60}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="80" y="${top-70}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${W-80}" y1="${top-60}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
-    <text x="${W-80}" y="${top-70}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
-  `;
-}
-function drawSline(){
-  const W=20*dist, H=500; const top=120, bot=380;
-  $slineMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  // 여러 번 물결치는 S-라인 (cycles=3)
-  const cycles=3, amp=((bot-top)/2)-18, mid=(top+bot)/2;
-  let d=[];
-  const steps=220;
-  for(let i=0;i<=steps;i++){
-    const t=i/steps;
-    const x=80 + (W-160)*t;
-    const y= mid + amp*Math.sin(2*Math.PI*cycles*t);
-    d.push(`${x},${y}`);
-  }
-  $slineMap.innerHTML=`
-    <rect x="0" y="${top-40}" width="${W}" height="${(bot-top)+80}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <polyline points="${d.join(' ')}" fill="none" stroke="#5b708f" stroke-dasharray="8,6" stroke-width="2"/>
-    <line x1="${80}" y1="${top-60}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="80" y="${top-70}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${W-80}" y1="${top-60}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
-    <text x="${W-80}" y="${top-70}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
-  `;
-}
-
-/* ====== Horses / Entities ====== */
 function horseSVG(color){return `<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
   <g class="g-bob">
     <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
     <path class="body" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
     <rect class="saddle" x="28" y="17" width="11" height="7" rx="2"/>
-    <!-- ✅ 라이더를 rider 클래스로(기존 jockey 충돌 제거) -->
-    <g class="rider">
-      <circle cx="31" cy="10.8" r="3.6"/>
-      <rect x="28" y="14.8" width="10" height="7" rx="2"/>
-    </g>
+    <g class="jockey"><circle cx="31" cy="12" r="3.6"/><rect x="28" y="15.5" width="10" height="7" rx="2"/></g>
     <circle class="eye" cx="22.5" cy="20.5" r="0.9"/>
     <rect class="front-leg" x="21" y="26" width="3.5" height="13" fill="#e5e7eb"/>
     <rect class="back-leg"  x="36" y="26" width="3.5" height="13" fill="#e5e7eb"/>
   </g>
 </svg>`}
-function runnerSVG(color){return `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="20" cy="12" r="6" fill="${color}"/>
-  <rect x="13" y="18" width="14" height="12" rx="3" fill="#e5e7eb"/>
-  <rect x="9" y="30" width="8" height="6" rx="2" fill="#e5e7eb"/>
-  <rect x="23" y="30" width="8" height="6" rx="2" fill="#e5e7eb"/>
-</svg>`}
 
-function clearHorses(){ $canvas.querySelectorAll('.horse,.runner').forEach(n=>n.remove()); H.length=0; }
+function clearHorses(){ $canvas.querySelectorAll('.horse').forEach(n=>n.remove()); H.length=0; }
 
 function buildHorses(list){
   clearHorses();
@@ -484,108 +346,65 @@ function buildHorses(list){
     plate.style.borderColor = color;
     plate.style.boxShadow = `0 0 0 1px rgba(0,0,0,.25), 0 0 8px 0 ${color}33`;
     el.appendChild(plate);
-
-    const icon=document.createElement('div'); icon.className='stateIcon'; el.appendChild(icon);
-
     $canvas.appendChild(el);
 
-    const base = BASE_SPEED_MIN + _rand()*(BASE_SPEED_MAX-BASE_SPEED_MIN);
-    let baseY = 200;
-    if(mapMode==='straight'){ const gap = Math.min(28, dynamicTrackHeight()/Math.max(1,lanes)); baseY = dynTrackY + dynTrackH/2 + (i-(lanes-1)/2) * gap; }
-    if(mapMode==='zigzag' || mapMode==='sline'){ baseY = 250 + (i-(lanes-1)/2) * Math.min(28, 140/Math.max(1,lanes)); }
+    if(mapMode==="oval"){
+      H.push({name:ent.name,no:ent.no,color,$el:el,theta:-Math.PI/2 + i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
+    }else{
+      // 목표 시간대 제거 — 말마다 기본 속도 랜덤(m/s)
+      const base   = BASE_SPEED_MIN + _rand()*(BASE_SPEED_MAX-BASE_SPEED_MIN);
+      const laneCenter = 200;
+      const laneGap = Math.min(28, 90/Math.max(1,lanes-1));
+      const y = laneCenter + (i - (lanes-1)/2)*laneGap;
 
-    H.push({
-      entryId: i, role:'horse',
-      name:ent.name,no:ent.no,color,$el:el,iconEl:icon,
-      x:0,y:baseY, sx:0, sy:0,
-      base, speed: base*(0.85+_rand()*0.3),
-      fatigue:0, legsDur:.42, done:false, _finished:false,
-      party:{spin:0,moon:0,pee:0,jump:0,biped:0,shades:0,stun:0,piggy:0},
-      jumpT:0, jumpDur:0.55, stumble:0,
-    });
+      H.push({
+        name:ent.name,no:ent.no,color,$el:el,
+        x:0,y,
+        base,
+        speed: base*(0.85+_rand()*0.3), // 초기 속도 약간 랜덤
+        fatigue:0,
+        legsDur:.42, done:false,
+        jumping:false,jumpT:0,jumpDur:0.55, stumble:0,
+        _passed:{}, _finished:false
+      });
+    }
   });
   updateRanking();
-  H.forEach(placeEntity);
-}
-
-/* ====== Helpers: 활성 맵/트랙 경계 ====== */
-function activeView(){
-  return (mapMode==='straight')?$straightMap: (mapMode==='zigzag')?$zigzagMap: (mapMode==='sline')?$slineMap : $ovalMap;
-}
-function trackBounds(W){
-  if(mapMode==='straight'){
-    return {top:dynTrackY, bottom:dynTrackY+dynTrackH, left:80, right:W-80};
-  }
-  if(mapMode==='zigzag' || mapMode==='sline'){
-    const top=120-40, bot=380+40; // 사각 트랙 영역
-    return {top, bottom:bot, left:80, right:W-80};
-  }
-  return {top:80,bottom:520,left:80,right:920};
-}
-
-/* ====== Path center Y ====== */
-function pathCenterY(px, W){
-  if(mapMode==='straight') return dynTrackY + dynTrackH/2;
-  if(mapMode==='zigzag'){
-    const top=120, bot=380, per=(px-80)/(W-160);
-    const teeth=7; const seg=1/teeth;
-    const idx=Math.floor(clamp(per,0,1)/seg);
-    const a=idx%2?top:bot, b=idx%2?bot:top;
-    const t=(per-idx*seg)/seg;
-    return a + (b-a)*t;
-  }
-  if(mapMode==='sline'){
-    const top=120, bot=380;
-    const cycles=3, mid=(top+bot)/2, amp=((bot-top)/2)-18;
-    const t=clamp((px-80)/(W-160),0,1);
-    return mid + amp*Math.sin(2*Math.PI*cycles*t);
-  }
-  return 300;
+  H.forEach(placeHorse);
 }
 
 /* ====== Placement ====== */
-function placeEntity(h){
-  if(mapMode==='oval'){
-    // 생략(원형은 차후 확장)
+function placeHorse(h){
+  if(mapMode==="oval"){
+    const cx=500, cy=300, rx=390, ry=190;
+    const t=h.theta;
+    const sx = cx + rx*Math.cos(t), sy = cy + ry*Math.sin(t);
+    const rect=$canvas.getBoundingClientRect();
+    const scaleX=rect.width/1000, scaleY=rect.height/600;
+    const x=sx*scaleX, y=sy*scaleY;
+    h.$el.style.left = x+'px'; h.$el.style.top  = y+'px';
+    const dx=-rx*Math.sin(t), dy=ry*Math.cos(t);
+    const ang=Math.atan2(dy*scaleY, dx*scaleX)*180/Math.PI;
+    h.$el.style.transform=`translate(-50%,-50%) rotate(${ang}deg)`;
   }else{
-    const view = activeView();
-    const vb = view.getAttribute('viewBox').split(' ').map(Number);
-    const W=vb[2], H=vb[3];
+    const trackStart=80, trackFinish=straightViewW-80;
+    const progress = Math.max(0, Math.min(1, h.x / dist));
+    const sx = trackStart + (trackFinish-trackStart)*progress;
+    const rect=$canvas.getBoundingClientRect();
+    const scaleX=rect.width/straightViewW, scaleY=rect.height/straightViewH;
+    let x=sx*scaleX, y=h.y*scaleY;
 
-    const rect=view.getBoundingClientRect(); // ✅ 활성 맵 크기로 스케일
-    const scaleX=rect.width/W, scaleY=rect.height/H;
+    if(h.jumping){
+      const p = Math.min(1, h.jumpT / h.jumpDur);
+      const arc = Math.sin(Math.PI * p);
+      y -= 26 * arc;
+      h.$el.classList.add('jump');
+    }else h.$el.classList.remove('jump');
 
-    const progress = clamp(h.x/dist, 0, 1);
-    const px = 80 + (W-160)*progress;
-    const cy = pathCenterY(px, W);
-
-    // 개인 lane 오프셋 유지
-    let y = cy + (h.y - (mapMode==='straight'?(dynTrackY+dynTrackH/2):250));
-
-    // ✅ 트랙 경계로 y 클램프 (벗어남 방지)
-    const tb = trackBounds(W);
-    const yMin = tb.top+8, yMax = tb.bottom-8;
-    y = clamp(y, yMin, yMax);
-
-    const x = px*scaleX, ypx = y*scaleY;
-
-    // 파티 이펙트 표시
-    h.iconEl.textContent = '';
-    if(h.party.spin>0) {h.$el.classList.add('spin'); h.iconEl.textContent='🌀'} else h.$el.classList.remove('spin');
-    if(h.party.moon>0){h.$el.classList.add('moonwalk'); if(!h.iconEl.textContent) h.iconEl.textContent='🕺'} else h.$el.classList.remove('moonwalk');
-    if(h.party.biped>0){h.$el.classList.add('biped'); if(!h.iconEl.textContent) h.iconEl.textContent='🦵'} else h.$el.classList.remove('biped');
-    if(h.party.shades>0){h.$el.classList.add('frenzy'); if(!h.iconEl.textContent) h.iconEl.textContent='😎'} else h.$el.classList.remove('frenzy');
-    if(h.party.pee>0){h.iconEl.textContent='🚽'}
-    if(h.party.stun>0){h.iconEl.textContent='💫'}
-    if(h.party.piggy>0){h.iconEl.textContent='🤱'}
-
-    h.$el.style.left = x+'px'; h.$el.style.top = ypx+'px';
+    h.$el.style.left = x+'px'; h.$el.style.top = y+'px';
     h.$el.style.transform=`translate(-50%,-50%)`;
 
-    // 스크린 좌표 저장(카메라 추적용)
-    h.sx=x; h.sy=ypx;
-
-    // 다리 애니메이션 속도 동기화
+    // 다리 애니메이션 속도와 동기화
     const dur = Math.max(0.18, 0.6 - (h.speed*0.12));
     if(Math.abs(dur - h.legsDur) > 0.01){
       h.legsDur = dur;
@@ -595,49 +414,36 @@ function placeEntity(h){
 }
 
 /* ====== Ranking ====== */
-function toEntryOrder(){
-  const best = new Map();
-  H.forEach(h=>{ const key=h.entryId; if(!best.has(key) || best.get(key).x < h.x) best.set(key, h); });
-  const list=[...best.values()].sort((a,b)=> Math.min(b.x,dist)-Math.min(a.x,dist));
-  return list;
-}
-function renderRankColumns(list){
-  const cols = Math.ceil(list.length/10)||1;
-  $rankWrap.innerHTML='';
-  for(let c=0;c<cols;c++){
-    const box=document.createElement('div');
-    box.className='ranking';
-    box.innerHTML=`<h3>현재 순위</h3><div class="lines"></div>`;
-    const lines=box.querySelector('.lines');
-    const slice=list.slice(c*10,(c+1)*10);
-    lines.innerHTML=slice.map((h,i)=>{
-      const pos=c*10+i+1;
-      const status = h.done?'완주':`${Math.floor(h.x)}m`;
-      return `<div class="row"><span class="pos">${pos}위</span>
-      <span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name} - ${status}</span></div>`;
-    }).join('');
-    $rankWrap.appendChild(box);
-  }
-  if(cols>=2){
-    [...$rankWrap.children].forEach(b=>{ b.style.opacity = 0.9; b.style.transform='scale(0.96)'; });
+// 완료한 말은 finishOrder 순서대로 고정, 나머지는 진행도 기준으로 뒤에
+function orderByLead(){
+  if (mapMode === "oval") {
+    const finished = finishOrder.slice(); // 들어온 순서 그대로
+    const rest = H
+      .filter(h => !h.done)
+      .sort((a, b) => b.theta - a.theta);
+    return finished.concat(rest);
+  } else { // straight
+    const finished = finishOrder.slice();
+    const rest = H
+      .filter(h => !h.done)
+      // 결승선 통과 후 오버슈트 보정
+      .sort((a, b) => Math.min(b.x, dist) - Math.min(a.x, dist));
+    return finished.concat(rest);
   }
 }
-function updateRanking(){ renderRankColumns(toEntryOrder()); }
-
-/* ====== Camera (1등 뷰) ====== */
-function updateCamera(){
-  if(!firstCam){ $viewport.style.transform=`translate(-50%,-50%) scale(1)`; return; }
-  const order = toEntryOrder();
-  const lead = order[0];
-  if(!lead){ $viewport.style.transform=`translate(-50%,-50%) scale(1)`; return; }
-  const scale = 1.28;
-  const rect=activeView().getBoundingClientRect();
-  const targetPanX = clamp((rect.width/2 - lead.sx)/scale, -rect.width*0.35, rect.width*0.35);
-  camPanX += (targetPanX - camPanX)*0.15;
-  $viewport.style.transform=`translate(-50%,-50%) scale(${scale}) translate(${camPanX}px, 0)`;
+function updateRanking(){
+  const order=orderByLead();
+  $rankingBox.querySelector('h3').textContent = (mapMode==="oval") ? `현재 순위 (총 ${laps}바퀴)` : `현재 순위 (${dist}m 달리기)`;
+  $rankingLines.innerHTML=order.map((h,i)=>{
+    const status = (mapMode==="oval") ? (h.done?'완주':`${Math.floor((h.theta+Math.PI/2)/(2*Math.PI))+1}바퀴째`) : (h.done?'완주':`${Math.floor(h.x)}m`);
+    return `<div class="row"><span class="pos">${i+1}위</span><span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name} - ${status}</span></div>`;
+  }).join('');
 }
 
-/* ====== Countdown HUD ====== */
+/* ====== Camera ====== */
+function updateCamera(){ $viewport.style.transform="translate(-50%,-50%) scale(1)"; }
+
+/* ====== Countdown ====== */
 const $hud=document.getElementById('hud'),
       $ltR=document.getElementById('ltR'),
       $ltY=document.getElementById('ltY'),
@@ -654,33 +460,8 @@ async function countdown(){
   $hud.classList.remove('show'); $gunTxt.textContent='';
 }
 
-/* ====== Winner Overlay & Replay ====== */
-function winnerHorseSVG(color, big=false){
-  const s = big? 'winnerHorse':'horse-svg';
-  return `<svg class="${s}" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
-    <g class="g-bob">
-      <path fill="#cbd5e1" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
-      <path fill="#e5e7eb" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
-      <rect fill="#94a3b8" x="28" y="17" width="11" height="7" rx="2"/>
-      <g class="rider"><circle cx="31" cy="10.8" r="3.6"/><rect x="28" y="14.8" width="10" height="7" rx="2"/></g>
-      <circle cx="22.5" cy="20.5" r="0.9" fill="#0f172a"/>
-      <rect x="21" y="26" width="3.5" height="13" fill="#e5e7eb"/>
-      <rect x="36" y="26" width="3.5" height="13" fill="#e5e7eb"/>
-    </g>
-  </svg>`;
-}
-function showWinner(entry){
-  $cele.style.display='flex';
-  $winnerVisual.innerHTML = '👑 🥕 ✨';
-  $winnerCard.innerHTML = `<div>${winnerHorseSVG(entry.color,true)}</div><div class="winnerName">${entry.no}번 ${entry.name}</div>`;
-
-  // 🎬 우승 순간 리플레이 완성 & 버튼 동작
-  replay.meta.finishedAt = Date.now();
-  $replaySaveBtn.onclick = ()=>{
-    download('lucky-horse-replay.json', JSON.stringify(replay,null,2));
-  };
-
-  // 컨페티
+/* ====== Celebration & Draw ====== */
+function confettiBurst(){
   const emojis=['🎉','✨','🎊','🥳','🍾','🎈','⭐'];
   for(let i=0;i<30;i++){
     const c=document.createElement('div');
@@ -692,145 +473,140 @@ function showWinner(entry){
     setTimeout(()=>c.remove(),3500);
   }
 }
+function dropCarrot(sizePx){
+  const c=document.createElement('div');
+  c.className='carrot';
+  c.textContent='🥕';
+  c.style.left=Math.random()*100+'vw';
+  c.style.animationDuration=(2+Math.random()*2)+'s';
+  c.style.fontSize = (sizePx || (52+Math.random()*36)) + 'px';
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),4000);
+}
+function dropHay(sizePx){
+  const h=document.createElement('div');
+  h.className='hay';
+  h.textContent='🌾';
+  h.style.left=Math.random()*100+'vw';
+  h.style.animationDuration=(2+Math.random()*2)+'s';
+  h.style.fontSize = (sizePx || (48+Math.random()*32)) + 'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),4000);
+}
+function celebrate(title, subtitle){
+  $celeTitle.textContent=title;
+  $celeSubtitle.textContent=subtitle;
+  $cele.style.display='flex';
+  confettiBurst();
+  for(let i=0;i<36;i++) dropCarrot();
+  for(let i=0;i<10;i++) dropCarrot(96);
+  for(let i=0;i<28;i++) dropHay();
+  for(let i=0;i<8;i++)  dropHay(90);
+}
 
-/* 선택 등수 즉발 */
+/* 선택 등수가 '들어오는 순간' 즉발 */
 function maybeFireDraw(){
   if(drawFired || !pendingDraw) return;
-  const k = finishOrder.length; if(k===0) return;
-  const pick = (n)=> finishOrder[n-1];
-  let target=null;
-  if(pendingDraw.type==='first' && k>=1){ target=pick(1);}
-  if(pendingDraw.type==='nth'){ const n=Math.max(1,parseInt(pendingDraw.n||1,10)); if(k>=n) target=pick(n); }
-  if(pendingDraw.type==='last' && k===toEntryOrder().length){ target=pick(k); }
-  if(target){ drawFired=true; pendingDraw=null; showWinner(target); }
-}
+  const k = finishOrder.length;
+  if(k===0) return;
 
-/* ====== Party Engine ====== */
-function finishEntryIfFirst(h){
-  if(entryDone.get(h.entryId)) return;
-  entryDone.set(h.entryId, {who:h.role, x:h.x});
-  const entry = {entryId:h.entryId, name:h.name, no:h.no, color:h.color, who:h.role};
-  finishOrder.push(entry);
-  logEv((performance.now()-startTS)/1000,'finish', entry);
-  maybeFireDraw();
-}
-
-function spawnRunnerFrom(h){
-  if(H.find(e=>e.entryId===h.entryId && e.role==='runner' && !e.done)) return;
-  const el=document.createElement('div'); el.className='runner'; el.innerHTML=runnerSVG(h.color);
-  const plate=document.createElement('div'); plate.className='nameplate'; plate.textContent=`${h.no}번 ${h.name} (기수)`; el.appendChild(plate);
-  const icon=document.createElement('div'); icon.className='stateIcon'; el.appendChild(icon);
-  $canvas.appendChild(el);
-  const j = {
-    entryId:h.entryId, role:'runner',
-    name:h.name,no:h.no,color:h.color,$el:el,iconEl:icon,
-    x:h.x, y:h.y, sx:0, sy:0,
-    base: 3.6 + _rand()*0.6, speed: 3.2 + _rand()*0.6,
-    fatigue:0, legsDur:.4, done:false, _finished:false,
-    party:{spin:0,moon:0,pee:0,jump:0,biped:0,shades:0,stun:0,piggy:0},
-    jumpT:0, jumpDur:0.4, stumble:0,
-  };
-  H.push(j);
-}
-
-function maybeParty(h, dt, tnow){
-  if(!$partyChk.checked) return;
-  const scale = partyScale();
-
-  if(h.party.stun>0){ h.party.stun-=dt; return; }
-  ['spin','moon','pee','jump','biped','shades','piggy'].forEach(k=>{ if(h.party[k]>0) h.party[k]-=dt; });
-
-  const already = ['spin','moon','pee','jump','biped','shades','piggy'].some(k=>h.party[k]>0);
-  if(!already){
-    for(const [key,conf] of Object.entries(PARTY)){
-      if(key==='bomb' || key==='fall') continue;
-      const p = conf.p * scale * dt;
-      if(_rand()<p){
-        const dur = conf.dur? conf.dur[0] + _rand()*(conf.dur[1]-conf.dur[0]) : 0.8;
-        h.party[key]=dur;
-        logEv(tnow,'party', {entry:h.entryId, role:h.role, key, dur});
-        break;
-      }
+  if(pendingDraw.type==='first' && k===1){
+    const h = finishOrder[0];
+    celebrate('Champion', `우승: ${h.no}번 ${h.name}`);
+    drawFired = true; pendingDraw=null; return;
+  }
+  if(pendingDraw.type==='nth'){
+    const n = Math.max(1, parseInt(pendingDraw.n||1,10));
+    if(k===n){
+      const h = finishOrder[n-1];
+      celebrate('Champion', `${n}등 당첨: ${h.no}번 ${h.name}`);
+      drawFired = true; pendingDraw=null; return;
     }
   }
-
-  if(_rand() < PARTY.bomb.p * scale * dt){
-    const targets = H.filter(o=>o.entryId!==h.entryId && !o.done && Math.abs(o.x-h.x)<12);
-    const tgt = targets.length? targets[Math.floor(_rand()*targets.length)] : null;
-    if(tgt){
-      tgt.party.stun = PARTY.bomb.stun[0] + _rand()*(PARTY.bomb.stun[1]-PARTY.bomb.stun[0]);
-      logEv(tnow,'bomb',{from:h.entryId,to:tgt.entryId,dur:tgt.party.stun});
+  if(pendingDraw.type==='last'){
+    if(k===H.length){
+      const h = finishOrder[k-1];
+      celebrate('Champion', `마지막 당첨: ${h.no}번 ${h.name}`);
+      drawFired = true; pendingDraw=null; return;
     }
-  }
-
-  if(h.role==='horse' && _rand() < PARTY.fall.p * scale * dt){
-    spawnRunnerFrom(h);
-    h.speed *= 0.7;
-    logEv(tnow,'fall',{entry:h.entryId});
   }
 }
 
-function partySpeedFactor(h){
-  let f=1;
-  if(h.party.spin>0) f*=0.95;
-  if(h.party.moon>0) f*=0.9;
-  if(h.party.pee>0)  f*=0.0;
-  if(h.party.jump>0) f*=1.05;
-  if(h.party.biped>0)f*=1.08;
-  if(h.party.shades>0)f*=1.15;
-  if(h.party.piggy>0) f*=0.7;
-  return f;
+/* ====== Straight Map (SVG 트랙 + 장애물) ====== */
+function drawStraightMap(){
+  straightViewW = 20*dist;
+  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
+  const trackY=150, trackH=100, startX=80, finishX=straightViewW-80;
+  $straightMap.innerHTML = `
+    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="${startX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${finishX}" y1="${trackY-10}" x2="${finishX}" y2="${trackY+trackH+10}" stroke="#e5e7eb" stroke-width="6"/>
+    <text x="${finishX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+  `;
+  genObstacles();
+  renderObstacles();
 }
 
 /* ====== Race Loop ====== */
-let lastTime=null, startTS=0;
 function run(){
-  running=true; lastTime=null; startTS=performance.now();
+  running=true;
+  let lastTime=null;
 
   const tick=(now)=>{
     if(lastTime===null) lastTime=now;
     const dt=Math.max(0.001,Math.min(0.05,(now-lastTime)/1000));
     lastTime=now;
 
-    const orderEnt = toEntryOrder();
-    const leadX = orderEnt[0]? Math.min(orderEnt[0].x, dist):0;
-
     for(const h of H){
       if(h.done) continue;
 
-      maybeParty(h, dt, (now-startTS)/1000);
+      if(mapMode==="oval"){
+        h.v += (_rand()-0.5)*0.01;
+        if(_rand()<0.003) h.v += 0.06;
+        h.f = Math.max(0, h.f*0.95 + (h.v>0.035? 0.002: 0));
+        h.v -= h.f*0.015;
+        h.v = Math.max(0.006, Math.min(0.06, h.v));
+        h.theta += h.v;
+        if(h.theta >= (-Math.PI/2)+laps*2*Math.PI) h.done=true;
+      }else{
+        // 목표시간 없음: base 중심으로 역동적인 주행
+        h.speed += h.base*JITTER_FACTOR*(_rand()-0.5); // 흔들림
+        if(_rand()<BOOST_PROB) h.speed += h.base*BOOST_GAIN; // 부스터
+        if(h.speed>h.base*1.12) h.fatigue=Math.min(1,h.fatigue+dt*FATIGUE_INC);
+        else h.fatigue=Math.max(0,h.fatigue-dt*FATIGUE_DEC);
+        h.speed -= h.fatigue*h.base*FATIGUE_PENALTY;
 
-      h.speed += h.base*JITTER_FACTOR*(_rand()-0.5);
-      if(_rand()<BOOST_PROB) h.speed += h.base*BOOST_GAIN;
-      if(h.speed>h.base*1.12) h.fatigue = Math.min(1,h.fatigue+dt*FATIGUE_INC);
-      else h.fatigue = Math.max(0,h.fatigue-dt*FATIGUE_DEC);
-      h.speed -= h.fatigue*h.base*FATIGUE_PENALTY;
+        const vMin=h.base*VMIN_RATIO, vMax=h.base*VMAX_RATIO;
+        h.speed=Math.max(vMin,Math.min(vMax,h.speed));
 
-      if(mapMode!=='oval'){
-        const gap = leadX - Math.min(h.x,dist);
-        const gapNorm = clamp(gap/Math.max(20,dist*0.6),0,1);
-        const rankIdx = orderEnt.findIndex(e=>e.entryId===h.entryId);
-        const rankNorm = (orderEnt.length>1)?(rankIdx/(orderEnt.length-1)):0;
-        let assist = 1 + RB_RANK*rankNorm + RB_GAP*gapNorm;
-        assist=clamp(assist,RB_MIN,RB_MAX);
-        h.speed *= (1 + (assist-1)*0.5);
+        // 장애물 판정
+        if(obstaclesEnabled){
+          const ahead=h.x + h.speed*0.4;
+          const behind=h.x - 0.5;
+          const hit=obstacles.find(o=>!h._passed[o.id] && o.x>=behind && o.x<=ahead);
+          if(hit){
+            const jumpChance=0.7 + Math.min(0.2,(h.speed-h.base)*0.2);
+            if(Math.random()<jumpChance){ h.jumping=true; h.jumpT=0; h._passed[hit.id]=true; }
+            else{ h.stumble=0.5+Math.random()*0.3; h.speed*=0.35; h._passed[hit.id]=true; }
+          }
+          if(h.stumble>0){ h.stumble-=dt; h.speed*=0.98; }
+          if(h.jumping){ h.jumpT+=dt; if(h.jumpT>=h.jumpDur){ h.jumping=false; h.jumpT=0; } }
+        }
+
+        // 이동 (m)
+        h.x += h.speed*dt*SPEED_GLOBAL;
+        if(h.x>=dist) h.done=true;
       }
 
-      h.speed *= partySpeedFactor(h);
+      // 피니시 감지 → 순서 기록 → 선택 등수면 즉발
+      if(!h._finished && h.done){
+        h._finished = true;
+        finishOrder.push(h);
+        maybeFireDraw();
+      }
 
-      const vMin=h.base*VMIN_RATIO, vMax=h.base*VMAX_RATIO;
-      h.speed=clamp(h.speed, vMin, vMax);
-
-      h.x += h.speed*dt*SPEED_GLOBAL;
-
-      if(h.party.jump>0){ h.jumpT += dt; h.$el.classList.add('jump'); }
-      else{ h.jumpT=0; h.$el.classList.remove('jump'); }
-
-      if(h.x>=dist){ h.done=true; }
-
-      if(!h._finished && h.done){ h._finished=true; finishEntryIfFirst(h); }
-
-      placeEntity(h);
+      placeHorse(h);
     }
 
     updateRanking();
@@ -859,20 +635,13 @@ $start.onclick=async()=>{
   laps=parseInt($raceLen.value,10)||3;
   dist=parseInt($raceDist.value,10)||100;
 
-  seed=autoSeed(); reseed(seed);
-  replay = {meta:{seed, names:list.map(x=>x.name), map:mapMode, dist, laps, party:$partyChk.checked, partyLv:$partyLv.value, startedAt:Date.now()}, events:[]};
-
+  reseed(autoSeed());
   $cele.style.display='none';
-  if(raf) cancelAnimationFrame(raf);
-  raf=null; running=false;
   clearHorses();
+  clearObstaclesDOM();
   resetFinishOrder();
 
   if(mapMode==="straight") drawStraightMap();
-  if(mapMode==="zigzag") drawZigzag();
-  if(mapMode==="sline") drawSline();
-  if(mapMode==="oval") drawOvalMap();
-
   buildHorses(list);
   await countdown();
   run();
@@ -880,16 +649,13 @@ $start.onclick=async()=>{
 
 $reset.onclick=()=>{
   if(raf) cancelAnimationFrame(raf);
-  raf=null; running=false; pendingDraw={type:'first'};
-  document.querySelectorAll('#drawSeg .seg-item').forEach(l=>l.classList.remove('on'));
-  document.querySelector('#drawSeg .seg-item[data-type="first"]').classList.add('on');
+  raf=null; running=false; pendingDraw=null;
   $cele.style.display='none';
   clearHorses();
+  clearObstaclesDOM();
+  resetDrawUI();
   resetFinishOrder();
   if(mapMode==="straight") drawStraightMap();
-  if(mapMode==="zigzag") drawZigzag();
-  if(mapMode==="sline") drawSline();
-  if(mapMode==="oval") drawOvalMap();
 };
 
 $shuffle.onclick=()=>{
@@ -906,49 +672,58 @@ $names.addEventListener('input', ()=>{
 
 addEventListener('resize', ()=>{
   if(mapMode==="straight") drawStraightMap();
-  if(mapMode==="zigzag") drawZigzag();
-  if(mapMode==="sline") drawSline();
-  if(mapMode==="oval") drawOvalMap();
-  H.forEach(placeEntity);
+  H.forEach(placeHorse);
   updateCamera();
 });
 
 /* 맵 전환 */
 $mapToggle.onclick=()=>{
-  mapMode = (mapMode==='straight')?'oval':(mapMode==='oval')?'zigzag':(mapMode==='zigzag')?'sline':'straight';
-  $mapToggle.textContent = "맵: " + (mapMode==='straight'?'직선':mapMode==='oval'?'타원':mapMode==='zigzag'?'지그재그':'S-라인');
+  mapMode = (mapMode==="oval") ? "straight" : "oval";
+  $mapToggle.textContent = "맵 전환: " + (mapMode==="oval"?"타원":"직선");
 
-  $raceLen.style.display = (mapMode==='oval')?"inline-block":"none";
-  $raceDist.style.display = (mapMode!=='oval')?"inline-block":"none";
-
-  $straightMap.style.display = (mapMode==='straight')?'block':'none';
-  $ovalMap.style.display     = (mapMode==='oval')?'block':'none';
-  $zigzagMap.style.display   = (mapMode==='zigzag')?'block':'none';
-  $slineMap.style.display    = (mapMode==='sline')?'block':'none';
+  if(mapMode==="oval"){
+    $raceLen.style.display="inline-block";
+    $raceDist.style.display="none";
+    $ovalMap.style.display="block";
+    $straightMap.style.display="none";
+    $obstacleToggle.style.display = "none";
+    obstaclesEnabled = false;
+    $obstacleToggle.textContent = "장애물: 끔";
+    clearObstaclesDOM();
+  }else{
+    $raceLen.style.display="none";
+    $raceDist.style.display="inline-block";
+    $ovalMap.style.display="none";
+    $straightMap.style.display="block";
+    $obstacleToggle.style.display = "inline-flex";
+    drawStraightMap();
+  }
 
   if(raf) cancelAnimationFrame(raf);
-  raf=null; running=false;
+  raf=null; running=false; pendingDraw=null;
   $cele.style.display='none';
   clearHorses();
+  resetDrawUI();
   resetFinishOrder();
-
-  if(mapMode==="straight") drawStraightMap();
-  if(mapMode==="zigzag") drawZigzag();
-  if(mapMode==="sline") drawSline();
-  if(mapMode==="oval") drawOvalMap();
 };
 
-/* 1등 뷰 토글 */
-$firstCamBtn.onclick=()=>{
-  firstCam=!firstCam;
-  $firstCamBtn.textContent = firstCam? '1등 뷰 ON':'1등 뷰 OFF';
-  $firstCamBtn.classList.toggle('on', firstCam);
-  if(!firstCam){ camPanX=0; $viewport.style.transform=`translate(-50%,-50%) scale(1)`; }
+/* 장애물 토글 */
+$obstacleToggle.onclick=()=>{
+  obstaclesEnabled=!obstaclesEnabled;
+  $obstacleToggle.textContent=`장애물: ${obstaclesEnabled?'켬':'끔'}`;
+  if(mapMode==="straight"){
+    if(obstaclesEnabled) drawStraightMap();
+    else clearObstaclesDOM();
+  } else {
+    clearObstaclesDOM();
+    $obstacleToggle.style.display = "none";
+  }
 };
 
 /* 추첨(세그먼트) */
 const $drawSeg = document.getElementById('drawSeg');
 const $drawNthInput = document.getElementById('drawNthInput');
+
 function updateDrawUI(type){
   $drawSeg.querySelectorAll('.seg-item').forEach(lab=>{
     lab.classList.toggle('on', lab.dataset.type===type);
@@ -974,22 +749,20 @@ $drawNthInput.addEventListener('input', ()=>{
   const on = $drawSeg.querySelector('.seg-item.on');
   if(on && on.dataset.type==='nth') applyDrawSelection('nth');
 });
+function resetDrawUI(){
+  $drawSeg.querySelectorAll('.seg-item').forEach(l=>l.classList.remove('on'));
+  $drawNthInput.value=''; $drawNthInput.disabled = true;
+  pendingDraw=null;
+}
 
-/* 초기 표시 */
+/* ====== 초기 상태: 직선 기본 ====== */
 $raceLen.style.display="none";
 $raceDist.style.display="inline-block";
-$straightMap.style.display="block";
 $ovalMap.style.display="none";
-$zigzagMap.style.display="none";
-$slineMap.style.display="none";
+$straightMap.style.display="block";
+$obstacleToggle.style.display = "inline-flex";
 drawStraightMap();
-document.querySelector('#drawSeg .seg-item[data-type="first"]').classList.add('on');
-
 </script>
 
-<!-- ✅ 검색엔진이 읽을 수 있게, 작은 안내 푸터(가시적으로 표시) -->
-<footer style="position:absolute;left:8px;bottom:8px;font-size:12px;opacity:.75;color:#cbd5e1">
-  랜덤게임 · 온라인 추첨 · 룰렛 대체 — Lucky Horse Race 경마게임
-</footer>
-</body>
+  </body>
 </html>
