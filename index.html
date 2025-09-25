@@ -647,7 +647,6 @@ function showWinner(entry){
 }
 
 /* 선택 등수 즉발 */
-let drawFired=false; let pendingDraw={type:'first'};
 function maybeFireDraw(){
   if(drawFired || !pendingDraw) return;
   const k = finishOrder.length; if(k===0) return;
@@ -778,11 +777,14 @@ $reset.onclick=()=>{
   if(mapMode==="oval") drawOvalMap();
 };
 
-$shuffle.onclick=()=>{
-  const list=splitNames($names.value);
-  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(_rand()*(i+1)));[list[i],list[j]]=[list[j]]=[list[j],list[i]]}
-  $names.value=list.map(x=>x.name).join(' ');
-  if(list.length) buildHorses(list); else clearHorses();
+$shuffle.onclick = () => {
+  const list = splitNames($names.value);
+  for (let i = list.length - 1; i > 0; i--) {
+    const j = Math.floor(_rand() * (i + 1)); // 시드 랜덤 사용
+    [list[i], list[j]] = [list[j], list[i]];
+  }
+  $names.value = list.map(x => x.name).join(' ');
+  if (list.length) buildHorses(list); else clearHorses();
 };
 
 $names.addEventListener('input', ()=>{
