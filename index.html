@@ -512,21 +512,21 @@ function maybeFireDraw(){
 
   if(pendingDraw.type==='first' && k===1){
     const h = finishOrder[0];
-    celebrate('King Carrot 👑🥕', `우승: ${h.no}번 ${h.name}`);
+    celebrate('King Carrot 🥕', `우승: ${h.no}번 ${h.name}`);
     drawFired = true; pendingDraw=null; return;
   }
   if(pendingDraw.type==='nth'){
     const n = Math.max(1, parseInt(pendingDraw.n||1,10));
     if(k===n){
       const h = finishOrder[n-1];
-      celebrate('King Carrot 👑🥕', `${n}등 당첨: ${h.no}번 ${h.name}`);
+      celebrate('King Carrot 🥕', `${n}등 당첨: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
   if(pendingDraw.type==='last'){
     if(k===H.length){
       const h = finishOrder[k-1];
-      celebrate('King Carrot 👑🥕', `마지막 당첨: ${h.no}번 ${h.name}`);
+      celebrate('King Carrot 🥕', `마지막 당첨: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
