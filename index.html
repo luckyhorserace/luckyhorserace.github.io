@@ -572,17 +572,39 @@ function renderRankColumns(list){
 function updateRanking(){ renderRankColumns(toEntryOrder()); }
 
 /* ====== Camera (1등 뷰) ====== */
-let camPanX=0;
+let camPanX = 0;  // 기존에 있으면 유지
 function updateCamera(){
-  if(!firstCam){ $viewport.style.transform=`translate(-50%,-50%) scale(1)`; return; }
+  // 1) 1등뷰가 아니면 원복
+  if(!firstCam){
+    $viewport.style.transform = `translate(-50%,-50%) scale(1)`;
+    return;
+  }
+
   const order = toEntryOrder();
   const lead = order[0];
-  if(!lead){ $viewport.style.transform=`translate(-50%,-50%) scale(1)`; return; }
+  if(!lead){
+    $viewport.style.transform = `translate(-50%,-50%) scale(1)`;
+    return;
+  }
+
   const scale = 1.28;
-  const rect=activeView().getBoundingClientRect();
+  const rect = activeView().getBoundingClientRect();
+
+  // 2) 결승선 도달 여부 판단
+  const leadProg = (mapMode === 'oval') ? lead.lapProg : lead.x;
+  const finishVal = (mapMode === 'oval') ? laps : dist;
+  const finished = leadProg >= finishVal - 1e-6; // 부동소수 여유
+
+  // 3) 결승선 이후에는 카메라 '동결'(더 이상 타겟 갱신 X)
+  if (finished) {
+    $viewport.style.transform = `translate(-50%,-50%) scale(${scale}) translate(${camPanX}px, 0)`;
+    return;
+  }
+
+  // 4) 평상시엔 1등을 화면 중심 근처로 부드럽게 팬
   const targetPanX = clamp((rect.width/2 - lead.sx)/scale, -rect.width*0.35, rect.width*0.35);
-  camPanX += (targetPanX - camPanX)*0.15;
-  $viewport.style.transform=`translate(-50%,-50%) scale(${scale}) translate(${camPanX}px, 0)`;
+  camPanX += (targetPanX - camPanX) * 0.15;
+  $viewport.style.transform = `translate(-50%,-50%) scale(${scale}) translate(${camPanX}px, 0)`;
 }
 
 /* ====== Countdown HUD ====== */
