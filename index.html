@@ -10,7 +10,7 @@
 <meta name="description" content="이름만 넣고 자동으로 우승 발표! Lucky Horse Race 경마형 랜덤 추첨 게임. 직선/지그재그/S-라인/타원 트랙, 1등/마지막/n등 발표, 리플레이 다운로드 지원."/>
 <meta name="keywords" content="경마게임, 랜덤게임, 온라인 추첨, 룰렛, 사다리게임, 제비뽑기, 추첨기, 파티게임, 이름뽑기"/>
 
-<!-- 🔗 본문 주소(배포 도메인으로 교체) -->
+<!-- 🔗 배포 주소 -->
 <link rel="canonical" href="https://luckyhorserace.github.io/"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
@@ -18,6 +18,7 @@
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨"/>
 <meta property="og:description" content="이름만 넣고 달리면 자동 우승 발표. 직선/지그재그/S-라인/타원 트랙, 리플레이 다운로드까지!"/>
+<!-- 필요 시 png로 교체: https://luckyhorserace.github.io/og-luckyhorse.png -->
 <meta property="og:image" content="https://luckyhorserace.github.io/og-luckyhorse.jpg"/>
 <meta property="og:url" content="https://luckyhorserace.github.io/"/>
 <meta name="twitter:card" content="summary_large_image"/>
@@ -57,7 +58,7 @@ body{color:var(--ink);background:#0b1220;font-family:ui-sans-serif,system-ui,-ap
 /* Buttons / Layout */
 button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
-.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3a57;color:#cbd5e1}
+.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3b57;color:#cbd5e1}
 .btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
 .btn-toggle.on{outline:2px solid var(--accent2); box-shadow:0 0 0 2px #0006 inset}
 
@@ -72,9 +73,7 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 
 /* Horses */
 .horse{position:absolute;transform:translate(-50%,-50%);pointer-events:none;width:46px;height:34px; z-index:8}
-.horse.jump{ z-index:12; }
 .nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3b57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;white-space:nowrap}
-.stateIcon{position:absolute;left:50%;top:-36px;transform:translate(-50%,0);font-size:16px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
 
 /* 🐎 말+라이더 SVG */
 .horse-svg{width:46px;height:34px}
@@ -114,7 +113,7 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .countTxt{margin-left:6px;font-weight:900}
 .gun{margin-left:8px;font-size:12px;color:#93c5fd}
 
-/* 리플레이/우승 오버레이 */
+/* 우승 오버레이 */
 #celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.55);z-index:10000;text-align:center}
 #celebrate .big{font-size:96px;display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:8px}
 #celebrate .title{font-size:72px;color:#fff;margin:0 0 8px;letter-spacing:.2em;animation:jelly 1.6s ease both; text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25)}
@@ -123,11 +122,6 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .winnerCard{display:flex;gap:20px;align-items:center;justify-content:center;margin:8px 0 18px}
 .winnerHorse{width:160px;height:120px;transform:scale(1.2)}
 .winnerName{font-size:28px;font-weight:900}
-.confetti{position:fixed;top:-20px;font-size:26px;pointer-events:none;animation:fall 2.5s linear forwards;z-index:10001}
-@keyframes fall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
-
-/* 미니 헤드업 */
-.chip{display:inline-block;padding:6px 10px;border:1px solid #2a3b57;border-radius:999px;background:rgba(0,0,0,.35);color:#cbd5e1;font-weight:800}
 
 /* 모바일 보정 */
 @media (max-width:640px){.ranking{width:220px}#names{min-width:180px}}
@@ -200,19 +194,19 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
     </div>
 
     <div class="controls right">
-      <!-- 추첨 메뉴 (세그먼트) -->
+      <!-- 추첨 메뉴 -->
       <div class="seg" id="drawSeg" style="display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.05); border:1px solid #2a3b57; border-radius:12px; padding:6px; flex-wrap:wrap;">
         <label class="seg-item on" data-type="first" style="position:relative">
           <input type="radio" name="draw" value="first" checked style="display:none">
-          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer; user-select:none;">1등</span>
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:linear-gradient(180deg,#1b9ab7,#168aa4); color:#06131b; font-weight:800; cursor:pointer;">1등</span>
         </label>
         <label class="seg-item" data-type="last" style="position:relative">
           <input type="radio" name="draw" value="last" style="display:none">
-          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer; user-select:none;">마지막</span>
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer;">마지막</span>
         </label>
         <label class="seg-item" data-type="nth" style="position:relative">
           <input type="radio" name="draw" value="nth" style="display:none">
-          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer; user-select:none;">n등</span>
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer;">n등</span>
         </label>
         <input id="drawNthInput" type="number" min="1" step="1" placeholder="n등" disabled>
         <small style="opacity:.8;margin-left:6px">※ 선택만 해두면, 해당 등수 들어오는 순간 자동 발표</small>
@@ -289,17 +283,17 @@ let firstCam=false;
 let camPanX=0;
 let seed=autoSeed();
 
-/* ====== Replay: 자동 기록 → 우승자 화면에서 다운로드 ====== */
+/* ====== Replay ====== */
 let replay={meta:{}, events:[]};
 function logEv(t, type, data){ replay.events.push({t, type, data}); }
 function resetFinishOrder(){ finishOrder=[]; entryDone.clear(); drawFired=false; }
 
-/* ====== Speed/Physics (심플 & 안정) ====== */
+/* ====== Physics ====== */
 const BASE_SPEED_MIN = 3.2;
 const BASE_SPEED_MAX = 6.8;
 const SPEED_GLOBAL_STRAIGHT = 1.18;
 const SPEED_GLOBAL_CURVE   = 1.18;
-const SPEED_GLOBAL_OVAL    = 1.34;   // 🔸 타원맵은 빠릿하게 보정
+const SPEED_GLOBAL_OVAL    = 1.34;   // 타원맵은 빠릿 보정
 
 const JITTER_FACTOR   = 0.20;
 const BOOST_PROB      = 0.012;
@@ -310,7 +304,7 @@ const FATIGUE_PENALTY = 0.15;
 const VMIN_RATIO      = 0.58;
 const VMAX_RATIO      = 2.00;
 
-/* Rubberband (직선/커브용 살짝) */
+/* Rubberband */
 const RB_RANK=0.25, RB_GAP=0.55, RB_MIN=0.92, RB_MAX=1.40;
 
 /* ====== Track Drawing ====== */
@@ -338,6 +332,7 @@ function drawStraightMap(){
     <text x="${finishX}" y="${dynTrackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
   `;
 }
+
 function drawOvalMap(){
   const rx=420, ry=220;
   $ovalMap.innerHTML = `
@@ -347,27 +342,49 @@ function drawOvalMap(){
     <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발/도착</text>
   `;
 }
-/* Zigzag / S-line — 안내선 제거(언덕 타듯 내부 계산만) */
+
+/* === 지그재그 / S-라인: 상단 트랙 삭제 + 점선 경로 + 아래 트랙만 === */
 function drawZigzag(){
-  const W=20*dist, H=500; const top=120, bot=380;
+  const W=20*dist, H=500; const top=120, bot=380, mid=(top+bot)/2;
   $zigzagMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
+
+  // 경로(점선)
+  const teeth=7; let pts=[];
+  for(let i=0;i<=teeth;i++){
+    const x=80 + (W-160)*(i/teeth);
+    const y= i%2? (top):(bot);
+    pts.push(`${x},${y}`);
+  }
+  // 아래쪽 트랙 밴드만
   $zigzagMap.innerHTML=`
-    <rect x="0" y="${top-40}" width="${W}" height="${(bot-top)+80}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${80}" y1="${top-60}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="80" y="${top-70}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${W-80}" y1="${top-60}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
-    <text x="${W-80}" y="${top-70}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+    <rect x="0" y="${mid}" width="${W}" height="${bot-mid+60}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <polyline points="${pts.join(' ')}" fill="none" stroke="#5b708f" stroke-dasharray="8,6" stroke-width="2"/>
+    <line x1="${80}" y1="${mid-10}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="80" y="${mid-16}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${W-80}" y1="${mid-10}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
+    <text x="${W-80}" y="${mid-16}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
   `;
 }
+
 function drawSline(){
-  const W=20*dist, H=500; const top=120, bot=380;
+  const W=20*dist, H=500; const top=120, bot=380, mid=(top+bot)/2;
   $slineMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const cycles=3, amp=((bot-top)/2)-18, midLine=(top+bot)/2;
+  const steps=220; let pts=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps;
+    const x=80 + (W-160)*t;
+    const y= midLine + amp*Math.sin(2*Math.PI*cycles*t);
+    pts.push(`${x},${y}`);
+  }
+  // 아래쪽 트랙 밴드만 + 점선 경로
   $slineMap.innerHTML=`
-    <rect x="0" y="${top-40}" width="${W}" height="${(bot-top)+80}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${80}" y1="${top-60}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="80" y="${top-70}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${W-80}" y1="${top-60}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
-    <text x="${W-80}" y="${top-70}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+    <rect x="0" y="${mid}" width="${W}" height="${bot-mid+60}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <polyline points="${pts.join(' ')}" fill="none" stroke="#5b708f" stroke-dasharray="8,6" stroke-width="2"/>
+    <line x1="${80}" y1="${mid-10}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="80" y="${mid-16}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${W-80}" y1="${mid-10}" x2="${W-80}" y2="${bot+60}" stroke="#ffffff" stroke-width="8"/>
+    <text x="${W-80}" y="${mid-16}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
   `;
 }
 
@@ -402,23 +419,22 @@ function buildHorses(list){
     plate.style.boxShadow = `0 0 0 1px rgba(0,0,0,.25), 0 0 8px 0 ${color}33`;
     el.appendChild(plate);
 
-    const icon=document.createElement('div'); icon.className='stateIcon'; el.appendChild(icon);
-
     $canvas.appendChild(el);
 
     const base = BASE_SPEED_MIN + _rand()*(BASE_SPEED_MAX-BASE_SPEED_MIN);
     let baseY = 200;
     if(mapMode==='straight'){ const gap = Math.min(28, dynamicTrackHeight()/Math.max(1,lanes)); baseY = dynTrackY + dynTrackH/2 + (i-(lanes-1)/2) * gap; }
     if(mapMode==='zigzag' || mapMode==='sline'){ baseY = 250 + (i-(lanes-1)/2) * Math.min(28, 140/Math.max(1,lanes)); }
-    if(mapMode==='oval'){ baseY = 300 + (i-(lanes-1)/2) * Math.min(20, 120/Math.max(1,lanes)); }
+    if(mapMode==='oval'){ baseY = 300 + (i-(lanes-1)/2) * Math.min(26, 160/Math.max(1,lanes)); } /* 레인 조금 넓힘 */
 
     H.push({
-      entryId:i, name:ent.name,no:ent.no,color,$el:el,iconEl:icon,
+      entryId:i, name:ent.name,no:ent.no,color,$el:el,
       x:0,y:baseY, sx:0, sy:0,
       base, speed: base*(0.9+_rand()*0.25),
       fatigue:0, legsDur:.42, done:false, _finished:false,
-      // oval용 랩 진행
-      lapProg:0
+      // oval 전용
+      lapProg:0,
+      thetaOffset: (i-(lanes-1)/2) * 0.06  // 🔸 각 말마다 시작각 조금씩 다르게
     });
   });
   updateRanking();
@@ -434,14 +450,13 @@ function trackBounds(W){
     return {top:dynTrackY, bottom:dynTrackY+dynTrackH, left:80, right:W-80};
   }
   if(mapMode==='zigzag' || mapMode==='sline'){
-    const top=120-40, bot=380+40; // 사각 트랙 영역
-    return {top, bottom:bot, left:80, right:W-80};
+    const top=120, bot=380, mid=(top+bot)/2;
+    return {top:mid, bottom:bot+60, left:80, right:W-80}; // 상단 삭제, 하단만
   }
-  // oval은 전체 뷰 기준
   return {top:80,bottom:520,left:80,right:920};
 }
 
-/* ====== Path center Y (직선/지그재그/S) ====== */
+/* Path center Y */
 function pathCenterY(px, W){
   if(mapMode==='straight') return dynTrackY + dynTrackH/2;
   if(mapMode==='zigzag'){
@@ -467,14 +482,16 @@ function placeEntity(h){
     const rect=$ovalMap.getBoundingClientRect();
     const rx=420, ry=220, cx=500, cy=300;
 
-    // lapProg: 0~laps, 각 1.0이 한 바퀴. 화면 배치는 각도로 환산
+    // 진행도 → 각도 (각 말마다 thetaOffset으로 살짝 분리)
     const p = clamp(h.lapProg, 0, laps);
-    const frac = (p%1); // 현재 바퀴 내 진행
-    const angle = -Math.PI/2 + frac * Math.PI*2; // 위에서 시작, 시계방향
-    // lane 오프셋(타원 법선 방향)
+    const frac = (p%1);
+    const angle = -Math.PI/2 + frac * Math.PI*2 + h.thetaOffset;
+
+    // lane 오프셋(법선 방향)
     const nx = Math.cos(angle)/Math.hypot(Math.cos(angle)/rx, Math.sin(angle)/ry);
     const ny = Math.sin(angle)/Math.hypot(Math.cos(angle)/rx, Math.sin(angle)/ry);
-    const laneOffset = (h.y - 300) * 0.35; // 기본 y를 lane 기준으로 사용
+    const laneOffset = (h.y - 300) * 0.6; // 🔸 레인 간격 살짝 확대
+
     const px = cx + (rx * Math.cos(angle)) + nx*laneOffset;
     const py = cy + (ry * Math.sin(angle)) + ny*laneOffset;
 
@@ -487,7 +504,7 @@ function placeEntity(h){
 
     // 다리 속도 보정
     const dur = Math.max(0.18, 0.6 - (h.speed*0.12));
-    if(Math.abs(dur - h.legsDur) > 0.01){
+    if(Math.abs(dur - (h.legsDur||0.42)) > 0.01){
       h.legsDur = dur;
       h.$el.querySelectorAll('.front-leg,.back-leg').forEach(e=>e.style.animationDuration = dur+'s');
     }
@@ -499,17 +516,17 @@ function placeEntity(h){
   const vb = view.getAttribute('viewBox').split(' ').map(Number);
   const W=vb[2], H=vb[3];
 
-  const rect=view.getBoundingClientRect(); // ✅ 활성 맵 크기 스케일
+  const rect=view.getBoundingClientRect();
   const scaleX=rect.width/W, scaleY=rect.height/H;
 
   const progress = clamp(h.x/dist, 0, 1);
   const px = 80 + (W-160)*progress;
   const cy = pathCenterY(px, W);
 
+  // 하단 트랙만: 기본 레인 오프셋 유지하되 밴드 내로 클램프
   let y = cy + (h.y - (mapMode==='straight'?(dynTrackY+dynTrackH/2):250));
   const tb = trackBounds(W);
-  const yMin = tb.top+8, yMax = tb.bottom-8;
-  y = clamp(y, yMin, yMax);
+  y = clamp(y, tb.top+8, tb.bottom-8);
 
   const x = px*scaleX, ypx = y*scaleY;
 
@@ -518,7 +535,7 @@ function placeEntity(h){
   h.sx=x; h.sy=ypx;
 
   const dur = Math.max(0.18, 0.6 - (h.speed*0.12));
-  if(Math.abs(dur - h.legsDur) > 0.01){
+  if(Math.abs(dur - (h.legsDur||0.42)) > 0.01){
     h.legsDur = dur;
     h.$el.querySelectorAll('.front-leg,.back-leg').forEach(e=>e.style.animationDuration = dur+'s');
   }
@@ -527,12 +544,11 @@ function placeEntity(h){
 /* ====== Ranking ====== */
 function toEntryOrder(){
   const best = new Map();
-  H.forEach(h=>{ const key=h.entryId; // entry 단일화
+  H.forEach(h=>{
     const progressVal = (mapMode==='oval') ? Math.min(h.lapProg, laps) : Math.min(h.x, dist);
-    if(!best.has(key) || best.get(key)._progress < progressVal) best.set(key, {...h, _progress:progressVal});
+    if(!best.has(h.entryId) || best.get(h.entryId)._progress < progressVal) best.set(h.entryId, {...h, _progress:progressVal});
   });
-  const list=[...best.values()].sort((a,b)=> b._progress - a._progress);
-  return list;
+  return [...best.values()].sort((a,b)=> b._progress - a._progress);
 }
 function renderRankColumns(list){
   const cols = Math.ceil(list.length/10)||1;
@@ -551,13 +567,12 @@ function renderRankColumns(list){
     }).join('');
     $rankWrap.appendChild(box);
   }
-  if(cols>=2){
-    [...$rankWrap.children].forEach(b=>{ b.style.opacity = 0.9; b.style.transform='scale(0.96)'; });
-  }
+  if(cols>=2){ [...$rankWrap.children].forEach(b=>{ b.style.opacity=0.9; b.style.transform='scale(0.96)'; }); }
 }
 function updateRanking(){ renderRankColumns(toEntryOrder()); }
 
 /* ====== Camera (1등 뷰) ====== */
+let camPanX=0;
 function updateCamera(){
   if(!firstCam){ $viewport.style.transform=`translate(-50%,-50%) scale(1)`; return; }
   const order = toEntryOrder();
@@ -587,7 +602,7 @@ async function countdown(){
   $hud.classList.remove('show'); $gunTxt.textContent='';
 }
 
-/* ====== Winner Overlay ====== */
+/* ====== Winner ====== */
 function winnerHorseSVG(color, big=false){
   const s = big? 'winnerHorse':'horse-svg';
   return `<svg class="${s}" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
@@ -605,25 +620,12 @@ function winnerHorseSVG(color, big=false){
 function showWinner(entry){
   $cele.style.display='flex';
   $winnerCard.innerHTML = `<div>${winnerHorseSVG(entry.color,true)}</div><div class="winnerName">${entry.no}번 ${entry.name}</div>`;
-
-  // 🎬 리플레이 완성 & 다운로드
   replay.meta.finishedAt = Date.now();
   $replaySaveBtn.onclick = ()=>{ download('lucky-horse-replay.json', JSON.stringify(replay,null,2)); };
-
-  // 컨페티
-  const emojis=['🎉','✨','🎊','🥳','🍾','🎈','⭐'];
-  for(let i=0;i<30;i++){
-    const c=document.createElement('div');
-    c.className='confetti';
-    c.textContent=emojis[i%emojis.length];
-    c.style.left=(Math.random()*100)+'vw';
-    c.style.animationDuration=(2+Math.random()*1.5)+'s';
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),3500);
-  }
 }
 
 /* 선택 등수 즉발 */
+let drawFired=false; let pendingDraw={type:'first'};
 function maybeFireDraw(){
   if(drawFired || !pendingDraw) return;
   const k = finishOrder.length; if(k===0) return;
@@ -638,7 +640,7 @@ function maybeFireDraw(){
 /* ====== Finish 기록 ====== */
 function finishEntryIfFirst(h){
   if(entryDone.get(h.entryId)) return;
-  entryDone.set(h.entryId, {x: (mapMode==='oval'? h.lapProg : h.x)});
+  entryDone.set(h.entryId, true);
   const entry = {entryId:h.entryId, name:h.name, no:h.no, color:h.color};
   finishOrder.push(entry);
   logEv((performance.now()-startTS)/1000,'finish', entry);
@@ -668,7 +670,7 @@ function run(){
       else h.fatigue = Math.max(0,h.fatigue-dt*FATIGUE_DEC);
       h.speed -= h.fatigue*h.base*FATIGUE_PENALTY;
 
-      // 러버밴드 (뒤에갈수록 살짝 도움)
+      // 러버밴드
       const gap = leadProg - (mapMode==='oval'? Math.min(h.lapProg,laps) : Math.min(h.x,dist));
       const gapNorm = clamp(gap/((mapMode==='oval'?laps:dist)*0.6 || 1),0,1);
       const rankIdx = orderEnt.findIndex(e=>e.entryId===h.entryId);
@@ -678,17 +680,16 @@ function run(){
       h.speed *= (1 + (assist-1)*0.5);
 
       // 속도 클램프
-      const vMin=h.base*VMIN_RATIO, vMax=h.base*VMAX_RATIO;
-      h.speed=clamp(h.speed, vMin, vMax);
+      h.speed=clamp(h.speed, h.base*VMIN_RATIO, h.base*VMAX_RATIO);
 
       // 진행 업데이트
       if(mapMode==='oval'){
-        h.lapProg += h.speed*dt*(SPEED_GLOBAL_OVAL)/100; // 스케일 맞춤(값이 너무 크지 않게)
+        h.lapProg += h.speed*dt*(SPEED_GLOBAL_OVAL)/100;
         if(h.lapProg>=laps){ h.lapProg=laps; h.done=true; }
       }else{
         const mult = (mapMode==='straight')?SPEED_GLOBAL_STRAIGHT:SPEED_GLOBAL_CURVE;
         h.x += h.speed*dt*mult;
-        if(h.x>=dist){ h.x=dist; h.done=true; } // 🔒 결승선에서 딱 멈춤
+        if(h.x>=dist){ h.x=dist; h.done=true; } // 결승선에서 멈춤
       }
 
       if(!h._finished && h.done){ h._finished=true; finishEntryIfFirst(h); }
@@ -699,7 +700,6 @@ function run(){
     updateRanking();
     updateCamera();
 
-    // 모두 완주 시 루프 종료 (결승선 넘어서 더 가지 않음)
     if(H.every(h=>h.done)){
       running=false;
     }else{
@@ -758,7 +758,7 @@ $reset.onclick=()=>{
 
 $shuffle.onclick=()=>{
   const list=splitNames($names.value);
-  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(_rand()*(i+1)));[list[i],list[j]]=[list[j],list[i]]}
+  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(_rand()*(i+1)));[list[i],list[j]]=[list[j]]=[list[j],list[i]]}
   $names.value=list.map(x=>x.name).join(' ');
   if(list.length) buildHorses(list); else clearHorses();
 };
@@ -854,7 +854,7 @@ document.querySelector('#drawSeg .seg-item[data-type="first"]').classList.add('o
 
 </script>
 
-<!-- ✅ 검색엔진이 읽을 수 있게, 작은 안내 푸터(가시적으로 표시) -->
+<!-- ✅ 작은 안내 푸터 -->
 <footer style="position:absolute;left:8px;bottom:8px;font-size:12px;opacity:.75;color:#cbd5e1">
   랜덤게임 · 온라인 추첨 · 룰렛 대체 — Lucky Horse Race 경마게임
 </footer>
