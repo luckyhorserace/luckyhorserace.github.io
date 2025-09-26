@@ -1,216 +1,283 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨</title>
 
-  <!-- 404 방지용 파비콘(투명) -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
+<!-- ✅ SEO 기본 -->
+<meta name="robots" content="index,follow"/>
+<meta name="description" content="이름만 넣고 자동으로 우승 발표! Lucky Horse Race 경마형 랜덤 추첨 게임. 직선/타원/멀리뛰기/팽이 경기장 트랙, 1등/마지막/n등 발표, 리플레이 다운로드 지원."/>
+<meta name="keywords" content="경마게임, 랜덤게임, 온라인 추첨, 룰렛, 사다리게임, 제비뽑기, 추첨기, 파티게임, 이름뽑기"/>
 
-  <style>
-    :root{
-      --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --accent:#6ee7ff;
-      --accent2:#fcd34d; --danger:#ef4444; --ok:#22c55e;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{color:var(--ink);background:#0b1220;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
+<!-- 🔗 배포 주소 -->
+<link rel="canonical" href="https://luckyhorserace.github.io/"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
-    /* 기본 스타일 */
-    .notice{
-      position:absolute; top:8px; left:12px; z-index:40;
-      background:rgba(0,0,0,.45); padding:6px 12px; border-radius:10px;
-      font-size:13px; color:#cbd5e1; backdrop-filter: blur(2px);
-    }
+<!-- ✅ 소셜 미리보기 -->
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Lucky Horse Race — 경마게임 · 랜덤게임 · 온라인 추첨"/>
+<meta property="og:description" content="이름만 넣고 달리면 자동 우승 발표. 직선/타원/멀리뛰기/팽이 경기장, 리플레이 다운로드까지!"/>
+<meta property="og:image" content="https://luckyhorserace.github.io/og-luckyhorse.jpg"/>
+<meta property="og:url" content="https://luckyhorserace.github.io/"/>
+<meta name="twitter:card" content="summary_large_image"/>
 
-    /* 타원맵 복원 */
-    .ovalSvg{width:100%;height:auto;display:block}
-    .horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%);pointer-events:none; z-index:8}
-    .horse .nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3b57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;white-space:nowrap}
+<!-- ✅ 구조화 데이터 -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"Lucky Horse Race",
+  "applicationCategory":"Game",
+  "operatingSystem":"Any",
+  "url":"https://luckyhorserace.github.io/",
+  "inLanguage":"ko-KR",
+  "description":"이름만 넣고 자동으로 우승 발표하는 경마형 랜덤 추첨 게임. 직선/타원/멀리뛰기/팽이 경기장 지원. 1등/마지막/n등 자동 발표, 리플레이 다운로드.",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+  "potentialAction":{"@type":"PlayAction","target":{"@type":"EntryPoint","urlTemplate":"https://luckyhorserace.github.io/"}}
+}
+</script>
 
-    /* 회전맵 */
-    #spinMap{width:100%;height:auto;display:block}
+<style>
+:root{
+  --bg:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --accent:#6ee7ff;
+  --accent2:#fcd34d; --danger:#ef4444; --ok:#22c55e;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{color:var(--ink);background:#0b1220;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
 
-    /* 점프맵 */
-    .horse.buried {
-      opacity: 0.3;
-    }
+/* 안내 배너 */
+.notice{
+  position:absolute; top:8px; left:12px; z-index:40;
+  background:rgba(0,0,0,.45); padding:6px 12px; border-radius:10px;
+  font-size:13px; color:#cbd5e1; backdrop-filter: blur(2px);
+}
 
-    .horse .face {
-      display: none; 
-      position: absolute;
-      bottom: 10px; 
-      left: 50%;
-      transform: translateX(-50%);
-    }
+/* Buttons / Layout */
+button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;letter-spacing:.2px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn-accent{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border:1px solid #0a6c82}
+.btn-ghost{background:rgba(0,0,0,.35);border:1px solid #2a3b57;color:#cbd5e1}
+.btn-accent:hover,.btn-ghost:hover{filter:brightness(1.06)}
+.btn-toggle.on{outline:2px solid var(--accent2); box-shadow:0 0 0 2px #0006 inset}
 
-    .horse .nameplate {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translate(-50%, -8px);
-      background: #09111e;
-      color: #dbe7f3;
-      border: 1px solid #2a3b57;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      white-space: nowrap;
-      opacity: 1;
-    }
+/* Stage */
+.wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
+.stage{position:absolute; inset:0;}
+.viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);transform-origin:50% 50%; transition:transform .12s ease-out}
+.canvas{position:relative;width:min(98vw,1800px);height:auto;margin:0 auto}
 
-  </style>
+/* Maps */
+.ovalSvg,.straightSvg,.longJumpSvg,.bladeArenaSvg{width:100%;height:auto;display:block}
+
+/* Horses */
+.horse{position:absolute;transform:translate(-50%,-50%);pointer-events:none;width:46px;height:34px; z-index:8}
+.nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3b57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;white-space:nowrap}
+
+/* 🐎 말+라이더 SVG */
+.horse-svg{width:46px;height:34px}
+.horse-svg .body{fill:#e5e7eb}
+.horse-svg .mane{fill:#cbd5e1}
+.horse-svg .rider{fill:var(--jersey,#60a5fa)}
+.horse-svg .saddle{fill:#94a3b8}
+.horse-svg .eye{fill:#0f172a}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
+.horse-svg .g-bob{animation:bob .26s infinite ease-in-out}
+.front-leg{transform-origin: top center;animation: leg-run-front .42s infinite linear}
+.back-leg {transform-origin: top center;animation: leg-run-back  .42s infinite linear}
+
+/* Ranking (다열) */
+.rankWrap{position:absolute;top:12px;right:12px;z-index:25;display:flex;gap:8px;align-items:flex-start}
+.ranking{width:260px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;font-size:13px}
+.ranking h3{margin:2px 0 6px;font-size:13px;color:#93c5fd}
+.ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
+.ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
+.ranking .pos{font-weight:900;color:#6ee7ff}
+.color-badge{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;border:1px solid #1f2937}
+
+/* Header */
+header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,.5);z-index:30}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#names{min-width:260px;padding:10px;border:1px solid #223047;border-radius:10px;background:rgba(0,0,0,.35);color:#dbe7f3}
+
+/* HUD */
+.hud{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:20}
+.hud.show{display:flex}
+.traffic{display:flex;gap:10px;align-items:center;background:#0b1220cc;border:1px solid #334155;padding:10px 14px;border-radius:12px}
+.light{width:18px;height:18px;border-radius:50%;background:#111827;border:1px solid #334155}
+.light.on.red{background:#ef4444}.light.on.yellow{background:#f59e0b}.light.on.green{background:#22c55e}
+.countTxt{margin-left:6px;font-weight:900}
+.gun{margin-left:8px;font-size:12px;color:#93c5fd}
+
+/* 우승 오버레이 */
+#celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.55);z-index:10000;text-align:center}
+#celebrate .big{font-size:96px;display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:8px}
+#celebrate .title{font-size:72px;color:#fff;margin:0 0 8px;letter-spacing:.2em;animation:jelly 1.6s ease both; text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25)}
+#celebrate .subtitle{font-size:28px;color:#e6f9ff;margin:0 18px 18px;text-shadow:0 1px 6px rgba(0,0,0,.35)}
+@keyframes jelly{0%{transform:scale(0.8)}40%{transform:scale(1.12)}60%{transform:scale(0.98)}100%{transform:scale(1)}}
+.winnerCard{display:flex;gap:20px;align-items:center;justify-content:center;margin:8px 0 18px}
+.winnerHorse{width:160px;height:120px;transform:scale(1.2)}
+.winnerName{font-size:28px;font-weight:900}
+
+/* 모바일 보정 */
+@media (max-width:640px){.ranking{width:220px}#names{min-width:180px}}
+</style>
 </head>
 <body>
-  <div class="wrap">
+<div class="wrap">
 
-    <div class="notice">자유롭게 사용해주시고 피드백 부탁드립니다.</div>
+  <div class="notice">자유롭게 사용해주시고 피드백 부탁드립니다.</div>
 
-    <!-- HUD -->
-    <div class="hud" id="hud">
-      <div class="traffic">
-        <div class="light" id="ltR"></div>
-        <div class="light" id="ltY"></div>
-        <div class="light" id="ltG"></div>
-        <span class="countTxt" id="countTxt">Ready</span>
-        <span class="gun" id="gunTxt"></span>
+  <!-- HUD -->
+  <div class="hud" id="hud">
+    <div class="traffic">
+      <div class="light" id="ltR"></div>
+      <div class="light" id="ltY"></div>
+      <div class="light" id="ltG"></div>
+      <span class="countTxt" id="countTxt">Ready</span>
+      <span class="gun" id="gunTxt"></span>
+    </div>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage" id="stage">
+    <div class="viewport" id="viewport">
+      <div class="canvas" id="canvas">
+        <!-- 타원맵 -->
+        <svg id="ovalMap" class="ovalSvg" viewBox="0 0 1000 600" style="display:none"></svg>
+        <!-- 직선맵 -->
+        <svg id="straightMap" class="straightSvg" viewBox="0 0 2000 400"></svg>
+        <!-- 멀리뛰기 맵 -->
+        <svg id="longJumpMap" class="longJumpSvg" viewBox="0 0 2000 400" style="display:none"></svg>
+        <!-- 팽이 경기장 맵 -->
+        <svg id="bladeArenaMap" class="bladeArenaSvg" viewBox="0 0 2000 400" style="display:none"></svg>
       </div>
     </div>
 
-    <!-- Stage -->
-    <div class="stage" id="stage">
-      <div class="viewport" id="viewport">
-        <div class="canvas" id="canvas">
-          <!-- 타원맵 -->
-          <svg id="ovalMap" class="ovalSvg" viewBox="0 0 1000 600" style="display:none"></svg>
-          <!-- 회전맵 -->
-          <svg id="spinMap" class="spinSvg" viewBox="0 0 2000 400" style="display:none"></svg>
-          <!-- 점프맵 -->
-          <svg id="sandJumpMap" class="jumpSvg" viewBox="0 0 2000 400" style="display:none"></svg>
-        </div>
-      </div>
-
-      <!-- 순위판 -->
+    <!-- 순위판 -->
+    <div class="rankWrap" id="rankWrap">
       <div id="rankingBox" class="ranking">
         <h3>현재 순위</h3>
         <div id="rankingLines"></div>
       </div>
     </div>
-
-    <!-- 하단 UI -->
-    <header>
-      <div class="controls left">
-        <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
-        <select id="raceLen" style="display:none">
-          <option value="1">1바퀴</option>
-          <option value="3" selected>3바퀴</option>
-          <option value="5">5바퀴</option>
-          <option value="10">10바퀴</option>
-        </select>
-        <select id="raceDist">
-          <option value="100" selected>100m</option>
-          <option value="200">200m</option>
-          <option value="300">300m</option>
-          <option value="500">500m</option>
-          <option value="1000">1km</option>
-        </select>
-
-        <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
-        <button class="btn-accent" id="startBtn">시작 ▶</button>
-        <button class="btn-ghost" id="resetBtn">리셋</button>
-
-        <button class="btn-ghost" id="mapToggleBtn">맵: 직선</button>
-        <button class="btn-ghost btn-toggle" id="firstCamBtn">1등 뷰 OFF</button>
-      </div>
-
-      <div class="controls right">
-        <!-- 추첨 메뉴 -->
-        <div class="seg" id="drawSeg" style="display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.05); border:1px solid #2a3b57; border-radius:12px; padding:6px; flex-wrap:wrap;">
-          <label class="seg-item on" data-type="first" style="position:relative">
-            <input type="radio" name="draw" value="first" checked style="display:none">
-            <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:linear-gradient(180deg,#1b9ab7,#168aa4); color:#06131b; font-weight:800; cursor:pointer;">1등</span>
-          </label>
-          <!-- 추가 -->
-        </div>
-        <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">개발자 컵라면 사주기 🍜</a>
-        <button class="btn-ghost" id="btnContact">문의 및 건의사항</button>
-      </div>
-    </header>
-
   </div>
 
-  <script>
-    // 기존 타원맵 복원
-    function drawOvalMap() {
-      const rx=420, ry=220;
-      $ovalMap.innerHTML = `
-        <ellipse cx="500" cy="300" rx="${rx}" ry="${ry}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-        <ellipse cx="500" cy="300" rx="${rx-60}" ry="${ry-60}" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
-        <ellipse cx="500" cy="300" rx="${rx-30}" ry="${ry-30}" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
-        <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발/도착</text>
-      `;
-    }
+  <!-- 하단 UI -->
+  <header>
+    <div class="controls left">
+      <input id="names" type="text" placeholder="참가자 입력 (예: 고구마 감자 김치 / 고구마*3)">
+      <select id="raceLen" style="display:none">
+        <option value="1">1바퀴</option>
+        <option value="3" selected>3바퀴</option>
+        <option value="5">5바퀴</option>
+        <option value="10">10바퀴</option>
+      </select>
+      <select id="raceDist">
+        <option value="100" selected>100m</option>
+        <option value="200">200m</option>
+        <option value="300">300m</option>
+        <option value="500">500m</option>
+        <option value="1000">1km</option>
+      </select>
 
-    // 회전맵 추가
-    function drawSpinMap() {
-      const W = 2000, H = 400;
-      $spinMap.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      $spinMap.innerHTML = `
-          <circle cx="1000" cy="200" r="150" fill="none" stroke="#5b708f" stroke-width="6"/>
-          <circle cx="1000" cy="200" r="120" fill="none" stroke="#22d3ee" stroke-dasharray="6,6" stroke-width="4"/>
-          <text x="1000" y="100" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">회전의 왕</text>
-      `;
-    }
+      <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
+      <button class="btn-accent" id="startBtn">시작 ▶</button>
+      <button class="btn-ghost" id="resetBtn">리셋</button>
 
-    // 점프맵 추가
-    function drawJumpMap() {
-      const W = 2000, H = 400;
-      $sandJumpMap.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      $sandJumpMap.innerHTML = `
-          <rect x="0" y="300" width="${W}" height="100" fill="tan" />
-          <text x="${W / 2}" y="290" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">점프의 왕</text>
-      `;
-    }
+      <button class="btn-ghost" id="mapToggleBtn">맵: 직선</button>
+      <button class="btn-ghost btn-toggle" id="firstCamBtn">1등 뷰 OFF</button>
+    </div>
 
-    // 맵 전환 및 처리
-    let mapMode = "oval";
-    function updateMap() {
-      if (mapMode === "oval") {
-        drawOvalMap();
-      } else if (mapMode === "spin") {
-        drawSpinMap();
-      } else if (mapMode === "jump") {
-        drawJumpMap();
-      }
-    }
+    <div class="controls right">
+      <!-- 추첨 메뉴 -->
+      <div class="seg" id="drawSeg" style="display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.05); border:1px solid #2a3b57; border-radius:12px; padding:6px; flex-wrap:wrap;">
+        <label class="seg-item on" data-type="first" style="position:relative">
+          <input type="radio" name="draw" value="first" checked style="display:none">
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:linear-gradient(180deg,#1b9ab7,#168aa4); color:#06131b; font-weight:800; cursor:pointer;">1등</span>
+        </label>
+        <label class="seg-item" data-type="last" style="position:relative">
+          <input type="radio" name="draw" value="last" style="display:none">
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer;">마지막</span>
+        </label>
+        <label class="seg-item" data-type="nth" style="position:relative">
+          <input type="radio" name="draw" value="nth" style="display:none">
+          <span style="display:inline-block; padding:8px 12px; border-radius:10px; border:1px solid #2a3b57; background:rgba(0,0,0,.35); color:#cbd5e1; font-weight:800; cursor:pointer;">n등</span>
+        </label>
+        <input id="drawNthInput" type="number" min="1" step="1" placeholder="n등" disabled>
+        <small style="opacity:.8;margin-left:6px">※ 선택만 해두면, 해당 등수 들어오는 순간 자동 발표</small>
+      </div>
 
-    // 회전과 점프 등 각 맵에서 일어나는 행동 처리
-    function spinHorse(horse) {
-      const angle = horse.rotationAngle += Math.random() * 5;
-      const radian = angle * Math.PI / 180;
-      const distance = 150 * Math.sin(radian);
-      horse.x += distance;
-      horse.y = 200 + 150 * Math.cos(radian);
-      horse.$el.style.left = `${horse.x}px`;
-      horse.$el.style.top = `${horse.y}px`;
-      horse.$el.style.transform = `rotate(${angle}deg)`;
-    }
+      <a href="https://buymeacoffee.com/luckyhorse" target="_blank" class="btn-accent btn">개발자 컵라면 사주기 🍜</a>
+      <button class="btn-ghost" id="btnContact">문의 및 건의사항</button>
+    </div>
+  </header>
+</div>
 
-    function jumpHorse(horse) {
-      const jumpDistance = Math.random() * 50 + 100;
-      horse.x += jumpDistance;
-      horse.done = true;
-      handleJumpLanding(horse);
-      updateJumpRanking();
-    }
+<!-- Winner Overlay -->
+<div id="celebrate">
+  <div class="big" id="winnerVisual">👑 🥕 ✨</div>
+  <div class="title" id="celeTitle">W i n n e r r r r r ~</div>
+  <div class="subtitle" id="celeSubtitle">이 맛에 달린다~</div>
+  <div class="winnerCard" id="winnerCard"></div>
+  <div style="display:flex; gap:8px">
+    <button class="btn-accent" id="replaySaveBtn">리플레이 다운로드</button>
+    <button class="btn-ghost" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
+  </div>
+</div>
 
-    // 경주 시작
-    function startGame() {
-      // 게임 로직
-      gameLoop(); // 게임 루프 시작
-    }
-  </script>
+<script>
+/* ====== Track Drawing ====== */
+// 직선맵
+function drawStraightMap(){
+  const straightViewW = 20*dist, straightViewH = 400;
+  const dynTrackY = 150, dynTrackH = 100;
+  startX=80; finishX=straightViewW-80;
+  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
+  $straightMap.innerHTML = `
+    <rect x="0" y="${dynTrackY}" width="${straightViewW}" height="${dynTrackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <line x1="${startX}" y1="${dynTrackY-12}" x2="${startX}" y2="${dynTrackY+dynTrackH+12}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="${startX}" y="${dynTrackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${finishX}" y1="${dynTrackY-16}" x2="${finishX}" y2="${dynTrackY+dynTrackH+16}" stroke="#ffffff" stroke-width="8"/>
+    <text x="${finishX}" y="${dynTrackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+  `;
+}
+// 타원맵
+function drawOvalMap(){
+  const rx=420, ry=220;
+  $ovalMap.innerHTML = `
+    <ellipse cx="500" cy="300" rx="${rx}" ry="${ry}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <ellipse cx="500" cy="300" rx="${rx-60}" ry="${ry-60}" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
+    <ellipse cx="500" cy="300" rx="${rx-30}" ry="${ry-30}" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
+    <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발/도착</text>
+  `;
+}
+// 멀리뛰기맵
+function drawLongJumpMap(){
+  const W=20*dist, H=400;
+  $longJumpMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const mid=200, top=100, bot=300;
+  $longJumpMap.innerHTML = `
+    <rect x="0" y="${top}" width="${W}" height="${bot-top+60}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <line x1="${80}" y1="${top}" x2="${80}" y2="${bot}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="80" y="${top-16}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${W-80}" y1="${top}" x2="${W-80}" y2="${bot}" stroke="#ffffff" stroke-width="8"/>
+    <text x="${W-80}" y="${top-16}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+  `;
+}
+// 팽이 경기장 맵
+function drawBladeArenaMap(){
+  const W=20*dist, H=400;
+  $bladeArenaMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const mid=200, top=100, bot=300;
+  $bladeArenaMap.innerHTML = `
+    <rect x="0" y="${top}" width="${W}" height="${bot-top+60}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    <line x1="${80}" y1="${top}" x2="${80}" y2="${bot}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="80" y="${top-16}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
+    <line x1="${W-80}" y1="${top}" x2="${W-80}" y2="${bot}" stroke="#ffffff" stroke-width="8"/>
+    <text x="${W-80}" y="${top-16}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
+  `;
+}
+</script>
 </body>
 </html>
