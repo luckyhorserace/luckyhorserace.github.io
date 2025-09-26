@@ -15,7 +15,7 @@
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="Lucky Horse Race — 랜덤 경마게임"/>
 <meta property="og:description" content="직선·타원·샌드 점프·스피닝 더비! 우승자 발표와 리플레이 다운로드 지원."/>
-<meta property="og:image" content="https://example.com/preview.png"/> <!-- 여기 너 스샷 주소로 교체 -->
+<meta property="og:image" content="https://example.com/preview.png"/> <!-- 스크린샷 URL로 교체 -->
 <meta property="og:url" content="https://luckyhorserace.github.io/"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Lucky Horse Race — 랜덤 경마게임"/>
@@ -37,6 +37,13 @@ body{color:var(--ink);background:var(--bg);font-family:ui-sans-serif,system-ui,-
 .stage{position:absolute; inset:0;}
 .viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);transform-origin:50% 50%;transition:transform .12s ease-out}
 .canvas{position:relative;width:min(98vw,1800px);height:auto;margin:0 auto}
+
+/* 안내 배너 */
+.notice{
+  position:absolute; top:8px; left:12px; z-index:40;
+  background:rgba(0,0,0,.45); padding:6px 12px; border-radius:10px;
+  font-size:13px; color:#cbd5e1; backdrop-filter: blur(2px);
+}
 
 /* Maps */
 svg{display:block}
@@ -98,15 +105,15 @@ input[type="text"],select,input[type="number"]{padding:10px;border:1px solid #22
 .winnerHorse{width:160px;height:120px;transform:scale(1.2)}
 .winnerName{font-size:28px;font-weight:900}
 
-/* Sand pit labels */
-.pitLabel{position:absolute;top:0;left:0;right:0;text-align:center;color:#e5e7eb;font-size:12px}
-
 /* 모바일 보정 */
 @media (max-width:640px){.ranking{width:220px}#names{min-width:180px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <!-- 좌측 상단 안내 -->
+  <div class="notice">자유롭게 사용해주시고 피드백 부탁드려요 🙏</div>
 
   <!-- HUD -->
   <div class="hud" id="hud">
@@ -184,6 +191,13 @@ input[type="text"],select,input[type="number"]{padding:10px;border:1px solid #22
       <label class="seg-item" data-type="nth"><input type="radio" name="draw" value="nth"> n등</label>
       <input id="drawNthInput" type="number" min="1" step="1" placeholder="n등" disabled>
     </div>
+
+    <!-- 지원/문의 -->
+    <div class="group">
+      <h4>지원</h4>
+      <a class="btn-accent" href="https://buymeacoffee.com/luckyhorse" target="_blank" rel="noopener">개발자에게 라면 사주기 🍜</a>
+      <button class="btn-ghost" id="btnContact">문의·피드백</button>
+    </div>
   </header>
 </div>
 
@@ -258,12 +272,11 @@ let replay={meta:{}, events:[]};
 function logEv(t, type, data){ replay.events.push({t, type, data}); }
 function resetFinishOrder(){ finishOrder=[]; entryDone.clear(); drawFired=false; }
 
-/* ====== Straight map sizing ====== */
+/* ====== Dynamic sizing ====== */
 let straightViewW = 2000, straightViewH = 400;
 function dynamicTrackHeight(){
   const n=Math.max(2, H.length||splitNames($names.value).length||2);
-  // 더 공격적으로 확장
-  return Math.min(260, 80 + n*10);
+  return Math.min(260, 90 + n*9); // 혼잡 방지로 조금 넓힘
 }
 
 /* ====== SVG drawing ====== */
@@ -285,6 +298,7 @@ function drawStraight(){
 }
 function drawOval(){
   const rx=420, ryBase=220;
+  $ovalMap.setAttribute('viewBox','0 0 1000 600');
   $ovalMap.innerHTML = `
     <ellipse cx="500" cy="300" rx="${rx}" ry="${ryBase}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
     <ellipse cx="500" cy="300" rx="${rx-60}" ry="${ryBase-60}" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
@@ -297,14 +311,13 @@ function drawSand(){
   $sandMap.setAttribute('viewBox',`0 0 ${W} ${H}`);
   const top=120, bot=380, mid=(top+bot)/2;
   const takeoffX = Math.round(W*0.4);
-  const pitStartX = takeoffX + 0;
+  const pitStartX = takeoffX;
   const pitEndX   = Math.min(W-80, pitStartX + pitLen*20);
 
-  // 트랙(도약선 이전), 모래 피트(이후)
   $sandMap.innerHTML = `
     <rect x="0" y="${mid}" width="${pitStartX-0}" height="${bot-mid+60}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
     <rect x="${pitStartX}" y="${mid}" width="${Math.max(1,pitEndX-pitStartX)}" height="${bot-mid+60}" fill="#5a4125" stroke="#3a2b18" stroke-width="2"/>
-    <line x1="${80}" y1="${mid-10}" x2="${80}" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
+    <line x1="80" y1="${mid-10}" x2="80" y2="${bot+60}" stroke="#22d3ee" stroke-width="6"/>
     <text x="80" y="${mid-16}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
     <line x1="${takeoffX}" y1="${mid-10}" x2="${takeoffX}" y2="${bot+60}" stroke="#fcd34d" stroke-width="6"/>
     <text x="${takeoffX}" y="${mid-16}" text-anchor="middle" font-size="14" fill="#fde68a" font-weight="900">도약선</text>
@@ -312,6 +325,7 @@ function drawSand(){
 }
 function drawArena(){
   const W=800,H=800, cx=W/2, cy=H/2, r=320;
+  $arenaMap.setAttribute('viewBox','0 0 800 800');
   $arenaMap.innerHTML = `
     <defs>
       <radialGradient id="g" cx="50%" cy="50%"><stop offset="0%" stop-color="#0b1628"/><stop offset="100%" stop-color="#09111e"/></radialGradient>
@@ -336,16 +350,13 @@ function horseSVG(color){return `<svg class="horse-svg" viewBox="0 0 64 44" xmln
 </svg>`}
 function winnerHorseSVG(color){return `<svg class="winnerHorse" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
   <g>
-    <!-- 트로피 포즈(말 뒷발로 서기 + 말 오른앞발 트로피 / 기수 왼손 트로피) -->
     <path fill="#cbd5e1" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
     <path fill="#e5e7eb" d="M8 28c7-9 12-11 20-11h9c7 0 14 4 19 9l3 5-4 2-6-4-7 2H28l-8 1-6 3-6-1 6-6z"/>
     <rect fill="#94a3b8" x="28" y="17" width="11" height="7" rx="2"/>
     <g class="jockey"><circle cx="31" cy="10.8" r="3.6" fill="${color}"/><rect x="28" y="14.8" width="10" height="7" rx="2" fill="${color}"/></g>
     <circle cx="22.5" cy="20.5" r="0.9" fill="#0f172a"/>
-    <!-- 앞다리 포즈 -->
     <rect x="36" y="18" width="3.5" height="13" fill="#e5e7eb" transform="rotate(-25 37.75 24.5)"/>
     <rect x="21" y="22" width="3.5" height="13" fill="#e5e7eb" transform="rotate(15 22.75 28.5)"/>
-    <!-- 트로피 두 개 -->
     <g transform="translate(44,10)">
       <path d="M0 4h10v6a5 5 0 0 1-10 0z" fill="#facc15" stroke="#a16207"/>
       <rect x="3" y="10" width="4" height="5" rx="1" fill="#d97706"/>
@@ -400,23 +411,19 @@ function placeHorseSand(h){
   const rect=$sandMap.getBoundingClientRect();
   const scaleX=rect.width/W, scaleY=rect.height/Hvb;
 
-  const top=120, bot=380, mid=(top+bot)/2;
-  const takeoffX = Math.round(W*0.4);
-  const startX=80;
-
-  const progress = clamp(h.x/dist, 0, 1);
-  const sx = startX + (W-160)*progress;
-
   const lanes = H.length;
   const laneGap = Math.min(28, 140/Math.max(1,lanes));
-  const baseY = 250 + (h.laneIdx-(lanes-1)/2) * laneGap;
+  const baseY = 260 + (h.laneIdx-(lanes-1)/2) * laneGap;
+
+  const startX=80;
+  const sx = startX + (W-160)*(h.x/dist);
 
   let x=sx*scaleX, y=baseY*scaleY;
-  // 점프일 때 포물선
+
   if(h.air){
-    const p = clamp((h.airT/h.airDur),0,1);
+    const p = clamp(h.airT/h.airDur,0,1);
     const arc = Math.sin(Math.PI*p);
-    y -= 26*arc;
+    y -= 26 * arc;
   }
   h.$el.style.left = x+'px'; h.$el.style.top = y+'px';
   h.$el.style.transform=`translate(-50%,-50%)`;
@@ -453,11 +460,10 @@ function placeHorseOval(h){
 }
 function placeHorseArena(h){
   const vb=$arenaMap.getAttribute('viewBox').split(' ').map(Number);
-  const W=vb[2], H=vb[3], cx=W/2, cy=H/2;
+  const W=vb[2], H=vb[3];
   const rect=$arenaMap.getBoundingClientRect();
   const scaleX=rect.width/W, scaleY=rect.height/H;
 
-  // 위치 업데이트는 run()에서, 여기서는 렌더만
   const x = h.ax*scaleX, y=h.ay*scaleY;
   h.$el.style.left=x+'px'; h.$el.style.top=y+'px';
   h.$el.style.transform=`translate(-50%,-50%) rotate(${h.rot||0}deg)`;
@@ -489,8 +495,7 @@ function buildHorses(list){
       });
     }else if(mapMode==='sand'){
       const base   = 2.8 + _rand()*(6.2-2.8);
-      // 점프 거리는 러닝과 독립 랜덤
-      const jumpPow = 0.6 + _rand()*1.4; // 0.6~2.0 (상대치)
+      const jumpPow = 0.6 + _rand()*1.4; // 러닝과 독립
       H.push({
         entryId:i, laneIdx:i, name:ent.name,no:ent.no,color,$el:el,
         x:0, base, speed: base*(0.85+_rand()*0.3), fatigue:0, legsDur:.42,
@@ -498,7 +503,6 @@ function buildHorses(list){
         done:false,_finished:false
       });
     }else if(mapMode==='oval'){
-      const base   = 0.02 + (_rand()-0.5)*0.004;
       H.push({
         entryId:i, laneIdx:i, name:ent.name,no:ent.no,color,$el:el,
         lapProg:0, speed: 4.3 + _rand()*1.6, thetaOffset:(i-(list.length-1)/2)*0.06,
@@ -507,11 +511,11 @@ function buildHorses(list){
     }else if(mapMode==='arena'){
       const vb=$arenaMap.getAttribute('viewBox').split(' ').map(Number);
       const W=vb[2], Hvb=vb[3], cx=W/2, cy=Hvb/2;
-      const r=40;
+      const r=60;
       const ax=cx + (_rand()-0.5)*r, ay=cy + (_rand()-0.5)*r;
       H.push({
         entryId:i, laneIdx:i, name:ent.name,no:ent.no,color,$el:el,
-        ax, ay, vx:(_rand()-0.5)*2.4, vy:(_rand()-0.5)*2.4, rot:_rand()*360,
+        ax, ay, vx:(_rand()-0.5)*2.0, vy:(_rand()-0.5)*2.0, rot:_rand()*360,
         done:false,_finished:false
       });
     }
@@ -539,12 +543,10 @@ function toEntryOrder(){
     });
     return [...best.values()].sort((a,b)=> b._p - a._p);
   }else if(mapMode==='sand'){
-    // 샌드: 착지한 말은 landX(착지거리) 기준, 아직이면 진행 x
     const landed = H.filter(h=>h.landed).slice().sort((a,b)=> b.landX - a.landX);
     const rest   = H.filter(h=>!h.landed).slice().sort((a,b)=> b.x - a.x);
     return landed.concat(rest);
   }else if(mapMode==='arena'){
-    // 아레나: 탈락 순으로 finishOrder에 쌓임. 남은 애들 회장 안쪽 거리 기준
     const finished = finishOrder.slice();
     const rest = H.filter(h=>!h.done).slice().sort((a,b)=>{
       const vb=$arenaMap.getAttribute('viewBox').split(' ').map(Number);
@@ -589,17 +591,15 @@ function updateCamera(){
     $viewport.style.transform = `translate(-50%,-50%) scale(1)`;
     return;
   }
-  // 리더(현재 선두)
   const order = toEntryOrder();
   const lead = order[0];
   if(!lead){ $viewport.style.transform = `translate(-50%,-50%) scale(1)`; return; }
 
   const activeView = (mapMode==='straight')?$straightMap:(mapMode==='sand')?$sandMap:(mapMode==='oval')?$ovalMap:$arenaMap;
   const rect = activeView.getBoundingClientRect();
-  const scale = (mapMode==='arena')? 1.08 : 1.24; // 스피닝더비는 과확대 금지
+  const scale = (mapMode==='arena')? 1.08 : 1.24;
   const leadX = lead.$el?.offsetLeft || rect.width/2;
 
-  // 경기 종료 후엔 팬 동결
   const finished = (mapMode==='oval') ? (lead.lapProg>=laps-1e-6) :
                    (mapMode==='sand') ? H.every(h=>h.landed) :
                    (mapMode==='arena') ? (H.filter(h=>!h.done).length<=1) :
@@ -647,11 +647,7 @@ function maybeFireDraw(){
   const k = finishOrder.length; if(k===0) return;
 
   function pick(n){return finishOrder[n-1];}
-  let target=null, extra=null;
-
-  if(mapMode==='sand'){
-    // 샌드: finishOrder는 착지 완료 순으로 쌓는 대신, 여기선 이미 기록 시점 처리
-  }
+  let target=null;
 
   if(pendingDraw.type==='first' && k>=1){ target=pick(1); }
   if(pendingDraw.type==='nth'){
@@ -663,7 +659,7 @@ function maybeFireDraw(){
   if(target){
     drawFired=true; pendingDraw=null;
     let add='';
-    if(mapMode==='sand' && target.landX) add=`${target.landX.toFixed(1)}m`;
+    if(mapMode==='sand' && target.landX!=null) add=`${Number(target.landX).toFixed(1)}m`;
     if(mapMode==='arena') add='최후 생존자';
     showWinner(target, add);
   }
@@ -718,7 +714,7 @@ function run(){
         const vMin=h.base*VMIN_RATIO, vMax=h.base*VMAX_RATIO;
         h.speed=clamp(h.speed,vMin,vMax);
         h.x += h.speed*dt*1.20;
-        if(h.x>=dist){ h.x=dist; h.done=true; }
+        if(h.x>=dist){ h.x=dist; h.done=true; }    // 결승선에서 정확히 멈춤
         if(!h._finished && h.done){ h._finished=true; finishEntry(h); }
         placeHorseStraight(h);
       }
@@ -733,7 +729,7 @@ function run(){
         if(h.done) continue;
 
         if(!h.air && !h.landed){
-          // 달리기
+          // 달리기(점프 길이와 독립)
           h.speed += h.base*JITTER_FACTOR*(_rand()-0.5);
           if(_rand()<BOOST_PROB) h.speed += h.base*BOOST_GAIN;
           if(h.speed>h.base*1.12) h.fatigue=Math.min(1,h.fatigue+dt*FATIGUE_INC);
@@ -744,25 +740,19 @@ function run(){
           h.x += h.speed*dt*1.20;
 
           if(h.x>=takeoffM && !h.air){
-            // 도약선 도달 즉시 점프 (점프 길이는 러닝과 독립)
-            h.air=true; h.airT=0;
+            h.air=true; h.airT=0; // 도약선에서 즉시 점프
           }
         }
 
         if(h.air){
           h.airT += dt;
           if(h.airT>=h.airDur){
-            // 착지
+            // 착지: 포물선 이후 모래 피트 내 위치
             h.air=false; h.landed=true;
-             const jumpMeters = (h.jumpPow * (12 + _rand()*18)); // 12~30m 범위를 jumpPow로 가변
-            // 모래 피트 범위로 클램프
+            const jumpMeters = (h.jumpPow * (12 + _rand()*18)); // 12~30m 기본을 jumpPow로 가변
             h.landX = clamp(jumpMeters, 0, pitLen);
-            // 말 위치를 착지 지점으로 이동(총 진행 m = 도약선 + 착지거리)
-            h.x = takeoffM + h.landX;
+            h.x = takeoffM + h.landX; // 전체 진행 = 도약선 + 착지거리
             h.done = true;
-            // 모래에 "박힘" 표현: 살짝 내려앉고 점프 클래스 해제
-            h.$el.classList.remove('jump');
-            // 이름표는 그대로 (번호/이름 표시)
             finishEntry(h);
           }
         }
@@ -770,49 +760,63 @@ function run(){
         placeHorseSand(h);
       }
     }else if(mapMode==='arena'){
-      // 스피닝 더비: 원형 경기장, 충돌/반발/탈락
       const vb=$arenaMap.getAttribute('viewBox').split(' ').map(Number);
       const W=vb[2],Hvb=vb[3],cx=W/2,cy=Hvb/2;
-      const R=320; // 아레나 반지름
+      const R=320; // 경기장 반지름
 
-      // 단순 물리 업데이트
       for(const h of H){
         if(h.done) continue;
-        // 회전+드리프트 느낌
-        h.rot = (h.rot + 240*dt) % 360;
-        // 약간의 소용돌이 힘 (중앙을 도는 가속)
-        const dx=h.ax-cx, dy=h.ay-cy, distC=Math.hypot(dx,dy)+1e-6;
-        const tangential = {x: -dy/distC, y: dx/distC};
-        h.vx += tangential.x * 5 * dt;
-        h.vy += tangential.y * 5 * dt;
+        h.rot = (h.rot + 240*dt) % 360; // 회전 연출
 
-        // 속도 감쇠
+        // 중앙을 축으로 도는 힘 + 약간의 노이즈
+        const dx=h.ax-cx, dy=h.ay-cy, d=Math.hypot(dx,dy)||1;
+        const tangential = {x: -dy/d, y: dx/d};
+        const inward = {x: -dx/d, y: -dy/d};
+
+        h.vx += tangential.x * 5 * dt + (Math.random()-0.5)*0.4;
+        h.vy += tangential.y * 5 * dt + (Math.random()-0.5)*0.4;
+
+        // 바깥으로 과하게 치우치면 안쪽으로 끌어당김(즉시 탈락 방지)
+        if(d>R*0.75){
+          h.vx += inward.x * 18 * dt;
+          h.vy += inward.y * 18 * dt;
+        }
+
+        // 감쇠
         h.vx *= 0.996; h.vy *= 0.996;
 
         // 위치 갱신
         h.ax += h.vx; h.ay += h.vy;
 
-        // 벽 충돌 → 튕겨나가면 탈락
-        const d=Math.hypot(h.ax-cx,h.ay-cy);
-        if(d>R){
-          // 탈락 처리
-          h.done=true;
-          if(!h._finished){ h._finished=true; finishEntry(h); }
-          continue;
+        // 벽 충돌 체크: 벽을 치면 반발하고, 일정 속도 이상으로 바깥쪽이면 탈락
+        const nd=Math.hypot(h.ax-cx,h.ay-cy);
+        if(nd>R){
+          // 벽에 부딪혔다 → 안으로 반사
+          const nx=(h.ax-cx)/nd, ny=(h.ay-cy)/nd;
+          const dot = h.vx*nx + h.vy*ny;
+          h.vx -= 1.8*dot*nx; h.vy -= 1.8*dot*ny; // 반사
+          // 그래도 많이 벗어나면 탈락
+          if(nd>R+14){
+            h.done=true;
+            if(!h._finished){ h._finished=true; finishEntry(h); }
+          }else{
+            // 살짝 안쪽으로 되밀기
+            h.ax = cx + nx*(R-2);
+            h.ay = cy + ny*(R-2);
+          }
         }
       }
 
-      // 간단한 말-말 충돌(서로 밀치기)
+      // 말-말 충돌로 밀치기
       for(let i=0;i<H.length;i++){
         for(let j=i+1;j<H.length;j++){
           const a=H[i], b=H[j];
           if(a.done||b.done) continue;
           const dx=b.ax-a.ax, dy=b.ay-a.ay, dd=dx*dx+dy*dy;
-          const minD=22; // 말 간 최소 간격
+          const minD=22;
           if(dd<(minD*minD)){
             const d=Math.sqrt(dd)||1;
             const nx=dx/d, ny=dy/d;
-            // 반발
             const push=1.2;
             a.vx -= nx*push; a.vy -= ny*push;
             b.vx += nx*push; b.vy += ny*push;
@@ -820,20 +824,17 @@ function run(){
         }
       }
 
-      // 생존자 1명 남으면 종료
       const alive = H.filter(x=>!x.done);
       if(alive.length===1 && !alive[0]._finished){
         alive[0].done=true; alive[0]._finished=true; finishEntry(alive[0]);
       }
 
-      // 렌더
       for(const h of H) placeHorseArena(h);
     }
 
     updateRanking();
     updateCamera();
 
-    // 모두 종료?
     const allDone = (mapMode==='arena') ? (H.filter(h=>!h.done).length<=0) : H.every(h=>h.done);
     if(allDone){
       running=false;
@@ -852,6 +853,10 @@ document.getElementById('fullscreenBtn').onclick=()=>{
   else{ document.exitFullscreen?.(); }
 };
 
+document.getElementById('btnContact').onclick=()=>{
+  alert("문의/건의/피드백: luckyhorserace@gmail.com\n언제든 자유롭게 의견 주세요!");
+};
+
 function updateMapVisibility(){
   $straightMap.style.display = (mapMode==='straight')?'block':'none';
   $ovalMap.style.display     = (mapMode==='oval')?'block':'none';
@@ -868,14 +873,12 @@ $mapSel.onchange=()=>{
   mapMode = $mapSel.value;
   updateMapVisibility();
 
-  // 캔버스/상태 초기화
   if(raf) cancelAnimationFrame(raf);
   raf=null; running=false; pendingDraw={type:'first'}; drawFired=false; camPanX=0;
   $cele.style.display='none';
   clearHorses();
   resetFinishOrder();
 
-  // 맵 드로우
   if(mapMode==='straight'){ drawStraight(); }
   if(mapMode==='oval'){ drawOval(); }
   if(mapMode==='sand'){ drawSand(); }
@@ -972,12 +975,11 @@ addEventListener('resize', ()=>{
 });
 
 /* ====== 초기 진입 기본값 ====== */
-// 1) 기본 맵: 직선, 리더뷰 ON, 추첨 '1등' 선택 ON
+// 기본 맵: 직선, 리더뷰 ON, 추첨 '1등' 자동 선택
 mapMode='straight';
 updateMapVisibility();
 drawStraight();
 document.querySelector('#drawGroup .seg-item[data-type="first"]').classList.add('on');
-// 리더뷰 버튼 텍스트 보정
 $leaderBtn.textContent='리더뷰: ON';
 </script>
 </body>
