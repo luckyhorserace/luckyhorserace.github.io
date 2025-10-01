@@ -321,24 +321,35 @@ function placeHorse(h){
   }
 }
 
-/* ====== Ranking (10명 단위 페이징) ====== */
+/* ====== 순위판 (10명 단위, 항상 다 보이게) ====== */
 function updateRanking(){
-  const finished=finishOrder.slice();
-  const rest=H.filter(h=>!h.done).sort((a,b)=>{
-    if(mapMode==="oval") return b.theta-a.theta;
-    else return Math.min(b.x,dist)-Math.min(a.x,dist);
-  });
-  const order=finished.concat(rest);
-  $rankingLines.innerHTML="";
+  const finished = finishOrder.slice();
+  const rest = H.filter(h=>!h.done).sort((a,b)=>
+    mapMode==="oval" ? (b.theta-a.theta) : (Math.min(b.x,dist)-Math.min(a.x,dist))
+  );
+  const order = finished.concat(rest);
+
+  const wrap = $rankingLines;
+  wrap.innerHTML = '';
+  wrap.style.display = 'flex';
+  wrap.style.flexWrap = 'wrap';   // 👈 자동 줄바꿈
+  wrap.style.gap = '8px';
+
   for(let i=0;i<order.length;i+=10){
-    const blk=document.createElement('div');blk.className='rank-block';
-    blk.innerHTML=order.slice(i,i+10).map((h,j)=>
-      `<div class="row"><span class="pos">${i+j+1}위</span><span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name}</span></div>`).join('');
-    $rankingLines.appendChild(blk);
+    const page=document.createElement('div');
+    page.className='rank-block';
+    page.style.minWidth='260px';
+    page.innerHTML = order.slice(i,i+10).map((h,j)=>
+      `<div class="row"><span class="pos">${i+j+1}위</span>
+       <span><span class="color-badge" style="background:${h.color}"></span>
+       ${h.no}번 ${h.name}</span></div>`).join('');
+    wrap.appendChild(page);
   }
-  // 블록 밀기 효과 (최근 블록이 오른쪽)
-  const blocks=$rankingLines.querySelectorAll('.rank-block');
-  blocks.forEach((b,idx)=>{b.style.transform=`translateX(${-(blocks.length-1-idx)*270}px)`});
+
+  const title = (mapMode==='oval') ? 
+    `현재 순위 (총 ${laps}바퀴)` : 
+    `현재 순위 (${dist}m 달리기)`;
+  $rankingBox.querySelector('h3').textContent = title;
 }
 
 /* ====== Camera ====== */
@@ -365,11 +376,15 @@ function updateCamera(){
   }
 }
 
-/* ====== Straight Map ====== */
+/* ====== 직선 맵 (레인 수에 맞춰 높이/폭 자동 확장) ====== */
 function drawStraightMap(lanes=H.length){
-  const straightViewW=20*dist,straightViewH=Math.max(400,lanes*28+200);
+  const straightViewW = 20 * dist;
+  const straightViewH = Math.max(400, lanes * 40 + 200); // 레인 많으면 세로도 늘림
   $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
-  const trackY=(straightViewH/2)-50,trackH=100,startX=80,finishX=straightViewW-80;
+
+  const trackY=(straightViewH/2)-80, trackH=160;
+  const startX=80, finishX=straightViewW-80;
+
   $straightMap.innerHTML=`
     <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
     <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
@@ -477,27 +492,29 @@ function confettiBurst(){
   }
 }   // ✅ confettiBurst 끝나는 괄호
 
+/* ====== 우승 연출 ====== */
 function celebrate(winnerText){
-  // WINNER 텍스트 유지
   document.querySelector('#celebrate .title').textContent = 'WINNER~';
   document.querySelectorAll('#celebrate .subtitle')[0].textContent = '이맛에 달린다~';
+
+  // ✅ 우승자 텍스트
   document.getElementById('celeHorse').textContent = winnerText || '';
 
-  // ✅ 내가 만든 우승 이미지 추가
+  // ✅ 우승 이미지 추가
   const img = document.createElement('img');
   img.src = 'GPThorse.png';
   img.alt = 'Winner Horse';
-  img.style.width = '350px';     
+  img.style.width = '350px';
   img.style.marginBottom = '12px';
 
-  // 중복 추가 방지
+  // 중복 제거
   const oldImg = document.querySelector('#celebrate .win-art');
   if(oldImg) oldImg.remove();
 
   img.classList.add('win-art');
   document.getElementById('celebrate').prepend(img);
 
-  // 오버레이 표시 + 효과
+  // 표시 + 이펙트
   document.getElementById('celebrate').style.display = 'flex';
   confettiBurst();
 }
