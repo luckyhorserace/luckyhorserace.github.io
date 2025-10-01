@@ -393,23 +393,20 @@ function drawStraightMap(lanes = H.length) {
     </defs>
   `;
 
-  $straightMap.innerHTML = `
-    ${defs}
-    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}"
-          fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    
-    <!-- 출발선 -->
-    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY + trackH + 10}"
-          stroke="#22d3ee" stroke-width="6"/>
-    <text x="${startX}" y="${trackY - 22}" text-anchor="middle"
-          font-size="14" fill="#a5f3fc" font-weight="800">출발 (0m)</text>
+$straightMap.innerHTML = `
+  ${defs}
 
-    <!-- 도착선 (정확한 거리 기준) -->
-    <rect x="${finishX - 6}" y="${trackY - 10}" width="12" height="${trackH + 20}"
-          fill="url(#checkers)"/>
-    <text x="${finishX}" y="${trackY - 22}" text-anchor="middle"
-          font-size="14" fill="#e5e7eb" font-weight="900">도착 (${dist}m)</text>
-  `;
+  <!-- 초원 배경 -->
+  <rect x="0" y="0" width="${straightViewW}" height="${straightViewH}" fill="#def7c0" />
+
+  <!-- 출발선 -->
+  <line x1="${startX}" y1="0" x2="${startX}" y2="${straightViewH}" stroke="#2563eb" stroke-width="6"/>
+  <text x="${startX}" y="24" text-anchor="middle" font-size="14" fill="#1e3a8a" font-weight="800">출발 (0m)</text>
+
+  <!-- 도착선 -->
+  <rect x="${finishX - 6}" y="0" width="12" height="${straightViewH}" fill="url(#checkers)" />
+  <text x="${finishX}" y="24" text-anchor="middle" font-size="14" fill="#1e293b" font-weight="900">도착 (${dist}m)</text>
+`;
 }
   
 /* ====== 카메라 & 배치 (보정 버전으로 재정의) ====== */
