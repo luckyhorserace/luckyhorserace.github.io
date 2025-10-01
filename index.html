@@ -112,6 +112,35 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .seg-item span{display:inline-block;padding:8px 12px;border-radius:10px;border:1px solid #2a3b57;background:rgba(0,0,0,.35);color:#cbd5e1;font-weight:800;cursor:pointer;user-select:none}
 .seg-item.on span{background:linear-gradient(180deg,#1b9ab7,#168aa4);color:#06131b;border-color:#0a6c82;box-shadow:0 0 0 1px rgba(0,0,0,.15), 0 0 12px #6ee7ff33}
 #drawNthInput{width:70px;padding:8px;border-radius:10px;border:1px solid #223047;background:rgba(0,0,0,.35);color:#dbe7f3}
+
+/* 우승 레이아웃 + 이름표 스타일 */
+#celebrate .winRow{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  justify-content:center;
+  margin-bottom:14px;
+}
+#celebrate .winRow .title{ margin:0; }
+
+.namepill{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(0,0,0,.55);
+  padding:6px 12px;
+  border-radius:20px;
+  font-weight:800;
+  font-size:16px;
+  color:#e5e7eb;
+}
+.namepill .dot{
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:2px solid #1f2937;
+}
 </style>
 </head>
 <body>
@@ -170,8 +199,6 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
         <option value="200">200m</option>
         <option value="300">300m</option>
         <option value="500">500m</option>
-        <option value="1000">1km</option>
-        <option value="2000">2km</option>
       </select>
 
       <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
@@ -396,7 +423,7 @@ function drawStraightMap(lanes = H.length){
   const PX_PER_M = 80;  // ← 기존보다 2배 (40 → 80)
   const straightViewW = PX_PER_M * dist;
 
-  const laneGap = 40;
+  const laneGap = Math.min(50, 600 / lanes);
   const straightViewH = Math.max(400, lanes * laneGap + 200);
   $straightMap.setAttribute('viewBox', `0 0 ${straightViewW} ${straightViewH}`);
 
@@ -535,34 +562,63 @@ function confettiBurst(){
   }
 }   // ✅ confettiBurst 끝나는 괄호
 
-/* ====== 우승 연출 ====== */
-function celebrate(winnerText){
-  // WINNER 글씨 크게
-  document.querySelector('#celebrate .title').textContent = 'WINNER~';
-  document.querySelector('#celebrate .title').style.fontSize = '100px';
+/* ====== 우승 연출 (WINNER 오른쪽에 이미지+이름표) ====== */
+function celebrate(){
+  const $cele = document.getElementById('celebrate');
+  const $title = $cele.querySelector('.title');
 
-  // 1등 말/기수 데이터 가져오기
+  // 1등 데이터
   const winner = finishOrder[0];
-  const text = winner ? `우승: ${winner.no}번 ${winner.name}` : (winnerText || '');
-  document.getElementById('celeHorse').textContent = text;
+  if(!winner){ $cele.style.display='flex'; return; }
 
-  // 캐릭터(말+기수) 표시
-  if (winner) {
-    const char = winner.$el.cloneNode(true); // 경기에서 쓰던 캐릭터 복사
-    char.style.position = 'static';
-    char.style.transform = 'scale(2)';  // 크게 보여주기
-    char.style.margin = '12px auto';
+  // WINNER 글자 세팅 (크게)
+  $title.textContent = 'WINNER~';
+  $title.style.fontSize = '100px';
 
-    // 중복 제거
-    const oldChar = document.querySelector('#celebrate .winner-char');
-    if (oldChar) oldChar.remove();
+  // 이전 요소 제거
+  const oldRow = $cele.querySelector('.winRow');
+  if(oldRow) oldRow.remove();
 
-    char.classList.add('winner-char');
-    document.getElementById('celebrate').appendChild(char);
-  }
+  // 오른쪽 패널
+  const rightBox = document.createElement('div');
+  rightBox.style.display = 'flex';
+  rightBox.style.flexDirection = 'column';
+  rightBox.style.alignItems = 'center';
+  rightBox.style.gap = '10px';
+
+  // ① 우승 이미지 (negachego.png)
+  const img = document.createElement('img');
+  img.src = 'negachego.png';
+  img.alt = 'Winner';
+  img.style.width = '220px';
+  img.style.height = 'auto';
+  img.style.filter = 'drop-shadow(0 6px 14px rgba(0,0,0,.45))';
+  rightBox.appendChild(img);
+
+  // ② 초록 동그라미 이름표
+  const pill = document.createElement('div');
+  pill.className = 'namepill';
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+  dot.style.background = winner.color;
+  pill.appendChild(dot);
+
+  const label = document.createElement('span');
+  label.textContent = `${winner.no}번 ${winner.name}`;
+  pill.appendChild(label);
+  rightBox.appendChild(pill);
+
+  // WINNER 글자와 오른쪽 패널 묶기
+  const row = document.createElement('div');
+  row.className = 'winRow';
+  row.appendChild($title);
+  row.appendChild(rightBox);
+
+  // 버튼 위에 삽입
+  $cele.insertBefore(row, $cele.querySelector('div'));
 
   // 표시 + 이펙트
-  document.getElementById('celebrate').style.display = 'flex';
+  $cele.style.display = 'flex';
   confettiBurst();
 }
 
@@ -582,14 +638,16 @@ function updateRanking(){
 
   const pages=[];
   for(let i=0;i<order.length;i+=10){
-    const page=document.createElement('div'); page.className='rank-block';
-    page.innerHTML = order.slice(i,i+10).map((h,j)=>{
-      const status = (mapMode==='oval') ? (h.done?'완주':`${Math.floor((h.theta+Math.PI/2)/(2*Math.PI))+1}바퀴째`) : (h.done?'완주':`${Math.floor(h.x)}m`);
-      return `<div class="row"><span class="pos">${i+j+1}위</span><span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name} - ${status}</span></div>`;
-    }).join('');
-    wrap.appendChild(page);
-    pages.push(page);
-  }
+  const page=document.createElement('div'); 
+  page.className='rank-block';
+  page.innerHTML = order.slice(i,i+10).map((h,j)=>{
+    return `<div class="row"><span class="pos">${i+j+1}위</span>
+      <span><span class="color-badge" style="background:${h.color}"></span>
+      ${h.no}번 ${h.name}</span></div>`;
+  }).join('');
+  wrap.appendChild(page);
+  pages.push(page);
+}
 
   // 모든 페이지가 다 보이게 줄바꿈 처리
 wrap.style.display='flex';
