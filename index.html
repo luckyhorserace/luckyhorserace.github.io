@@ -369,7 +369,7 @@ function buildHorses(list){
 
 /* ====== 직선 맵 (거리 정확히 반영) ====== */
 function drawStraightMap(lanes = H.length){
-  const PX_PER_M = 80;  // ← 기존보다 2배 (40 → 80)
+  const PX_PER_M = 160;  // ← 기존보다 2배 (40 → 80)
   const straightViewW = PX_PER_M * dist;
 
   const laneGap = Math.min(50, 600 / lanes);
@@ -382,14 +382,6 @@ function drawStraightMap(lanes = H.length){
   const paddingX = 80;
   const startX = paddingX;
   const finishX = straightViewW - paddingX;
-
-  // 20m 단위 눈금 다시 배치
-  let ticks = '';
-  for(let m = 20; m < dist; m += 20){
-    const x = startX + (finishX - startX) * (m / dist);
-    ticks += `<line x1="${x}" y1="${trackY}" x2="${x}" y2="${trackY + trackH}" stroke="#1f2b40" stroke-width="1" stroke-dasharray="6,6" />`;
-    ticks += `<text x="${x}" y="${trackY - 16}" text-anchor="middle" font-size="12" fill="#93c5fd">${m}m</text>`;
-  }
 
   const defs = `
     <defs>
