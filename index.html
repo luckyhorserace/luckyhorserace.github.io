@@ -369,7 +369,7 @@ function buildHorses(list){
 
 /* ====== 직선 맵 (거리 정확히 반영) ====== */
 function drawStraightMap(lanes = H.length){
-  const PX_PER_M = 20;  // ← 기존보다 2배 (40 → 80)
+  const PX_PER_M = 40;  // ← 기존보다 2배 (40 → 80)
   const straightViewW = PX_PER_M * dist;
 
   const laneGap = Math.min(50, 600 / lanes);
