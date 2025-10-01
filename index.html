@@ -29,7 +29,7 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 
 .wrap{position:relative;width:100vw;height:100vh;overflow:hidden}
 .stage{position:absolute; inset:0;}
-.viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transform-origin:center}
+.viewport{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center;transition:transform .18s ease}
 .canvas{position:relative;width:min(98vw,1800px);height:auto;margin:0 auto}
 
 /* Maps */
@@ -37,7 +37,6 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 
 /* Horses */
 .horse{position:absolute;width:46px;height:34px;transform:translate(-50%,-50%);pointer-events:none; z-index:8}
-.horse.jump{ z-index:12; } /* 점프 시 더 위 */
 .nameplate{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-8px);background:#09111e;color:#dbe7f3;border:1px solid #2a3b57;border-radius:10px;font-size:11px;font-weight:800;padding:3px 8px;white-space:nowrap}
 .horse-svg{width:46px;height:34px}
 .horse-svg .body{fill:#e5e7eb}
@@ -54,14 +53,14 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 .front-leg{transform-origin: top center;animation: leg-run-front .42s infinite linear}
 .back-leg {transform-origin: top center;animation: leg-run-back  .42s infinite linear}
 
-/* 장애물 (말보다 아래) */
-.obstacle{position:absolute;width:18px;height:24px;background:#f97316;border:2px solid #a74c0a;border-radius:4px;transform:translate(-50%,-50%);z-index:5}
+/* (장애물 관련 CSS 제거됨) */
 
-/* Ranking */
-.ranking{position:absolute;top:12px;right:12px;width:260px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px}
-.ranking h3{margin:2px 0 6px;font-size:13px;color:#93c5fd}
-.ranking .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
-.ranking .row:nth-child(odd){background:rgba(255,255,255,.03)}
+/* Ranking (10명 단위 블록) */
+.ranking{position:absolute;top:12px;right:12px;min-width:260px;max-width:600px;background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;z-index:25;font-size:13px;display:flex;flex-wrap:wrap;gap:10px}
+.ranking h3{flex-basis:100%;margin:2px 0 6px;font-size:13px;color:#93c5fd}
+.rank-block{width:260px}
+.rank-block .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px}
+.rank-block .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .ranking .pos{font-weight:900;color:#6ee7ff}
 .color-badge{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;border:1px solid #1f2937}
 
@@ -84,14 +83,15 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
 .carrot{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999;font-size:56px}
 .hay{position:fixed;top:-50px;animation:fall 3s linear forwards;pointer-events:none;z-index:9999;font-size:52px}
 
-/* 축하 오버레이 */
+/* 축하 오버레이(업그레이드) */
 #celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.55);z-index:10000;text-align:center}
 #celebrate .big{font-size:96px}
-#celebrate .title{font-size:72px;color:#fff;margin:0 0 8px;text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25)}
+#celebrate .title{font-size:74px;color:#fff;margin:0 0 8px;font-weight:1000;letter-spacing:4px;text-transform:uppercase;background:linear-gradient(90deg,#ffde59,#ff8a00,#ff00e0,#39ffe1,#ffde59);-webkit-background-clip:text;color:transparent;text-shadow:0 2px 10px rgba(0,0,0,.45),0 0 22px rgba(110,231,255,.25);animation:wobble .35s ease-in-out infinite alternate}
 #celebrate .subtitle{font-size:28px;color:#e6f9ff;margin:0 0 18px;text-shadow:0 1px 6px rgba(0,0,0,.35)}
 .confetti{position:fixed;top:-20px;font-size:26px;pointer-events:none;animation:fall 2.5s linear forwards;z-index:10001}
+@keyframes wobble{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
 
-/* 추첨 세그먼트 */
+/* 추첨 세그먼트 (원본 유지) */
 .seg{
   display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.05);
   border:1px solid #2a3b57; border-radius:12px; padding:6px; flex-wrap:wrap;
@@ -135,15 +135,14 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   <div class="stage" id="stage">
     <div class="viewport" id="viewport">
       <div class="canvas" id="canvas">
-        <!-- 타원맵 (초기 숨김) -->
+        <!-- 타원맵 (도착 텍스트 제거) -->
         <svg id="ovalMap" class="ovalSvg" viewBox="0 0 1000 600" style="display:none">
           <ellipse cx="500" cy="300" rx="420" ry="220" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
           <ellipse cx="500" cy="300" rx="360" ry="160" fill="#0b1220" stroke="#1f2937" stroke-width="2"/>
           <ellipse cx="500" cy="300" rx="390" ry="190" fill="none" stroke="#5b708f" stroke-dasharray="6,6" stroke-width="2"/>
           <text x="500" y="70" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-          <text x="500" y="540" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
         </svg>
-        <!-- 직선맵 (초기 노출) -->
+        <!-- 직선맵 -->
         <svg id="straightMap" class="straightSvg" viewBox="0 0 2000 400"></svg>
       </div>
     </div>
@@ -169,17 +168,20 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
         <option value="100" selected>100m</option>
         <option value="200">200m</option>
         <option value="300">300m</option>
+        <option value="500">500m</option>
+        <option value="1000">1km</option>
+        <option value="2000">2km</option>
       </select>
 
       <button class="btn-ghost" id="shuffleBtn">말 섞기</button>
       <button class="btn-accent" id="startBtn">시작 ▶</button>
       <button class="btn-ghost" id="resetBtn">리셋</button>
       <button class="btn-ghost" id="mapToggleBtn">맵 전환: 직선</button>
-      <button class="btn-ghost" id="obstacleToggleBtn">장애물: 끔</button>
+      <!-- 장애물 토글 제거됨 -->
     </div>
 
     <div class="controls right">
-      <!-- 추첨 메뉴 (세그먼트) -->
+      <!-- 추첨 메뉴 (세그먼트) — 원본 유지 -->
       <div class="seg" id="drawSeg">
         <label class="seg-item" data-type="first">
           <input type="radio" name="draw" value="first">
@@ -203,16 +205,18 @@ header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-i
   </header>
 </div>
 
-<!-- 축하 오버레이 -->
+<!-- 우승 오버레이 (텍스트만 교체 & 버튼 추가) -->
 <div id="celebrate">
-  <div class="big"></div>
-  <div class="title" id="celeTitle">Champion!</div>
-  <div class="subtitle" id="celeSubtitle">당첨자 축하합니다!</div>
-  <button class="btn-accent" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
+  <div class="big">🏇🏆</div>
+  <div class="title" id="celeTitle">WINNER~</div>
+  <div class="subtitle" id="celeSubtitle">이맛에 달린다~</div>
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+    <button class="btn-accent" id="btnReplaySave">리플레이 저장</button>
+    <button class="btn-ghost" onclick="document.getElementById('celebrate').style.display='none'">닫기</button>
+  </div>
 </div>
 
-  
-  <script>
+<script>
 /* ====== Utils ====== */
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 let _rand=Math.random;
@@ -234,7 +238,6 @@ const $names=document.getElementById('names'),
       $reset=document.getElementById('resetBtn'),
       $shuffle=document.getElementById('shuffleBtn'),
       $mapToggle=document.getElementById('mapToggleBtn'),
-      $obstacleToggle=document.getElementById('obstacleToggleBtn'),
       $rankingBox=document.getElementById('rankingBox'),
       $rankingLines=document.getElementById('rankingLines'),
       $viewport=document.getElementById('viewport'),
@@ -243,80 +246,35 @@ const $names=document.getElementById('names'),
       $straightMap=document.getElementById('straightMap'),
       $cele=document.getElementById('celebrate'),
       $celeTitle=document.getElementById('celeTitle'),
-      $celeSubtitle=document.getElementById('celeSubtitle');
+      $celeSubtitle=document.getElementById('celeSubtitle'),
+      $btnReplaySave=document.getElementById('btnReplaySave');
 
 /* ====== State ====== */
 const MIN=2,MAX=50;
 let H=[],running=false,raf=null;
 let laps=3, dist=100;
 let mapMode="straight";
-let obstaclesEnabled=false;
-let obstacles=[];
-let pendingDraw=null;
 let finishOrder = [];
-let drawFired = false;
-function resetFinishOrder(){ finishOrder=[]; drawFired=false; }
+let pendingDraw=null;
+let drawFired=false;
+let lastSeed=0, lastInput=null;
 
-/* ====== Tuning (시간대 제거 버전) ====== */
-/* 말 기본 속도 분포(m/s). 레이스 체감 속도는 여기서 조절 */
-const BASE_SPEED_MIN = 2.8;   // 느린 말
-const BASE_SPEED_MAX = 6.2;   // 빠른 말
-const SPEED_GLOBAL   = 1.20;  // 전체 배율(더 빠르게 하고 싶으면 1.2~1.4로)
+/* ====== Tuning ====== */
+const BASE_SPEED_MIN = 2.8;   
+const BASE_SPEED_MAX = 6.2;   
+const SPEED_GLOBAL   = 1.20;  
 
-/* 가감속/부스터/피로 파라미터 */
-const JITTER_FACTOR   = 0.22;  // 프레임마다 흔들림 (base * 이 값 * 랜덤)
-const BOOST_PROB      = 0.015; // 한 틱에서 부스터 발동 확률
-const BOOST_GAIN      = 0.75;  // 부스터 시 추가 속도 (base * 이 값)
-const FATIGUE_INC     = 0.14;  // 과속 시 피로 증가
-const FATIGUE_DEC     = 0.07;  // 서행 시 피로 회복
-const FATIGUE_PENALTY = 0.16;  // 피로가 속도를 깎는 비율
-const VMIN_RATIO      = 0.55;  // 순간 최소속도 = base * 이 값
-const VMAX_RATIO      = 2.10;  // 순간 최대속도 = base * 이 값
-
-/* ====== Obstacles ====== */
-function genObstacles(){
-  obstacles=[];
-  if(!obstaclesEnabled) return;
-  const baseCount=Math.round(dist/25);
-  const bonus=Math.floor(H.length/10);
-  const count=Math.max(3,baseCount+bonus);
-  const minGap=Math.max(6,Math.round(dist*0.06));
-  const marginStart=Math.round(dist*0.12), marginEnd=Math.round(dist*0.88);
-  const pos=[];
-  for(let i=0;i<count;i++){
-    let tries=0;
-    while(tries++<50){
-      const x=Math.round(marginStart+_rand()*(marginEnd-marginStart));
-      if(pos.every(px=>Math.abs(px-x)>=minGap)){pos.push(x);break;}
-    }
-  }
-  pos.sort((a,b)=>a-b);
-  obstacles=pos.map((x,idx)=>({x,w:1.0+_rand()*1.0,id:'ob'+idx}));
-}
-function renderObstacles(){
-  $canvas.querySelectorAll('.obstacle').forEach(e=>e.remove());
-  if(mapMode!=="straight"||!obstaclesEnabled) return;
-  const rect=$canvas.getBoundingClientRect();
-  const straightViewW = parseFloat($straightMap.getAttribute('viewBox').split(' ')[2]) || 2000;
-  const scaleX=rect.width/straightViewW, scaleY=rect.height/400;
-  obstacles.forEach(ob=>{
-    const div=document.createElement('div');
-    div.className='obstacle'; div.id=ob.id;
-    const trackY=150, trackH=100, startX=80;
-    const sx = startX + ob.x*20;
-    div.style.left=(sx*scaleX)+'px';
-    div.style.top=((trackY+trackH/2)*scaleY)+'px';
-    $canvas.appendChild(div);
-  });
-}
-function clearObstaclesDOM(){
-  obstacles = [];
-  document.querySelectorAll('.obstacle').forEach(e=>e.remove());
-}
+const JITTER_FACTOR   = 0.22;  
+const BOOST_PROB      = 0.015; 
+const BOOST_GAIN      = 0.75;  
+const FATIGUE_INC     = 0.14;  
+const FATIGUE_DEC     = 0.07;  
+const FATIGUE_PENALTY = 0.16;  
+const VMIN_RATIO      = 0.55;  
+const VMAX_RATIO      = 2.10;  
 
 /* ====== Horses ====== */
 let straightViewW = 2000, straightViewH = 400;
-
 function horseSVG(color){return `<svg class="horse-svg" viewBox="0 0 64 44" xmlns="http://www.w3.org/2000/svg" style="--jersey:${color}">
   <g class="g-bob">
     <path class="mane" d="M10 26c2-3 3-5 6-6 0 4-2 7-4 9l-4-1 2-2z"/>
@@ -349,9 +307,8 @@ function buildHorses(list){
     $canvas.appendChild(el);
 
     if(mapMode==="oval"){
-      H.push({name:ent.name,no:ent.no,color,$el:el,theta:-Math.PI/2 + i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
+      H.push({name:ent.name,no:ent.no,color,$el:el,theta:-Math.PI/2 + i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false,_finished:false});
     }else{
-      // 목표 시간대 제거 — 말마다 기본 속도 랜덤(m/s)
       const base   = BASE_SPEED_MIN + _rand()*(BASE_SPEED_MAX-BASE_SPEED_MIN);
       const laneCenter = 200;
       const laneGap = Math.min(28, 90/Math.max(1,lanes-1));
@@ -361,11 +318,9 @@ function buildHorses(list){
         name:ent.name,no:ent.no,color,$el:el,
         x:0,y,
         base,
-        speed: base*(0.85+_rand()*0.3), // 초기 속도 약간 랜덤
+        speed: base*(0.85+_rand()*0.3),
         fatigue:0,
-        legsDur:.42, done:false,
-        jumping:false,jumpT:0,jumpDur:0.55, stumble:0,
-        _passed:{}, _finished:false
+        done:false,_finished:false
       });
     }
   });
@@ -394,54 +349,74 @@ function placeHorse(h){
     const scaleX=rect.width/straightViewW, scaleY=rect.height/straightViewH;
     let x=sx*scaleX, y=h.y*scaleY;
 
-    if(h.jumping){
-      const p = Math.min(1, h.jumpT / h.jumpDur);
-      const arc = Math.sin(Math.PI * p);
-      y -= 26 * arc;
-      h.$el.classList.add('jump');
-    }else h.$el.classList.remove('jump');
-
     h.$el.style.left = x+'px'; h.$el.style.top = y+'px';
     h.$el.style.transform=`translate(-50%,-50%)`;
 
-    // 다리 애니메이션 속도와 동기화
+    // 다리 애니메이션 속도 동기화
     const dur = Math.max(0.18, 0.6 - (h.speed*0.12));
-    if(Math.abs(dur - h.legsDur) > 0.01){
+    if(Math.abs((h.legsDur||0.42) - dur) > 0.01){
       h.legsDur = dur;
       h.$el.querySelectorAll('.front-leg,.back-leg').forEach(e=>e.style.animationDuration = dur+'s');
     }
   }
 }
 
-/* ====== Ranking ====== */
-// 완료한 말은 finishOrder 순서대로 고정, 나머지는 진행도 기준으로 뒤에
+/* ====== Ranking (10명 단위) ====== */
 function orderByLead(){
   if (mapMode === "oval") {
-    const finished = finishOrder.slice(); // 들어온 순서 그대로
-    const rest = H
-      .filter(h => !h.done)
-      .sort((a, b) => b.theta - a.theta);
-    return finished.concat(rest);
-  } else { // straight
     const finished = finishOrder.slice();
-    const rest = H
-      .filter(h => !h.done)
-      // 결승선 통과 후 오버슈트 보정
-      .sort((a, b) => Math.min(b.x, dist) - Math.min(a.x, dist));
+    const rest = H.filter(h => !h.done).sort((a, b) => b.theta - a.theta);
+    return finished.concat(rest);
+  } else {
+    const finished = finishOrder.slice();
+    const rest = H.filter(h => !h.done).sort((a, b) => Math.min(b.x, dist) - Math.min(a.x, dist));
     return finished.concat(rest);
   }
 }
 function updateRanking(){
   const order=orderByLead();
   $rankingBox.querySelector('h3').textContent = (mapMode==="oval") ? `현재 순위 (총 ${laps}바퀴)` : `현재 순위 (${dist}m 달리기)`;
-  $rankingLines.innerHTML=order.map((h,i)=>{
-    const status = (mapMode==="oval") ? (h.done?'완주':`${Math.floor((h.theta+Math.PI/2)/(2*Math.PI))+1}바퀴째`) : (h.done?'완주':`${Math.floor(h.x)}m`);
-    return `<div class="row"><span class="pos">${i+1}위</span><span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name} - ${status}</span></div>`;
-  }).join('');
+  $rankingLines.innerHTML="";
+  for(let i=0;i<order.length;i+=10){
+    const blk=document.createElement('div'); blk.className='rank-block';
+    blk.innerHTML=order.slice(i,i+10).map((h,j)=>{
+      const status = (mapMode==="oval") ? (h.done?'완주':`${Math.floor((h.theta+Math.PI/2)/(2*Math.PI))+1}바퀴째`) : (h.done?'완주':`${Math.floor(h.x)}m`);
+      return `<div class="row"><span class="pos">${i+j+1}위</span><span><span class="color-badge" style="background:${h.color}"></span>${h.no}번 ${h.name} - ${status}</span></div>`;
+    }).join('');
+    $rankingLines.appendChild(blk);
+  }
 }
 
-/* ====== Camera ====== */
-function updateCamera(){ $viewport.style.transform="translate(-50%,-50%) scale(1)"; }
+/* ====== Camera (줌 + 1등 추적) ====== */
+function updateCamera(){
+  // leader 찾기
+  const order = orderByLead();
+  const leader = order[0];
+  if(!leader) return;
+
+  let zoom = (mapMode==="straight") ? 1.6 : 1.35; // 직선 더 가까이
+  const rect=$canvas.getBoundingClientRect();
+
+  // 리더의 화면 x 좌표 계산
+  let leaderX = rect.width/2;
+  if(mapMode==="straight"){
+    const trackStart=80, trackFinish=straightViewW-80;
+    const progress = Math.max(0, Math.min(1, leader.x / dist));
+    const sx = trackStart + (trackFinish-trackStart)*progress;
+    const scaleX=rect.width/straightViewW;
+    leaderX = sx*scaleX;
+  }else{
+    const cx=500, rx=390;
+    const scaleX=rect.width/1000;
+    leaderX = (cx + rx*Math.cos(leader.theta))*scaleX;
+  }
+
+  // 가운데로 데려오도록 offset (클램프)
+  const target = rect.width*0.52; // 약간 오른쪽 위치
+  const dx = Math.max(-rect.width*0.35, Math.min(rect.width*0.35, target - leaderX));
+
+  $viewport.style.transform = `translate(-50%,-50%) translate(${dx}px,0) scale(${zoom})`;
+}
 
 /* ====== Countdown ====== */
 const $hud=document.getElementById('hud'),
@@ -460,7 +435,7 @@ async function countdown(){
   $hud.classList.remove('show'); $gunTxt.textContent='';
 }
 
-/* ====== Celebration & Draw ====== */
+/* ====== Celebration & Draw (원본 유지, 텍스트만 변경) ====== */
 function confettiBurst(){
   const emojis=['🎉','✨','🎊','🥳','🍾','🎈','⭐'];
   for(let i=0;i<30;i++){
@@ -494,8 +469,9 @@ function dropHay(sizePx){
   setTimeout(()=>h.remove(),4000);
 }
 function celebrate(title, subtitle){
-  $celeTitle.textContent=title;
-  $celeSubtitle.textContent=subtitle;
+  // 요구사항 반영: WINNER~ / 이맛에 달린다~
+  $celeTitle.textContent = title || 'WINNER~';
+  $celeSubtitle.textContent = subtitle || '이맛에 달린다~';
   $cele.style.display='flex';
   confettiBurst();
   for(let i=0;i<36;i++) dropCarrot();
@@ -504,7 +480,7 @@ function celebrate(title, subtitle){
   for(let i=0;i<8;i++)  dropHay(90);
 }
 
-/* 선택 등수가 '들어오는 순간' 즉발 */
+/* 선택 등수가 '들어오는 순간' 즉발 (원본 유지 / 텍스트만 변경) */
 function maybeFireDraw(){
   if(drawFired || !pendingDraw) return;
   const k = finishOrder.length;
@@ -512,31 +488,31 @@ function maybeFireDraw(){
 
   if(pendingDraw.type==='first' && k===1){
     const h = finishOrder[0];
-    celebrate('Champion', `우승: ${h.no}번 ${h.name}`);
+    celebrate('WINNER~', `이맛에 달린다~  •  우승: ${h.no}번 ${h.name}`);
     drawFired = true; pendingDraw=null; return;
   }
   if(pendingDraw.type==='nth'){
     const n = Math.max(1, parseInt(pendingDraw.n||1,10));
     if(k===n){
       const h = finishOrder[n-1];
-      celebrate('Champion', `${n}등 당첨: ${h.no}번 ${h.name}`);
+      celebrate('WINNER~', `이맛에 달린다~  •  ${n}등: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
   if(pendingDraw.type==='last'){
     if(k===H.length){
       const h = finishOrder[k-1];
-      celebrate('Champion', `마지막 당첨: ${h.no}번 ${h.name}`);
+      celebrate('WINNER~', `이맛에 달린다~  •  마지막: ${h.no}번 ${h.name}`);
       drawFired = true; pendingDraw=null; return;
     }
   }
 }
 
-/* ====== Straight Map (SVG 트랙 + 장애물) ====== */
+/* ====== Straight Map ====== */
 function drawStraightMap(){
   straightViewW = 20*dist;
-  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
   const trackY=150, trackH=100, startX=80, finishX=straightViewW-80;
+  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
   $straightMap.innerHTML = `
     <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
     <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
@@ -544,8 +520,6 @@ function drawStraightMap(){
     <line x1="${finishX}" y1="${trackY-10}" x2="${finishX}" y2="${trackY+trackH+10}" stroke="#e5e7eb" stroke-width="6"/>
     <text x="${finishX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>
   `;
-  genObstacles();
-  renderObstacles();
 }
 
 /* ====== Race Loop ====== */
@@ -570,7 +544,7 @@ function run(){
         h.theta += h.v;
         if(h.theta >= (-Math.PI/2)+laps*2*Math.PI) h.done=true;
       }else{
-        // 목표시간 없음: base 중심으로 역동적인 주행
+        // 장애물/점프 제거 → 순수 주행
         h.speed += h.base*JITTER_FACTOR*(_rand()-0.5); // 흔들림
         if(_rand()<BOOST_PROB) h.speed += h.base*BOOST_GAIN; // 부스터
         if(h.speed>h.base*1.12) h.fatigue=Math.min(1,h.fatigue+dt*FATIGUE_INC);
@@ -580,30 +554,20 @@ function run(){
         const vMin=h.base*VMIN_RATIO, vMax=h.base*VMAX_RATIO;
         h.speed=Math.max(vMin,Math.min(vMax,h.speed));
 
-        // 장애물 판정
-        if(obstaclesEnabled){
-          const ahead=h.x + h.speed*0.4;
-          const behind=h.x - 0.5;
-          const hit=obstacles.find(o=>!h._passed[o.id] && o.x>=behind && o.x<=ahead);
-          if(hit){
-            const jumpChance=0.7 + Math.min(0.2,(h.speed-h.base)*0.2);
-            if(Math.random()<jumpChance){ h.jumping=true; h.jumpT=0; h._passed[hit.id]=true; }
-            else{ h.stumble=0.5+Math.random()*0.3; h.speed*=0.35; h._passed[hit.id]=true; }
-          }
-          if(h.stumble>0){ h.stumble-=dt; h.speed*=0.98; }
-          if(h.jumping){ h.jumpT+=dt; if(h.jumpT>=h.jumpDur){ h.jumping=false; h.jumpT=0; } }
-        }
-
-        // 이동 (m)
         h.x += h.speed*dt*SPEED_GLOBAL;
         if(h.x>=dist) h.done=true;
       }
 
-      // 피니시 감지 → 순서 기록 → 선택 등수면 즉발
+      // 피니시 감지 → 순서 기록 → 추첨 즉발
       if(!h._finished && h.done){
         h._finished = true;
         finishOrder.push(h);
-        maybeFireDraw();
+        maybeFireDraw(); // 추첨 즉발
+        // 우승(첫 완주) 때 WINNER 표출 보장
+        if(finishOrder.length===1){
+          const f=finishOrder[0];
+          celebrate('WINNER~', `이맛에 달린다~  •  우승: ${f.no}번 ${f.name}`);
+        }
       }
 
       placeHorse(h);
@@ -622,6 +586,40 @@ function run(){
   raf=requestAnimationFrame(tick);
 }
 
+/* ====== Draw UI ====== */
+const $drawSeg = document.getElementById('drawSeg');
+const $drawNthInput = document.getElementById('drawNthInput');
+function updateDrawUI(type){
+  $drawSeg.querySelectorAll('.seg-item').forEach(lab=>{
+    lab.classList.toggle('on', lab.dataset.type===type);
+  });
+  $drawNthInput.disabled = (type!=='nth');
+  if(type==='nth'){ $drawNthInput.focus(); }
+}
+function applyDrawSelection(type){
+  if(type==='first') pendingDraw = {type:'first'};
+  else if(type==='last') pendingDraw = {type:'last'};
+  else if(type==='nth'){
+    const n = parseInt($drawNthInput.value,10);
+    if(!n || n<1){ pendingDraw=null; alert('n등 숫자를 입력해주세요.'); return; }
+    pendingDraw = {type:'nth', n};
+  } else pendingDraw=null;
+}
+$drawSeg.addEventListener('click', (e)=>{
+  const lab = e.target.closest('.seg-item'); if(!lab) return;
+  const type = lab.dataset.type;
+  updateDrawUI(type); applyDrawSelection(type);
+});
+$drawNthInput.addEventListener('input', ()=>{
+  const on = $drawSeg.querySelector('.seg-item.on');
+  if(on && on.dataset.type==='nth') applyDrawSelection('nth');
+});
+function resetDrawUI(){
+  $drawSeg.querySelectorAll('.seg-item').forEach(l=>l.classList.remove('on'));
+  $drawNthInput.value=''; $drawNthInput.disabled = true;
+  pendingDraw=null; drawFired=false;
+}
+
 /* ====== Controls ====== */
 document.getElementById('btnContact').onclick=()=>{
   alert("문의/건의/피드백: luckyhorserace@gmail.com\n자유롭게 이용해 주시고 언제든 의견 주세요!");
@@ -635,12 +633,13 @@ $start.onclick=async()=>{
   laps=parseInt($raceLen.value,10)||3;
   dist=parseInt($raceDist.value,10)||100;
 
-  reseed(autoSeed());
+  lastSeed = autoSeed();
+  lastInput = {names:list.map(x=>x.name), mapMode, laps, dist};
+  reseed(lastSeed);
+
   $cele.style.display='none';
   clearHorses();
-  clearObstaclesDOM();
-  resetFinishOrder();
-
+  finishOrder=[]; drawFired=false;
   if(mapMode==="straight") drawStraightMap();
   buildHorses(list);
   await countdown();
@@ -652,9 +651,10 @@ $reset.onclick=()=>{
   raf=null; running=false; pendingDraw=null;
   $cele.style.display='none';
   clearHorses();
-  clearObstaclesDOM();
   resetDrawUI();
-  resetFinishOrder();
+  finishOrder=[];
+  // 카메라 리셋
+  $viewport.style.transform="translate(-50%,-50%) scale(1)";
   if(mapMode==="straight") drawStraightMap();
 };
 
@@ -686,16 +686,11 @@ $mapToggle.onclick=()=>{
     $raceDist.style.display="none";
     $ovalMap.style.display="block";
     $straightMap.style.display="none";
-    $obstacleToggle.style.display = "none";
-    obstaclesEnabled = false;
-    $obstacleToggle.textContent = "장애물: 끔";
-    clearObstaclesDOM();
   }else{
     $raceLen.style.display="none";
     $raceDist.style.display="inline-block";
     $ovalMap.style.display="none";
     $straightMap.style.display="block";
-    $obstacleToggle.style.display = "inline-flex";
     drawStraightMap();
   }
 
@@ -704,65 +699,29 @@ $mapToggle.onclick=()=>{
   $cele.style.display='none';
   clearHorses();
   resetDrawUI();
-  resetFinishOrder();
+  finishOrder=[];
+  // 카메라 리셋
+  $viewport.style.transform="translate(-50%,-50%) scale(1)";
 };
 
-/* 장애물 토글 */
-$obstacleToggle.onclick=()=>{
-  obstaclesEnabled=!obstaclesEnabled;
-  $obstacleToggle.textContent=`장애물: ${obstaclesEnabled?'켬':'끔'}`;
-  if(mapMode==="straight"){
-    if(obstaclesEnabled) drawStraightMap();
-    else clearObstaclesDOM();
-  } else {
-    clearObstaclesDOM();
-    $obstacleToggle.style.display = "none";
-  }
+/* 리플레이 저장 (seed 기반 재현용 메타 저장) */
+$btnReplaySave.onclick=()=>{
+  const payload={
+    seed:lastSeed,
+    names:lastInput?.names||splitNames($names.value).map(x=>x.name),
+    mapMode,
+    laps,
+    dist,
+    finish: finishOrder.map(h=>({no:h.no,name:h.name})),
+    ts: Date.now()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='lucky-horse-replay.json';
+  a.click();
 };
-
-/* 추첨(세그먼트) */
-const $drawSeg = document.getElementById('drawSeg');
-const $drawNthInput = document.getElementById('drawNthInput');
-
-function updateDrawUI(type){
-  $drawSeg.querySelectorAll('.seg-item').forEach(lab=>{
-    lab.classList.toggle('on', lab.dataset.type===type);
-  });
-  $drawNthInput.disabled = (type!=='nth');
-  if(type==='nth'){ $drawNthInput.focus(); }
-}
-function applyDrawSelection(type){
-  if(type==='first') pendingDraw = {type:'first'};
-  else if(type==='last') pendingDraw = {type:'last'};
-  else if(type==='nth'){
-    const n = parseInt($drawNthInput.value,10);
-    if(!n || n<1){ pendingDraw=null; alert('n등 숫자를 입력해주세요.'); return; }
-    pendingDraw = {type:'nth', n};
-  } else pendingDraw=null;
-}
-$drawSeg.addEventListener('click', (e)=>{
-  const lab = e.target.closest('.seg-item'); if(!lab) return;
-  const type = lab.dataset.type;
-  updateDrawUI(type); applyDrawSelection(type);
-});
-$drawNthInput.addEventListener('input', ()=>{
-  const on = $drawSeg.querySelector('.seg-item.on');
-  if(on && on.dataset.type==='nth') applyDrawSelection('nth');
-});
-function resetDrawUI(){
-  $drawSeg.querySelectorAll('.seg-item').forEach(l=>l.classList.remove('on'));
-  $drawNthInput.value=''; $drawNthInput.disabled = true;
-  pendingDraw=null;
-}
-
-/* ====== 초기 상태: 직선 기본 ====== */
-$raceLen.style.display="none";
-$raceDist.style.display="inline-block";
-$ovalMap.style.display="none";
-$straightMap.style.display="block";
-$obstacleToggle.style.display = "inline-flex";
-drawStraightMap();
 </script>
 
-  </body>
+</body>
 </html>
