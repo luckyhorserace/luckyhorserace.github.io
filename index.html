@@ -369,21 +369,63 @@ function updateCamera(){
   }
 }
 
-/* ====== 직선 맵 (레인 수에 맞춰 높이/폭 자동 확장) ====== */
-function drawStraightMap(lanes=H.length){
-  const straightViewW = 20 * dist;
-  const straightViewH = Math.max(400, lanes * 40 + 200); // 레인 많으면 세로도 늘림
-  $straightMap.setAttribute('viewBox',`0 0 ${straightViewW} ${straightViewH}`);
+/* ====== 직선 맵 (더 길게 + 100m 피니시라인 표시) ====== */
+function drawStraightMap(lanes = H.length){
+  // 트랙을 더 길게: dist(미터) * 배율
+  const PX_PER_M = 40;                 // ← 필요하면 50, 60으로 더 늘려도 됨
+  const straightViewW = PX_PER_M * dist;
 
-  const trackY=(straightViewH/2)-80, trackH=160;
-  const startX=80, finishX=straightViewW-80;
+  // 레인 수에 따라 세로 확장
+  const laneGap = 40;                  // 레인 간격
+  const straightViewH = Math.max(400, lanes * laneGap + 200);
+  $straightMap.setAttribute('viewBox', `0 0 ${straightViewW} ${straightViewH}`);
 
-  $straightMap.innerHTML=`
+  // 트랙 위치/크기
+  const trackH = Math.max(160, lanes * laneGap + 80);
+  const trackY = (straightViewH - trackH) / 2;
+
+  // 0m(출발) / dist m(도착) 좌표
+  const paddingX = 80;
+  const startX = paddingX;
+  const finishX = straightViewW - paddingX;
+
+  // 눈금(옵션): 20m 간격
+  const tickEvery = 20;
+  let ticks = '';
+  for(let m = tickEvery; m < dist; m += tickEvery){
+    const x = startX + (finishX - startX) * (m / dist);
+    ticks += `<line x1="${x}" y1="${trackY}" x2="${x}" y2="${trackY + trackH}" stroke="#1f2b40" stroke-width="1" stroke-dasharray="6,6" />`;
+    ticks += `<text x="${x}" y="${trackY - 16}" text-anchor="middle" font-size="12" fill="#93c5fd">${m}m</text>`;
+  }
+
+  // 피니시라인 체크 패턴 정의
+  const defs = `
+    <defs>
+      <pattern id="checkers" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="#e5e7eb"/>
+        <rect width="3" height="3" x="0" y="0" fill="#0b1220"/>
+        <rect width="3" height="3" x="3" y="3" fill="#0b1220"/>
+      </pattern>
+    </defs>
+  `;
+
+  // SVG 본체
+  $straightMap.innerHTML = `
+    ${defs}
+    <!-- 트랙 -->
     <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY+trackH+10}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="${startX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발</text>
-    <line x1="${finishX}" y1="${trackY-10}" x2="${finishX}" y2="${trackY+trackH+10}" stroke="#e5e7eb" stroke-width="6"/>
-    <text x="${finishX}" y="${trackY-20}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착</text>`;
+
+    <!-- 눈금 -->
+    ${ticks}
+
+    <!-- 출발선 -->
+    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY + trackH + 10}" stroke="#22d3ee" stroke-width="6"/>
+    <text x="${startX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발 (0m)</text>
+
+    <!-- 도착선 (체커 플래그) -->
+    <rect x="${finishX - 6}" y="${trackY - 10}" width="12" height="${trackH + 20}" fill="url(#checkers)"/>
+    <text x="${finishX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착 (${dist}m)</text>
+  `;
 }
 /* ====== 카메라 & 배치 (보정 버전으로 재정의) ====== */
 function placeHorse(h){
@@ -554,12 +596,12 @@ function updateRanking(){
     pages.push(page);
   }
 
-  // 최신 페이지(오른쪽 끝) 보이도록 전체를 왼쪽으로 이동
-  if(pages.length>0){
-    const pageWidth = 260; // CSS와 동일
-    wrap.style.width = (pages.length*pageWidth)+'px';
-    wrap.style.transform = `translateX(-${(pages.length-1)*pageWidth}px)`;
-  }
+  // 모든 페이지가 다 보이게 줄바꿈 처리
+wrap.style.display='flex';
+wrap.style.flexWrap='wrap';
+wrap.style.gap='8px';
+wrap.style.width='auto';
+wrap.style.transform='none';
 
   // 제목 텍스트
   const title = (mapMode==='oval') ? `현재 순위 (총 ${laps}바퀴)` : `현재 순위 (${dist}m 달리기)`;
