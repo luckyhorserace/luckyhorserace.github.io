@@ -287,12 +287,25 @@ function buildHorses(list){
     if(mapMode==="oval"){
       H.push({name:ent.name,no:ent.no,color,$el:el,theta:-Math.PI/2+i*0.03,v:0.02+(_rand()-0.5)*0.004,f:0,done:false});
     }else{
-      const base=BASE_SPEED_MIN+_rand()*(BASE_SPEED_MAX-BASE_SPEED_MIN);
-      const laneCenter=200;
-      const laneGap=Math.min(28,90/Math.max(1,lanes-1));
-      const y=laneCenter+(i-(lanes-1)/2)*laneGap;
-      H.push({name:ent.name,no:ent.no,color,$el:el,x:0,y,base,speed:base*(0.85+_rand()*0.3),fatigue:0,done:false,_finished:false});
-    }
+  const base = BASE_SPEED_MIN + _rand() * (BASE_SPEED_MAX - BASE_SPEED_MIN);
+
+  // 트랙 높이 가져오기
+  const vb = $straightMap.viewBox.baseVal;
+  const trackH = Math.max(160, lanes * 40 + 80);
+  const trackY = (vb.height - trackH) / 2;
+
+  // 말 위치 (트랙 아래부터 랜덤하게)
+  const laneGap = 40;
+  const y = trackY + trackH - 60 - (i * laneGap) + (_rand() * laneGap * 0.5);
+
+  H.push({
+    name: ent.name, no: ent.no, color, $el: el,
+    x: 0, y,
+    base,
+    speed: base * (0.85 + _rand() * 0.3),
+    fatigue: 0, done: false, _finished: false
+  });
+}
   });
   updateRanking();
   H.forEach(placeHorse);
@@ -378,36 +391,30 @@ function updateCamera(){
   }
 }
 
-/* ====== 직선 맵 (더 길게 + 100m 피니시라인 표시) ====== */
+/* ====== 직선 맵 (거리 정확히 반영) ====== */
 function drawStraightMap(lanes = H.length){
-  // 트랙을 더 길게: dist(미터) * 배율
-  const PX_PER_M = 40;                 // ← 필요하면 50, 60으로 더 늘려도 됨
+  const PX_PER_M = 80;  // ← 기존보다 2배 (40 → 80)
   const straightViewW = PX_PER_M * dist;
 
-  // 레인 수에 따라 세로 확장
-  const laneGap = 40;                  // 레인 간격
+  const laneGap = 40;
   const straightViewH = Math.max(400, lanes * laneGap + 200);
   $straightMap.setAttribute('viewBox', `0 0 ${straightViewW} ${straightViewH}`);
 
-  // 트랙 위치/크기
   const trackH = Math.max(160, lanes * laneGap + 80);
   const trackY = (straightViewH - trackH) / 2;
 
-  // 0m(출발) / dist m(도착) 좌표
   const paddingX = 80;
   const startX = paddingX;
   const finishX = straightViewW - paddingX;
 
-  // 눈금(옵션): 20m 간격
-  const tickEvery = 20;
+  // 20m 단위 눈금 다시 배치
   let ticks = '';
-  for(let m = tickEvery; m < dist; m += tickEvery){
+  for(let m = 20; m < dist; m += 20){
     const x = startX + (finishX - startX) * (m / dist);
     ticks += `<line x1="${x}" y1="${trackY}" x2="${x}" y2="${trackY + trackH}" stroke="#1f2b40" stroke-width="1" stroke-dasharray="6,6" />`;
     ticks += `<text x="${x}" y="${trackY - 16}" text-anchor="middle" font-size="12" fill="#93c5fd">${m}m</text>`;
   }
 
-  // 피니시라인 체크 패턴 정의
   const defs = `
     <defs>
       <pattern id="checkers" width="6" height="6" patternUnits="userSpaceOnUse">
@@ -418,20 +425,12 @@ function drawStraightMap(lanes = H.length){
     </defs>
   `;
 
-  // SVG 본체
   $straightMap.innerHTML = `
     ${defs}
-    <!-- 트랙 -->
     <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-
-    <!-- 눈금 -->
     ${ticks}
-
-    <!-- 출발선 -->
     <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY + trackH + 10}" stroke="#22d3ee" stroke-width="6"/>
     <text x="${startX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발 (0m)</text>
-
-    <!-- 도착선 (체커 플래그) -->
     <rect x="${finishX - 6}" y="${trackY - 10}" width="12" height="${trackH + 20}" fill="url(#checkers)"/>
     <text x="${finishX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착 (${dist}m)</text>
   `;
@@ -538,42 +537,29 @@ function confettiBurst(){
 
 /* ====== 우승 연출 ====== */
 function celebrate(winnerText){
+  // WINNER 글씨 크게
   document.querySelector('#celebrate .title').textContent = 'WINNER~';
-  document.querySelectorAll('#celebrate .subtitle')[0].textContent = '이맛에 달린다~';
+  document.querySelector('#celebrate .title').style.fontSize = '100px';
 
-  // ✅ 우승자 데이터 가져오기
-  const winner = finishOrder[0]; // 1등 확정된 말
+  // 1등 말/기수 데이터 가져오기
+  const winner = finishOrder[0];
   const text = winner ? `우승: ${winner.no}번 ${winner.name}` : (winnerText || '');
   document.getElementById('celeHorse').textContent = text;
 
-  // ✅ 말/기수 색상 배지 표시
+  // 캐릭터(말+기수) 표시
   if (winner) {
-    const badge = document.createElement('div');
-    badge.innerHTML = `
-      <span style="display:inline-block;width:16px;height:16px;border-radius:50%;
-                   background:${winner.color};border:2px solid #222;margin-right:8px"></span>
-      <strong style="color:${winner.color}">기수 색상</strong>
-    `;
-    // 중복 방지
-    const oldBadge = document.querySelector('#celebrate .winner-badge');
-    if (oldBadge) oldBadge.remove();
-    badge.classList.add('winner-badge');
-    document.getElementById('celebrate').appendChild(badge);
+    const char = winner.$el.cloneNode(true); // 경기에서 쓰던 캐릭터 복사
+    char.style.position = 'static';
+    char.style.transform = 'scale(2)';  // 크게 보여주기
+    char.style.margin = '12px auto';
+
+    // 중복 제거
+    const oldChar = document.querySelector('#celebrate .winner-char');
+    if (oldChar) oldChar.remove();
+
+    char.classList.add('winner-char');
+    document.getElementById('celebrate').appendChild(char);
   }
-
-  // ✅ 우승 이미지 추가
-  const img = document.createElement('img');
-  img.src = 'GPThorse.png';
-  img.alt = 'Winner Horse';
-  img.style.width = '350px';
-  img.style.marginBottom = '12px';
-
-  // 중복 제거
-  const oldImg = document.querySelector('#celebrate .win-art');
-  if(oldImg) oldImg.remove();
-
-  img.classList.add('win-art');
-  document.getElementById('celebrate').prepend(img);
 
   // 표시 + 이펙트
   document.getElementById('celebrate').style.display = 'flex';
