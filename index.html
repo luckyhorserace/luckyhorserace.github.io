@@ -475,12 +475,28 @@ function confettiBurst(){
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),3500);
   }
-}
 function celebrate(winnerText){
-  document.querySelector('#celebrate .title').textContent='WINNER~';
-  document.querySelectorAll('#celebrate .subtitle')[0].textContent='이맛에 달린다~';
-  document.getElementById('celeHorse').textContent=winnerText||'';
-  document.getElementById('celebrate').style.display='flex';
+  // WINNER 텍스트 유지
+  document.querySelector('#celebrate .title').textContent = 'WINNER~';
+  document.querySelectorAll('#celebrate .subtitle')[0].textContent = '이맛에 달린다~';
+  document.getElementById('celeHorse').textContent = winnerText || '';
+
+  // ✅ 내가 만든 우승 이미지 추가
+  const img = document.createElement('img');
+  img.src = 'GPThorse.png';   // 업로드한 파일 이름
+  img.alt = 'Winner Horse';
+  img.style.width = '350px';     
+  img.style.marginBottom = '12px';
+
+  // 중복 추가 방지
+  const oldImg = document.querySelector('#celebrate .win-art');
+  if(oldImg) oldImg.remove();
+
+  img.classList.add('win-art');
+  document.getElementById('celebrate').prepend(img);
+
+  // 오버레이 표시 + 효과
+  document.getElementById('celebrate').style.display = 'flex';
   confettiBurst();
 }
 
