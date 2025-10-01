@@ -368,9 +368,11 @@ const y = trackY + laneGap * (i + 0.5) + (_rand() - 0.5) * 10;
 }
 
 /* ====== 직선 맵 (거리 정확히 반영) ====== */
-function drawStraightMap(lanes = H.length){
-  const PX_PER_M = 40;  // ← 기존보다 2배 (40 → 80)
-  const straightViewW = PX_PER_M * dist;
+function drawStraightMap(lanes = H.length) {
+  const PX_PER_M = 40;
+  const finishX = PX_PER_M * dist;             // ✅ 도착선 = 실제 말 멈추는 위치
+  const paddingX = 80;
+  const straightViewW = finishX + paddingX * 2; // ✅ 전체 트랙 길이
 
   const laneGap = Math.min(50, 600 / lanes);
   const straightViewH = Math.max(400, lanes * laneGap + 200);
@@ -379,9 +381,7 @@ function drawStraightMap(lanes = H.length){
   const trackH = Math.max(160, lanes * laneGap + 80);
   const trackY = (straightViewH - trackH) / 2;
 
-  const paddingX = 80;
   const startX = paddingX;
-  const finishX = straightViewW - paddingX;
 
   const defs = `
     <defs>
@@ -395,13 +395,23 @@ function drawStraightMap(lanes = H.length){
 
   $straightMap.innerHTML = `
     ${defs}
-    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}" fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
-    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY + trackH + 10}" stroke="#22d3ee" stroke-width="6"/>
-    <text x="${startX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#a5f3fc" font-weight="800">출발 (0m)</text>
-    <rect x="${finishX - 6}" y="${trackY - 10}" width="12" height="${trackH + 20}" fill="url(#checkers)"/>
-    <text x="${finishX}" y="${trackY - 22}" text-anchor="middle" font-size="14" fill="#e5e7eb" font-weight="900">도착 (${dist}m)</text>
+    <rect x="0" y="${trackY}" width="${straightViewW}" height="${trackH}"
+          fill="#0e1a2a" stroke="#2a3b54" stroke-width="2"/>
+    
+    <!-- 출발선 -->
+    <line x1="${startX}" y1="${trackY-10}" x2="${startX}" y2="${trackY + trackH + 10}"
+          stroke="#22d3ee" stroke-width="6"/>
+    <text x="${startX}" y="${trackY - 22}" text-anchor="middle"
+          font-size="14" fill="#a5f3fc" font-weight="800">출발 (0m)</text>
+
+    <!-- 도착선 (정확한 거리 기준) -->
+    <rect x="${finishX - 6}" y="${trackY - 10}" width="12" height="${trackH + 20}"
+          fill="url(#checkers)"/>
+    <text x="${finishX}" y="${trackY - 22}" text-anchor="middle"
+          font-size="14" fill="#e5e7eb" font-weight="900">도착 (${dist}m)</text>
   `;
 }
+  
 /* ====== 카메라 & 배치 (보정 버전으로 재정의) ====== */
 function placeHorse(h){
   if(mapMode==="oval"){
