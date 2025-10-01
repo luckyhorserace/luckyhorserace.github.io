@@ -70,10 +70,10 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 }
 .ranking h3{margin:0 0 6px; font-size:13px; color:#93c5fd; text-align:right}
 
-/* 순위 블록: 가로 260px로 고정해 칼럼처럼 줄바꿈되게 */
+/* 변경 */
 .rank-block{
-  width:260px;               /* ← 핵심! */
-  flex:0 0 260px;            /* ← flex-wrap 시 칼럼 폭 고정 */
+  width:auto;         /* 내용에 맞게 */
+  flex:0 0 auto;      /* 내용폭만큼 칼럼 차지 */
   transition:transform .3s ease;
 }
 .rank-block .row{
@@ -90,7 +90,10 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 .rank-block .row:nth-child(odd){
   background:rgba(255,255,255,.03)
 }
-
+  
+/* 👇 이 한 줄을 바로 아래 추가 */
+.rank-block .row .namecell{ white-space: nowrap; }
+  
 .pos{
   font-weight:900;
   color:#6ee7ff;
@@ -389,34 +392,44 @@ function placeHorse(h){
   }
 }
 
-/* ====== 순위판 (10명 단위, 항상 다 보이게) ====== */
+/* ====== 순위판 (10명 단위, 칼럼 폭 = 가장 긴 이름 줄) ====== */
 function updateRanking(){
+  // 정렬
   const finished = finishOrder.slice();
   const rest = H.filter(h=>!h.done).sort((a,b)=>
-    mapMode==="oval" ? (b.theta-a.theta) : (Math.min(b.x,dist)-Math.min(a.x,dist))
+    mapMode==="oval" ? (b.theta - a.theta) : (Math.min(b.x, dist) - Math.min(a.x, dist))
   );
   const order = finished.concat(rest);
 
+  // 컨테이너
   const wrap = $rankingLines;
   wrap.innerHTML = '';
   wrap.style.display = 'flex';
-  wrap.style.flexWrap = 'wrap';   // 👈 자동 줄바꿈
+  wrap.style.flexWrap = 'wrap';
   wrap.style.gap = '8px';
+  wrap.style.width = 'auto';
+  wrap.style.transform = 'none';
 
-  for(let i=0;i<order.length;i+=10){
-    const page=document.createElement('div');
-    page.className='rank-block';
-    page.style.minWidth='260px';
-    page.innerHTML = order.slice(i,i+10).map((h,j)=>
-      `<div class="row"><span class="pos">${i+j+1}위</span>
-       <span><span class="color-badge" style="background:${h.color}"></span>
-       ${h.no}번 ${h.name}</span></div>`).join('');
+  // 10명씩 칼럼 생성 (이름칸에 namecell 클래스 추가!)
+  for (let i = 0; i < order.length; i += 10) {
+    const page = document.createElement('div');
+    page.className = 'rank-block';
+    page.innerHTML = order.slice(i, i + 10).map((h, j) => `
+      <div class="row">
+        <span class="pos">${i + j + 1}위</span>
+        <span class="namecell">
+          <span class="color-badge" style="background:${h.color}"></span>
+          ${h.no}번 ${h.name}
+        </span>
+      </div>
+    `).join('');
     wrap.appendChild(page);
   }
 
-  const title = (mapMode==='oval') ? 
-    `현재 순위 (총 ${laps}바퀴)` : 
-    `현재 순위 (${dist}m 달리기)`;
+  // 제목
+  const title = (mapMode === 'oval')
+    ? \`현재 순위 (총 \${laps}바퀴)\`
+    : \`현재 순위 (\${dist}m 달리기)\`;
   $rankingBox.querySelector('h3').textContent = title;
 }
 
@@ -648,45 +661,41 @@ function celebrate(){
   confettiBurst();
 }
 
-/* ====== 순위판: 10명 단위 페이징(오른쪽 최신) ====== */
+/* ====== 순위판 (10명 단위, 칼럼 폭 = 가장 긴 이름 줄) ====== */
 function updateRanking(){
-  // 정렬
-  const finished=finishOrder.slice();
-  const rest=H.filter(h=>!h.done).sort((a,b)=> mapMode==="oval" ? (b.theta-a.theta) : (Math.min(b.x,dist)-Math.min(a.x,dist)));
-  const order=finished.concat(rest);
+  const finished = finishOrder.slice();
+  const rest = H.filter(h=>!h.done).sort((a,b)=>
+    mapMode==="oval" ? (b.theta - a.theta) : (Math.min(b.x, dist) - Math.min(a.x, dist))
+  );
+  const order = finished.concat(rest);
 
-  // 페이지 만들기 (10명씩)
-  const wrap=$rankingLines;
-  wrap.innerHTML='';
-  wrap.style.display='flex';
-  wrap.style.gap='0';
-  wrap.style.transform='translateX(0)';
+  const wrap = $rankingLines;
+  wrap.innerHTML = '';
+  wrap.style.display = 'flex';
+  wrap.style.flexWrap = 'wrap';
+  wrap.style.gap = '8px';
+  wrap.style.width = 'auto';
+  wrap.style.transform = 'none';
 
-  const pages=[];
-  for(let i=0;i<order.length;i+=10){
-  const page=document.createElement('div'); 
-  page.className='rank-block';
-  page.innerHTML = order.slice(i,i+10).map((h,j)=>{
-    return `<div class="row"><span class="pos">${i+j+1}위</span>
-      <span><span class="color-badge" style="background:${h.color}"></span>
-      ${h.no}번 ${h.name}</span></div>`;
-  }).join('');
-  wrap.appendChild(page);
-  pages.push(page);
-}
+  for (let i = 0; i < order.length; i += 10) {
+    const page = document.createElement('div');
+    page.className = 'rank-block';
+    page.innerHTML = order.slice(i, i + 10).map((h, j) => `
+      <div class="row">
+        <span class="pos">${i + j + 1}위</span>
+        <span class="namecell">
+          <span class="color-badge" style="background:${h.color}"></span>
+          ${h.no}번 ${h.name}
+        </span>
+      </div>
+    `).join('');
+    wrap.appendChild(page);
+  }
 
-  // 모든 페이지가 다 보이게 줄바꿈 처리
-wrap.style.display='flex';
-wrap.style.flexWrap='wrap';
-wrap.style.gap='8px';
-wrap.style.width='auto';
-wrap.style.transform='none';
-
-  // 제목 텍스트
   const title = (mapMode==='oval') ? `현재 순위 (총 ${laps}바퀴)` : `현재 순위 (${dist}m 달리기)`;
   $rankingBox.querySelector('h3').textContent = title;
 }
-
+  
 /* ====== 추첨 즉발 ====== */
 function maybeFireDraw(){
   if(!pendingDraw) return;
