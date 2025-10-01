@@ -475,6 +475,8 @@ function confettiBurst(){
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),3500);
   }
+}   // ✅ confettiBurst 끝나는 괄호
+
 function celebrate(winnerText){
   // WINNER 텍스트 유지
   document.querySelector('#celebrate .title').textContent = 'WINNER~';
@@ -483,7 +485,7 @@ function celebrate(winnerText){
 
   // ✅ 내가 만든 우승 이미지 추가
   const img = document.createElement('img');
-  img.src = 'GPThorse.png';   // 업로드한 파일 이름
+  img.src = 'GPThorse.png';
   img.alt = 'Winner Horse';
   img.style.width = '350px';     
   img.style.marginBottom = '12px';
