@@ -76,10 +76,36 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
   flex:0 0 260px;            /* ← flex-wrap 시 칼럼 폭 고정 */
   transition:transform .3s ease;
 }
-.rank-block .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px;line-height:24px;height:24px}
-.rank-block .row:nth-child(odd){background:rgba(255,255,255,.03)}
-.pos{font-weight:900;color:#6ee7ff}
-.color-badge{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;border:1px solid #1f2937}
+.rank-block .row{
+  display:flex;
+  align-items:center;  /* 세로 가운데 정렬 */
+  gap:8px;             /* 칸 간격 최소화 (필요하면 6px로 줄여도 됨) */
+  padding:2px 6px;
+  border-radius:6px;
+  line-height:24px;
+  height:24px;
+  /* justify-content:space-between;  ← 이 줄 삭제 */
+}
+
+.rank-block .row:nth-child(odd){
+  background:rgba(255,255,255,.03)
+}
+
+.pos{
+  font-weight:900;
+  color:#6ee7ff;
+  min-width:34px;      /* ← "1위" 같은 숫자 영역 고정폭 */
+  text-align:right;
+}
+
+.color-badge{
+  display:inline-block;
+  width:10px;height:10px;
+  border-radius:50%;
+  margin-right:4px;    /* ← 기존 6px → 4px, 더 타이트 */
+  vertical-align:middle;
+  border:1px solid #1f2937
+}
 
 /* 헤더 */
 header{position:absolute;inset:auto 0 0 0;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(0,0,0,.5);z-index:30}
