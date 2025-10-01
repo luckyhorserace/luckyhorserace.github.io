@@ -351,8 +351,8 @@ function buildHorses(list){
   const trackY = (vb.height - trackH) / 2;
 
   // 말 위치 (트랙 아래부터 랜덤하게)
-  const laneGap = 40;
-  const y = trackY + trackH - 60 - (i * laneGap) + (_rand() * laneGap * 0.5);
+const laneGap = 40;
+const y = trackY + laneGap * (i + 0.5) + (_rand() - 0.5) * 10;
 
   H.push({
     name: ent.name, no: ent.no, color, $el: el,
@@ -667,9 +667,10 @@ function run(){
 
         h.x += h.speed*dt*SPEED_GLOBAL;
         if(h.x >= dist){
-          h.x = dist; // 결승선에서 정지
-          h.done = true;
-        }
+  h.x = dist; // 결승선에서 정지
+  h.speed = 0; // 🔧 속도도 0으로 고정!
+  h.done = true;
+}
       }
 
       if(!h._finished && h.done){
