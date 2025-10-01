@@ -497,8 +497,25 @@ function celebrate(winnerText){
   document.querySelector('#celebrate .title').textContent = 'WINNER~';
   document.querySelectorAll('#celebrate .subtitle')[0].textContent = '이맛에 달린다~';
 
-  // ✅ 우승자 텍스트
-  document.getElementById('celeHorse').textContent = winnerText || '';
+  // ✅ 우승자 데이터 가져오기
+  const winner = finishOrder[0]; // 1등 확정된 말
+  const text = winner ? `우승: ${winner.no}번 ${winner.name}` : (winnerText || '');
+  document.getElementById('celeHorse').textContent = text;
+
+  // ✅ 말/기수 색상 배지 표시
+  if (winner) {
+    const badge = document.createElement('div');
+    badge.innerHTML = `
+      <span style="display:inline-block;width:16px;height:16px;border-radius:50%;
+                   background:${winner.color};border:2px solid #222;margin-right:8px"></span>
+      <strong style="color:${winner.color}">기수 색상</strong>
+    `;
+    // 중복 방지
+    const oldBadge = document.querySelector('#celebrate .winner-badge');
+    if (oldBadge) oldBadge.remove();
+    badge.classList.add('winner-badge');
+    document.getElementById('celebrate').appendChild(badge);
+  }
 
   // ✅ 우승 이미지 추가
   const img = document.createElement('img');
