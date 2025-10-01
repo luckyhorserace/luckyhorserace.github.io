@@ -60,13 +60,22 @@ button,a.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-w
 
 /* 순위판 (10명 단위 페이징) */
 .ranking{
-  position:absolute;top:38px;right:12px;
-  width:260px;height:calc(10*24px + 8px);
-  background:rgba(8,18,34,.78);border:1px solid #2a3b54;border-radius:10px;padding:8px;
-  z-index:25;font-size:13px;overflow:hidden;
+  position:absolute; top:38px; right:12px;
+  width:auto;                 /* ← 고정폭 해제 */
+  max-width:min(92vw, 560px); /* ← 한 화면에 두세 칼럼까지 확장 */
+  height:auto;                /* ← 고정높이 해제 */
+  background:rgba(8,18,34,.78);
+  border:1px solid #2a3b54; border-radius:10px; padding:8px;
+  z-index:25; font-size:13px; overflow:visible; /* ← 잘림 해제 */
 }
-.ranking h3{margin:0 0 4px;font-size:13px;color:#93c5fd;text-align:right}
-.rank-block{width:100%;transition:transform .3s ease}
+.ranking h3{margin:0 0 6px; font-size:13px; color:#93c5fd; text-align:right}
+
+/* 순위 블록: 가로 260px로 고정해 칼럼처럼 줄바꿈되게 */
+.rank-block{
+  width:260px;               /* ← 핵심! */
+  flex:0 0 260px;            /* ← flex-wrap 시 칼럼 폭 고정 */
+  transition:transform .3s ease;
+}
 .rank-block .row{display:flex;justify-content:space-between;padding:2px 6px;border-radius:6px;line-height:24px;height:24px}
 .rank-block .row:nth-child(odd){background:rgba(255,255,255,.03)}
 .pos{font-weight:900;color:#6ee7ff}
